@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+		classpath 'com.github.abrarsyed.gmcp:GMCP:latest.integration'
+    }
+}
+
+apply plugin: "gmcp"
+
+group = 'net.dries007.holoInventory'
+version = "0.1"
+archivesBaseName = 'HoloInventory'
+minecraft {
+	minecraftVersion = "1.6.4"
+}
+
+processResources
+{
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.minecraftVersion
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude '**/*.info'
+    }
+}
+// because the normal default jar task has been modified to be obfuscated
+task deobfJar(type: Jar) {
+	from sourceSets.main.output
+	appendix = 'dev'
+}
+
+artifacts {
+	archives deobfJar
+}
