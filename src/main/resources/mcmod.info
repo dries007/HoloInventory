@@ -1,0 +1,16 @@
+[
+{
+  "modid": "HoloInventory",
+  "name": "HoloInventory",
+  "description": "Holographic inventory screens!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/dries007/HoloInventory",
+  "updateUrl": "",
+  "authors": ["Dries007"],
+  "credits": "Morton for textures",
+  "logoFile": "HoloInventory.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
