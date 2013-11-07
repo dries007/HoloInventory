@@ -38,7 +38,6 @@ public class ClientPacketHandler implements IPacketHandler
     @Override
     public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player)
     {
-        System.out.println("Got!");
         try
         {
             ByteArrayInputStream streambyte = new ByteArrayInputStream(packet.data);

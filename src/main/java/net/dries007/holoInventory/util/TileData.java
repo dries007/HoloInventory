@@ -54,7 +54,7 @@ public class TileData
 
     public boolean isOld(World world, EntityPlayer player)
     {
-        return world.getTotalWorldTime() > playerSet.get(player) + 20 * 10;
+        return world.getTotalWorldTime() > playerSet.get(player) + 20 * 1; //TODO: Debug, add config for this
     }
 
     public Packet getPacket()

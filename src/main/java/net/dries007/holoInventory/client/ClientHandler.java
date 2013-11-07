@@ -23,15 +23,46 @@
 
 package net.dries007.holoInventory.client;
 
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraftforge.common.MinecraftForge;
 
 public class ClientHandler
 {
     public final Renderer renderer;
+    public final RenderItem itemRenderer = new RenderItem()
+    {
+        @Override
+        public void doRenderItem(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
+        {
+            try
+            {
+                super.doRenderItem(par1EntityItem, par2, par4, par6, par8, par9);
+            }
+            catch (Exception e)
+            {
+                //e.printStackTrace();
+            }
+        }
+
+        @Override
+        public boolean shouldBob()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean shouldSpreadItems()
+        {
+            return false;
+        }
+    };
 
     public ClientHandler()
     {
         renderer = new Renderer();
+        itemRenderer.setRenderManager(RenderManager.instance);
     }
 
     public void init()

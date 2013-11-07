@@ -23,8 +23,11 @@
 
 package net.dries007.holoInventory.util;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraftforge.common.ForgeDirection;
 
 public class Coord
 {
@@ -63,6 +66,16 @@ public class Coord
         this.x = coord.getInteger("x");
         this.y = coord.getInteger("y");
         this.z = coord.getInteger("z");
+    }
+
+    public Coord offset(int side)
+    {
+        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        this.x =+ dir.offsetX;
+        this.y =+ dir.offsetY;
+        this.z =+ dir.offsetZ;
+
+        return this;
     }
 
     public int hashCode()

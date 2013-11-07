@@ -61,12 +61,10 @@ public class TickHandler implements ITickHandler
         MovingObjectPosition mo = getPlayerLookingSpot(player);
         if (mo != null && mo.typeOfHit == EnumMovingObjectType.TILE)
         {
-
             Coord coord = new Coord(world.provider.dimensionId, mo);
             TileEntity te = world.getBlockTileEntity(coord.x, coord.y, coord.z);
             if (te != null && te instanceof IInventory)
             {
-
                 TileData tileData = temp.get(coord);
                 if (tileData == null || tileData.isOld(world, player))
                 {
