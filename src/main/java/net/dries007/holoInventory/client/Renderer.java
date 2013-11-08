@@ -50,7 +50,7 @@ import java.util.HashMap;
 
 public class Renderer
 {
-    public              HashMap<Coord, ItemStack[]> temp  = new HashMap<Coord, ItemStack[]>();
+    public HashMap<Coord, ItemStack[]> temp = new HashMap<Coord, ItemStack[]>();
 
     @ForgeSubscribe
     public void renderEvent(RenderWorldLastEvent event)
@@ -62,34 +62,41 @@ public class Renderer
             Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
             if (temp.containsKey(coord))
             {
+                ItemStack[] itemStacks = temp.get(coord);
+                if (itemStacks.length == 0) return;
                 double distance = distance(coord);
-                if (distance < 1.7) return;
+                if (distance < 2) return;
                 GL11.glPushMatrix();
-                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+                //GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glTranslated(coord.x + 0.5 - RenderManager.renderPosX,
                         coord.y + 0.5 - RenderManager.renderPosY,
                         coord.z + 0.5 - RenderManager.renderPosZ);
-                GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-                GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
+                GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
                 GL11.glTranslated(0, 0, -1);
 
                 float timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
                 EntityItem customitem = new EntityItem(mc.theWorld);
                 customitem.hoverStart = 0f;
-                ItemStack[] itemStacks = temp.get(coord);
-                int maxCollums = itemStacks.length >= 9 ? 9 : itemStacks.length;
+
+                int maxCollums = 9;
                 int maxRows = itemStacks.length / 9;
-                float blockScale = (float) (0.6f * distance * (1.3f / maxCollums));
+                if (itemStacks.length % 9 == 0) maxRows--;
+                float blockScale = 0.2f + (float) (0.1f * distance);
                 float maxWith = maxCollums * blockScale * 0.7f * 0.4f;
-                float maxHeight = maxRows * blockScale * 0.7f * 0.3f;
+                float maxHeight = maxRows * blockScale * 0.7f * 0.4f;
+
+                renderbox(blockScale, maxWith, maxHeight);
 
                 int collum = 0, row = 0;
                 for (ItemStack item : itemStacks)
                 {
                     GL11.glPushMatrix();
-                    GL11.glTranslatef(maxWith - (collum * blockScale * 0.6f),maxHeight - (row * blockScale * 0.6f),0f);
-                    renderbox(blockScale, maxWith, collum, maxHeight, row);
+                    GL11.glDisable(GL11.GL_DEPTH_TEST);
+                    GL11.glTranslatef(maxWith - ((collum + 0.2f) * blockScale * 0.6f),
+                            maxHeight - ((row + 0.05f) * blockScale * 0.6f),
+                            0f);
                     GL11.glScalef(blockScale, blockScale, blockScale);
                     GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
                     customitem.setEntityItemStack(item);
@@ -103,16 +110,6 @@ public class Renderer
                     }
                 }
 
-                while (collum != 0)
-                {
-                    GL11.glPushMatrix();
-                    GL11.glTranslatef(maxWith - (collum * blockScale * 0.6f),maxHeight - (row * blockScale * 0.6f),0f);
-                    renderbox(blockScale, maxWith, collum, maxHeight, row);
-                    GL11.glPopMatrix();
-                    collum ++;
-                    if (collum == 9) collum = 0;
-                }
-
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glPopMatrix();
@@ -120,28 +117,33 @@ public class Renderer
         }
     }
 
-    //TODO: Fix config settings
-    public void renderbox(float blockScale, float maxWith, int collum, float maxHeight, int row)
+    public void renderbox(float blockScale, float maxWith, float maxHeight)
     {
         if (!HoloInventory.instance.config.colorEnable) return;
+
+        GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glColor3f(HoloInventory.instance.config.colorR, HoloInventory.instance.config.colorG, HoloInventory.instance.config.colorB);
+        GL11.glEnable(GL_BLEND);
+        //GL11.glTranslatef(maxWith, maxHeight, 0);
+
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL11.GL_QUADS);
+        tess.setColorRGBA(HoloInventory.instance.config.colorR,HoloInventory.instance.config.colorG,HoloInventory.instance.config.colorB, HoloInventory.instance.config.colorAlpha);
         double d = blockScale/3;
-        tess.addVertex(-d, d, 0);
-        tess.addVertex(d, d, 0);
-        tess.addVertex(d, -d, 0);
-        tess.addVertex(-d, -d, 0);
+        tess.addVertex(maxWith + d, - d - maxHeight, 0);
+        tess.addVertex(-maxWith - d, -d - maxHeight, 0);
+        tess.addVertex(-maxWith - d, d + maxHeight, 0);
+        tess.addVertex(maxWith + d, d + maxHeight, 0);
         tess.draw();
+        GL11.glDisable(GL_BLEND);
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPopMatrix();
     }
-
 
     public double distance(Coord coord)
     {
