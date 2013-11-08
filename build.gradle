@@ -14,6 +14,7 @@ version = "0.1"
 archivesBaseName = 'HoloInventory'
 minecraft {
 	minecraftVersion = "1.6.4"
+    accessTransformers += 'src/main/resources/devcapes.at'
 }
 
 processResources
