@@ -45,12 +45,12 @@ import org.lwjgl.opengl.GL12;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import java.awt.*;
 import java.util.HashMap;
 
 public class Renderer
 {
     public              HashMap<Coord, ItemStack[]> temp  = new HashMap<Coord, ItemStack[]>();
-    public static final ResourceLocation            slot = new ResourceLocation("holoinventory:textures/slot.png");
 
     @ForgeSubscribe
     public void renderEvent(RenderWorldLastEvent event)
@@ -88,11 +88,10 @@ public class Renderer
                 for (ItemStack item : itemStacks)
                 {
                     GL11.glPushMatrix();
-
+                    GL11.glTranslatef(maxWith - (collum * blockScale * 0.6f),maxHeight - (row * blockScale * 0.6f),0f);
                     renderbox(blockScale, maxWith, collum, maxHeight, row);
-
-                    GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
                     GL11.glScalef(blockScale, blockScale, blockScale);
+                    GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
                     customitem.setEntityItemStack(item);
                     HoloInventory.instance.clientHandler.itemRenderer.doRenderItem(customitem, 0, 0, 0, 0, 0);
                     GL11.glPopMatrix();
@@ -103,14 +102,17 @@ public class Renderer
                         row ++;
                     }
                 }
+
                 while (collum != 0)
                 {
                     GL11.glPushMatrix();
+                    GL11.glTranslatef(maxWith - (collum * blockScale * 0.6f),maxHeight - (row * blockScale * 0.6f),0f);
                     renderbox(blockScale, maxWith, collum, maxHeight, row);
                     GL11.glPopMatrix();
                     collum ++;
                     if (collum == 9) collum = 0;
                 }
+
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glPopMatrix();
@@ -118,12 +120,15 @@ public class Renderer
         }
     }
 
+    //TODO: Fix config settings
     public void renderbox(float blockScale, float maxWith, int collum, float maxHeight, int row)
     {
-        GL11.glTranslatef(maxWith - (collum * blockScale * 0.6f),maxHeight - (row * blockScale * 0.6f),0f);
-
+        if (!HoloInventory.instance.config.colorEnable) return;
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glColor3f(HoloInventory.instance.config.colorR, HoloInventory.instance.config.colorG, HoloInventory.instance.config.colorB);
         Tessellator tess = Tessellator.instance;
-        Minecraft.getMinecraft().getTextureManager().bindTexture(slot);
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL11.GL_QUADS);
         double d = blockScale/3;
@@ -132,7 +137,11 @@ public class Renderer
         tess.addVertex(d, -d, 0);
         tess.addVertex(-d, -d, 0);
         tess.draw();
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
+
 
     public double distance(Coord coord)
     {

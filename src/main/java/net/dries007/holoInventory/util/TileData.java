@@ -24,6 +24,7 @@
 package net.dries007.holoInventory.util;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
+import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -52,9 +53,10 @@ public class TileData
         this.te = te;
     }
 
+    //TODO: Implement removing of tiledatas on client
     public boolean isOld(World world, EntityPlayer player)
     {
-        return world.getTotalWorldTime() > playerSet.get(player) + 20 * 1; //TODO: Debug, add config for this
+        return world.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.instance.config.syncFreq;
     }
 
     public Packet getPacket()
