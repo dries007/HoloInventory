@@ -2,9 +2,9 @@
 
 Adds Holographic inventory screen for all blocks with an inventory.
 
-WIP, no release yet. You can build with gradle.
+[Click for the latest download.](http://jenkins.dries007.net/job/HoloInventory/)
 
-Based on idea of [this reddit](http://www.reddit.com/r/Minecraft/comments/1prvo4) thread by [aleqsio](http://www.reddit.com/user/aleqsio).
+Based on idea of [this reddit thread](http://www.reddit.com/r/Minecraft/comments/1prvo4) by [aleqsio](http://www.reddit.com/user/aleqsio).
 
 (c) Copyright  Dries007.net 2013
 
