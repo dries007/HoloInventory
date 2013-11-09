@@ -53,7 +53,6 @@ public class TileData
         this.te = te;
     }
 
-    //TODO: Implement removing of tiledatas on client
     public boolean isOld(World world, EntityPlayer player)
     {
         return world.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.instance.config.syncFreq;

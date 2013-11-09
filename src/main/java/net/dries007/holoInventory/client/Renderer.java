@@ -62,13 +62,12 @@ public class Renderer
             Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
             if (temp.containsKey(coord))
             {
+                // Move to right position and rotate to face the player
                 ItemStack[] itemStacks = temp.get(coord);
                 if (itemStacks.length == 0) return;
                 double distance = distance(coord);
                 if (distance < 2) return;
                 GL11.glPushMatrix();
-                //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                //GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glTranslated(coord.x + 0.5 - RenderManager.renderPosX,
                         coord.y + 0.5 - RenderManager.renderPosY,
                         coord.z + 0.5 - RenderManager.renderPosZ);
@@ -76,6 +75,7 @@ public class Renderer
                 GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
                 GL11.glTranslated(0, 0, -1);
 
+                // Calculate angle based on time (so items rotate)
                 float timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
                 EntityItem customitem = new EntityItem(mc.theWorld);
                 customitem.hoverStart = 0f;
@@ -87,8 +87,10 @@ public class Renderer
                 float maxWith = maxCollums * blockScale * 0.7f * 0.4f;
                 float maxHeight = maxRows * blockScale * 0.7f * 0.4f;
 
+                // Render the BG
                 renderbox(blockScale, maxWith, maxHeight);
 
+                // Render items
                 int collum = 0, row = 0;
                 for (ItemStack item : itemStacks)
                 {
@@ -110,6 +112,32 @@ public class Renderer
                     }
                 }
 
+                // Render stacksizes
+                collum = 0;
+                row = 0;
+                for (ItemStack item : itemStacks)
+                {
+                    GL11.glPushMatrix();
+                    GL11.glDisable(GL11.GL_DEPTH_TEST);
+                    GL11.glTranslatef(maxWith - ((collum + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
+                    GL11.glScalef(blockScale, blockScale, blockScale);
+                    GL11.glScalef(0.03f, 0.03f, 0.03f);
+                    GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
+                    GL11.glTranslatef(-1f, 1f, 0f);
+                    if (item.stackSize < 10) GL11.glTranslatef(6f, 0f, 0f);
+                    if (item.stackSize > 99) GL11.glTranslatef(-6f, 0f, 0f);
+                    if (item.stackSize > 999) GL11.glTranslatef(6f, 0f, 0f);
+                    if (item.stackSize > 9999) GL11.glTranslatef(-6f, 0f, 0f);
+                    RenderManager.instance.getFontRenderer().drawString(item.stackSize > 999 ? item.stackSize/1000 + "K" : item.stackSize + "", 0, 0, 255 + (255 << 8) + (255 << 16) + (170 << 24), true);
+                    GL11.glDisable(GL_BLEND);
+                    GL11.glPopMatrix();
+                    collum ++;
+                    if (collum >= 9)
+                    {
+                        collum = 0;
+                        row ++;
+                    }
+                }
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glPopMatrix();
