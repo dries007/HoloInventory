@@ -10,7 +10,7 @@ buildscript {
 apply plugin: "gmcp"
 
 group = 'net.dries007.holoInventory'
-version = "0.1"
+version = "1.0"
 archivesBaseName = 'HoloInventory'
 minecraft {
 	minecraftVersion = "1.6.4"
