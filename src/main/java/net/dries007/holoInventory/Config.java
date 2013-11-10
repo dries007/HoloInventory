@@ -25,8 +25,6 @@ package net.dries007.holoInventory;
 
 import net.minecraftforge.common.Configuration;
 
-import javax.swing.plaf.synth.ColorType;
-import java.awt.*;
 import java.io.File;
 
 import static net.dries007.holoInventory.util.Data.MODID;
@@ -39,7 +37,7 @@ public class Config
     public final int           colorR;
     public final int           colorG;
     public final int           colorB;
-    public       int           syncFreq;
+    public final int           syncFreq;
 
     public Config(File file)
     {
@@ -48,10 +46,10 @@ public class Config
         configuration.addCustomCategoryComment(MODID, "All our settings are in here, as you might expect...");
 
         colorEnable = configuration.get(MODID, "colorEnable", false, "Enable a BG color").getBoolean(false);
-        colorAlpha = configuration.get(MODID, "colorAlpha", 192, "The BG transparancy (0-255)").getInt();
-        colorR = configuration.get(MODID, "colorR", 126, "0-255").getInt();
-        colorG = configuration.get(MODID, "colorG", 225, "0-255").getInt();
-        colorB = configuration.get(MODID, "colorB", 252, "0-255").getInt();
+        colorAlpha = configuration.get(MODID, "colorAlpha", 200, "The BG transparancy (0-255)").getInt();
+        colorR = configuration.get(MODID, "colorRed", 14, "0-255").getInt();
+        colorG = configuration.get(MODID, "colorGreen", 157, "0-255").getInt();
+        colorB = configuration.get(MODID, "colorBlue", 196, "0-255").getInt();
 
         syncFreq = configuration.get(MODID, "syncFreq", 5, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 

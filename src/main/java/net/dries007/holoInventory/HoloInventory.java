@@ -30,12 +30,12 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.client.ClientPacketHandler;
+import net.dries007.holoInventory.client.Glasses;
 import net.dries007.holoInventory.lib.developercapes.DevCapesUtil;
 import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;
 
-import static net.dries007.holoInventory.util.Data.CAPES;
-import static net.dries007.holoInventory.util.Data.MODID;
+import static net.dries007.holoInventory.util.Data.*;
 
 @NetworkMod(channels = {MODID},
         clientPacketHandlerSpec = @NetworkMod.SidedPacketHandler(channels = {MODID},
@@ -57,6 +57,7 @@ public class HoloInventory
     {
         config = new Config(event.getSuggestedConfigurationFile());
         DevCapesUtil.addFileUrl(CAPES);
+        Glasses.addFileUrl(GLASSES);
 
         if (event.getSide().isClient()) clientHandler = new ClientHandler();
         serverHandler = new ServerHandler();

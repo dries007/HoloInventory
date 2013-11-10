@@ -26,34 +26,31 @@ package net.dries007.holoInventory.client;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Coord;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumMovingObjectType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import static org.lwjgl.opengl.GL11.*;
-
-import java.awt.*;
 import java.util.HashMap;
 
 public class Renderer
 {
-    public HashMap<Coord, ItemStack[]> temp = new HashMap<Coord, ItemStack[]>();
-
     @ForgeSubscribe
     public void renderEvent(RenderWorldLastEvent event)
+    {
+        renderHologram();
+    }
+
+    public static final HashMap<Coord, ItemStack[]> temp = new HashMap<>();
+
+    public void renderHologram()
     {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -68,9 +65,7 @@ public class Renderer
                 double distance = distance(coord);
                 if (distance < 2) return;
                 GL11.glPushMatrix();
-                GL11.glTranslated(coord.x + 0.5 - RenderManager.renderPosX,
-                        coord.y + 0.5 - RenderManager.renderPosY,
-                        coord.z + 0.5 - RenderManager.renderPosZ);
+                GL11.glTranslated(coord.x + 0.5 - RenderManager.renderPosX, coord.y + 0.5 - RenderManager.renderPosY, coord.z + 0.5 - RenderManager.renderPosZ);
                 GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
                 GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
                 GL11.glTranslated(0, 0, -1);
@@ -88,7 +83,7 @@ public class Renderer
                 float maxHeight = maxRows * blockScale * 0.7f * 0.4f;
 
                 // Render the BG
-                renderbox(blockScale, maxWith, maxHeight);
+                renderBG(blockScale, maxWith, maxHeight);
 
                 // Render items
                 int collum = 0, row = 0;
@@ -96,19 +91,17 @@ public class Renderer
                 {
                     GL11.glPushMatrix();
                     GL11.glDisable(GL11.GL_DEPTH_TEST);
-                    GL11.glTranslatef(maxWith - ((collum + 0.2f) * blockScale * 0.6f),
-                            maxHeight - ((row + 0.05f) * blockScale * 0.6f),
-                            0f);
+                    GL11.glTranslatef(maxWith - ((collum + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
                     GL11.glScalef(blockScale, blockScale, blockScale);
                     GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
                     customitem.setEntityItemStack(item);
                     HoloInventory.instance.clientHandler.itemRenderer.doRenderItem(customitem, 0, 0, 0, 0, 0);
                     GL11.glPopMatrix();
-                    collum ++;
+                    collum++;
                     if (collum >= 9)
                     {
                         collum = 0;
-                        row ++;
+                        row++;
                     }
                 }
 
@@ -128,14 +121,18 @@ public class Renderer
                     if (item.stackSize > 99) GL11.glTranslatef(-6f, 0f, 0f);
                     if (item.stackSize > 999) GL11.glTranslatef(6f, 0f, 0f);
                     if (item.stackSize > 9999) GL11.glTranslatef(-6f, 0f, 0f);
-                    RenderManager.instance.getFontRenderer().drawString(item.stackSize > 999 ? item.stackSize/1000 + "K" : item.stackSize + "", 0, 0, 255 + (255 << 8) + (255 << 16) + (170 << 24), true);
-                    GL11.glDisable(GL_BLEND);
+                    RenderManager.instance.getFontRenderer().drawString(item.stackSize > 999 ? item.stackSize / 1000 + "K" : item.stackSize + "",
+                            0,
+                            0,
+                            255 + (255 << 8) + (255 << 16) + (170 << 24),
+                            true);
+                    GL11.glDisable(GL11.GL_BLEND);
                     GL11.glPopMatrix();
-                    collum ++;
+                    collum++;
                     if (collum >= 9)
                     {
                         collum = 0;
-                        row ++;
+                        row++;
                     }
                 }
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
@@ -145,7 +142,7 @@ public class Renderer
         }
     }
 
-    public void renderbox(float blockScale, float maxWith, float maxHeight)
+    public void renderBG(float blockScale, float maxWith, float maxHeight)
     {
         if (!HoloInventory.instance.config.colorEnable) return;
 
@@ -153,20 +150,21 @@ public class Renderer
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL_BLEND);
-        //GL11.glTranslatef(maxWith, maxHeight, 0);
-
+        GL11.glEnable(GL11.GL_BLEND);
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL11.GL_QUADS);
-        tess.setColorRGBA(HoloInventory.instance.config.colorR,HoloInventory.instance.config.colorG,HoloInventory.instance.config.colorB, HoloInventory.instance.config.colorAlpha);
-        double d = blockScale/3;
-        tess.addVertex(maxWith + d, - d - maxHeight, 0);
+        tess.setColorRGBA(HoloInventory.instance.config.colorR,
+                HoloInventory.instance.config.colorG,
+                HoloInventory.instance.config.colorB,
+                HoloInventory.instance.config.colorAlpha);
+        double d = blockScale / 3;
+        tess.addVertex(maxWith + d, -d - maxHeight, 0);
         tess.addVertex(-maxWith - d, -d - maxHeight, 0);
         tess.addVertex(-maxWith - d, d + maxHeight, 0);
         tess.addVertex(maxWith + d, d + maxHeight, 0);
         tess.draw();
-        GL11.glDisable(GL_BLEND);
+        GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -175,9 +173,9 @@ public class Renderer
 
     public double distance(Coord coord)
     {
-        return Math.sqrt(   (coord.x + 0.5 - RenderManager.renderPosX) * (coord.x + 0.5 - RenderManager.renderPosX)+
-                            (coord.y + 0.5 - RenderManager.renderPosY) * (coord.y + 0.5 - RenderManager.renderPosY)+
-                            (coord.z + 0.5 - RenderManager.renderPosZ) * (coord.z + 0.5 - RenderManager.renderPosZ));
+        return Math.sqrt((coord.x + 0.5 - RenderManager.renderPosX) * (coord.x + 0.5 - RenderManager.renderPosX) +
+                (coord.y + 0.5 - RenderManager.renderPosY) * (coord.y + 0.5 - RenderManager.renderPosY) +
+                (coord.z + 0.5 - RenderManager.renderPosZ) * (coord.z + 0.5 - RenderManager.renderPosZ));
     }
 
     public void read(NBTTagCompound tag)
