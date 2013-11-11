@@ -65,15 +65,26 @@ public class TickHandler implements ITickHandler
             TileEntity te = world.getBlockTileEntity(coord.x, coord.y, coord.z);
             if (te != null && te instanceof IInventory)
             {
+                boolean empty = idEmpty((IInventory) te);
+                if (empty && !temp.containsKey(coord)) return;
                 TileData tileData = temp.get(coord);
-                if (tileData == null || tileData.isOld(world, player))
+                if (tileData == null || tileData.isOld(world, player) || empty)
                 {
                     tileData = new TileData(te, coord);
                     tileData.send(player);
                     temp.put(coord, tileData);
                 }
+                if (empty && temp.containsKey(coord)) temp.remove(coord);
             }
         }
+    }
+
+    private boolean idEmpty(IInventory te)
+    {
+        for (int i = 0; i < te.getSizeInventory(); i++)
+            if (te.getStackInSlot(i) != null) return false;
+
+        return true;
     }
 
     @Override
