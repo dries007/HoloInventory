@@ -2,13 +2,18 @@
 
 Adds Holographic inventory screen for all blocks with an inventory.
 
+[Screenshots?!](http://www.dries007.net/holoinventory/)
+
 [Click for the latest download.](http://jenkins.dries007.net/job/HoloInventory/)
 
 Based on idea of [this reddit thread](http://www.reddit.com/r/Minecraft/comments/1prvo4) by [aleqsio](http://www.reddit.com/user/aleqsio).
 
 (c) Copyright  Dries007.net 2013
 
-## Setup dev env:
+### Modpacks:
+All modpacks can distribute this mod on one condition: You use the official versions (provided by the download link above).
+
+### Setup dev env:
 
 - Install gradle
 - Run "gradle setupDevWorkspace" in the git repo (some steps seem to take forever, namely getAssets)
@@ -19,16 +24,16 @@ Based on idea of [this reddit thread](http://www.reddit.com/r/Minecraft/comments
 - Test your changes
 - Make a PR!
 
-## Intellij run configurations:
+### Intellij run configurations:
 Don't forget to make "minecraft/jars".
 
-### Client:
+#### Client:
 - net.minecraft.launchwrapper.Launch
 - -Djava.library.path=../natives -XX:-UseSplitVerifier
 - --version 1.6 --tweakClass cpw.mods.fml.common.launcher.FMLTweaker --username Dries007
 - $MODULE_DIR$/minecraft/jars
 
-### Server:
+#### Server:
 - cpw.mods.fml.relauncher.ServerLaunchWrapper
 - -XX:-UseSplitVerifier
 - (empty)
