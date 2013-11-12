@@ -24,7 +24,6 @@
 package net.dries007.holoInventory.util;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -101,17 +100,5 @@ public class Coord
             return this.x == coord.x && this.y == coord.y && this.z == coord.z && this.dim == coord.dim;
         }
         return false;
-    }
-
-    public NBTTagCompound toNBT()
-    {
-        NBTTagCompound root = new NBTTagCompound();
-
-        root.setInteger("dim", this.dim);
-        root.setInteger("x", this.x);
-        root.setInteger("y", this.y);
-        root.setInteger("z", this.z);
-
-        return root;
     }
 }

@@ -32,8 +32,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

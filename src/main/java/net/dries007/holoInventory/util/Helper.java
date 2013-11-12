@@ -23,8 +23,16 @@
 
 package net.dries007.holoInventory.util;
 
+import net.dries007.holoInventory.client.Renderer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,5 +68,40 @@ public class Helper
             par0DataInput.readFully(abyte);
             return CompressedStreamTools.decompress(abyte);
         }
+    }
+
+    public void read(NBTTagCompound tag)
+    {
+        NBTTagList list = tag.getTagList("list");
+        ItemStack[] itemStacks = new ItemStack[list.tagCount()];
+        for (int i = 0; i < list.tagCount(); i++)
+        {
+            itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
+        }
+        Renderer.dataMap.put(tag.getInteger("id"), itemStacks);
+    }
+
+    public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer)
+    {
+        float f = 1.0F;
+        float f1 = par2EntityPlayer.prevRotationPitch + (par2EntityPlayer.rotationPitch - par2EntityPlayer.prevRotationPitch) * f;
+        float f2 = par2EntityPlayer.prevRotationYaw + (par2EntityPlayer.rotationYaw - par2EntityPlayer.prevRotationYaw) * f;
+        double d0 = par2EntityPlayer.prevPosX + (par2EntityPlayer.posX - par2EntityPlayer.prevPosX) * (double) f;
+        double d1 = par2EntityPlayer.prevPosY + (par2EntityPlayer.posY - par2EntityPlayer.prevPosY) * (double) f + (double) (par2EntityPlayer.worldObj.isRemote ? par2EntityPlayer.getEyeHeight() - par2EntityPlayer.getDefaultEyeHeight() : par2EntityPlayer.getEyeHeight()); // isRemote check to revert changes to ray trace position due to adding the eye height clientside and player yOffset differences
+        double d2 = par2EntityPlayer.prevPosZ + (par2EntityPlayer.posZ - par2EntityPlayer.prevPosZ) * (double) f;
+        Vec3 vec3 = par2EntityPlayer.worldObj.getWorldVec3Pool().getVecFromPool(d0, d1, d2);
+        float f3 = MathHelper.cos(-f2 * 0.017453292F - (float) Math.PI);
+        float f4 = MathHelper.sin(-f2 * 0.017453292F - (float) Math.PI);
+        float f5 = -MathHelper.cos(-f1 * 0.017453292F);
+        float f6 = MathHelper.sin(-f1 * 0.017453292F);
+        float f7 = f4 * f5;
+        float f8 = f3 * f5;
+        double d3 = 5.0D;
+        if (par2EntityPlayer instanceof EntityPlayerMP)
+        {
+            d3 = ((EntityPlayerMP) par2EntityPlayer).theItemInWorldManager.getBlockReachDistance();
+        }
+        Vec3 vec31 = vec3.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
+        return par2EntityPlayer.worldObj.rayTraceBlocks_do_do(vec3, vec31, false, !false);
     }
 }

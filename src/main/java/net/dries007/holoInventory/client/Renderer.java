@@ -31,9 +31,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumMovingObjectType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
@@ -47,7 +44,8 @@ public class Renderer
     public void renderEvent(RenderWorldLastEvent event)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
+        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null)
+            return;
         Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)
         {
@@ -192,16 +190,5 @@ public class Renderer
         return Math.sqrt((coord.x + 0.5 - RenderManager.renderPosX) * (coord.x + 0.5 - RenderManager.renderPosX) +
                 (coord.y + 0.5 - RenderManager.renderPosY) * (coord.y + 0.5 - RenderManager.renderPosY) +
                 (coord.z + 0.5 - RenderManager.renderPosZ) * (coord.z + 0.5 - RenderManager.renderPosZ));
-    }
-
-    public void read(NBTTagCompound tag)
-    {
-        NBTTagList list = tag.getTagList("list");
-        ItemStack[] itemStacks = new ItemStack[list.tagCount()];
-        for (int i = 0; i < list.tagCount(); i++)
-        {
-            itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
-        }
-        dataMap.put(tag.getInteger("id"), itemStacks);
     }
 }
