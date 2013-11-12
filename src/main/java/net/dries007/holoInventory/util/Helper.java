@@ -70,7 +70,7 @@ public class Helper
         }
     }
 
-    public void read(NBTTagCompound tag)
+    public static void read(NBTTagCompound tag)
     {
         NBTTagList list = tag.getTagList("list");
         ItemStack[] itemStacks = new ItemStack[list.tagCount()];

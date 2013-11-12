@@ -43,7 +43,7 @@ public class ClientPacketHandler implements IPacketHandler
             ByteArrayInputStream streambyte = new ByteArrayInputStream(packet.data);
             DataInputStream stream = new DataInputStream(streambyte);
 
-            HoloInventory.instance.clientHandler.renderer.read(Helper.readNBTTagCompound(stream));
+            Helper.read(Helper.readNBTTagCompound(stream));
 
             stream.close();
             streambyte.close();

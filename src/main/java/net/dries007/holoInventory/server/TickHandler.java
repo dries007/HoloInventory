@@ -57,6 +57,7 @@ public class TickHandler implements ITickHandler
         WorldServer world = player.getServerForPlayer();
         if (world == null) return;
         MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
+
         if (mo != null)
         {
             switch (mo.typeOfHit)
@@ -78,7 +79,6 @@ public class TickHandler implements ITickHandler
                     System.out.println(mo.entityHit.entityId);
                     if (mo.entityHit instanceof IInventory)
                     {
-
                         doStuff(mo.entityHit.entityId, (IInventory) mo.entityHit, player);
                     }
                     break;
