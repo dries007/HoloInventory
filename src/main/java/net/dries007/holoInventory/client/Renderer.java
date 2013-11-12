@@ -47,10 +47,17 @@ public class Renderer
     public void renderEvent(RenderWorldLastEvent event)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != EnumMovingObjectType.TILE) return;
+        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
         Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
-        if (!temp.containsKey(coord)) return;
-
+        switch (mc.objectMouseOver.typeOfHit)
+        {
+            case TILE:
+                if (!dataMap.containsKey(coord.hashCode())) return;
+                break;
+            case ENTITY:
+                if (!dataMap.containsKey(mc.objectMouseOver.entityHit.entityId)) return;
+                break;
+        }
         try
         {
             renderHologram(mc, coord);
@@ -62,11 +69,11 @@ public class Renderer
         }
     }
 
-    public static final HashMap<Coord, ItemStack[]> temp = new HashMap<>();
+    public static final HashMap<Integer, ItemStack[]> dataMap = new HashMap<>();
 
     public void renderHologram(Minecraft mc, Coord coord) throws Exception
     {
-        final ItemStack[] itemStacks = temp.get(coord);
+        final ItemStack[] itemStacks = dataMap.get(coord.hashCode());
         if (itemStacks.length == 0) return;
         final double distance = distance(coord);
         if (distance < 2) return;
@@ -84,7 +91,7 @@ public class Renderer
         customitem.hoverStart = 0f;
 
         final int maxCollums = (itemStacks.length > 9) ? 9 : itemStacks.length;
-        final int maxRows = (itemStacks.length % 9 == 0) ? (itemStacks.length / 9) - 1: itemStacks.length / 9;
+        final int maxRows = (itemStacks.length % 9 == 0) ? (itemStacks.length / 9) - 1 : itemStacks.length / 9;
         final float blockScale = 0.2f + (float) (0.1f * distance);
         final float maxWith = maxCollums * blockScale * 0.7f * 0.4f;
         final float maxHeight = maxRows * blockScale * 0.7f * 0.4f;
@@ -189,13 +196,12 @@ public class Renderer
 
     public void read(NBTTagCompound tag)
     {
-        Coord coord = new Coord(tag.getCompoundTag("coord"));
         NBTTagList list = tag.getTagList("list");
         ItemStack[] itemStacks = new ItemStack[list.tagCount()];
         for (int i = 0; i < list.tagCount(); i++)
         {
             itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
         }
-        temp.put(coord, itemStacks);
+        dataMap.put(tag.getInteger("id"), itemStacks);
     }
 }

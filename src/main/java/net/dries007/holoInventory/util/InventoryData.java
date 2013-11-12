@@ -41,21 +41,21 @@ import java.util.HashMap;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-public class TileData
+public class InventoryData
 {
-    public Coord      coord;
-    public TileEntity te;
+    public int        id;
+    public IInventory te;
     public HashMap<EntityPlayer, Long> playerSet = new HashMap<>();
 
-    public TileData(TileEntity te, Coord coord)
+    public InventoryData(IInventory te, int id)
     {
-        this.coord = coord;
+        this.id = id;
         this.te = te;
     }
 
-    public boolean isOld(World world, EntityPlayer player)
+    public boolean isOld(EntityPlayer player)
     {
-        return world.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.instance.config.syncFreq;
+        return player.worldObj.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.instance.config.syncFreq;
     }
 
     public Packet getPacket()
@@ -79,14 +79,13 @@ public class TileData
     private NBTTagCompound toNBT()
     {
         NBTTagCompound root = new NBTTagCompound();
-        root.setCompoundTag("coord", this.coord.toNBT());
+        root.setInteger("id", this.id);
         NBTTagList list = new NBTTagList();
-        IInventory inventory = ((IInventory) te);
-        for (int i = 0; i < inventory.getSizeInventory(); i++)
+        for (int i = 0; i < te.getSizeInventory(); i++)
         {
-            if (inventory.getStackInSlot(i) != null)
+            if (te.getStackInSlot(i) != null)
             {
-                list.appendTag(inventory.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
+                list.appendTag(te.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
             }
         }
         root.setTag("list", list);

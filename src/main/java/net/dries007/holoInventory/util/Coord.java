@@ -24,6 +24,7 @@
 package net.dries007.holoInventory.util;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -45,9 +46,20 @@ public class Coord
     public Coord(int dim, MovingObjectPosition mop)
     {
         this.dim = dim;
-        this.x = mop.blockX;
-        this.y = mop.blockY;
-        this.z = mop.blockZ;
+
+        switch (mop.typeOfHit)
+        {
+            case TILE:
+                this.x = mop.blockX;
+                this.y = mop.blockY;
+                this.z = mop.blockZ;
+                break;
+            case ENTITY:
+                this.x = mop.entityHit.chunkCoordX;
+                this.y = mop.entityHit.chunkCoordY;
+                this.z = mop.entityHit.chunkCoordZ;
+                break;
+        }
     }
 
     public Coord(int hash)
@@ -78,7 +90,7 @@ public class Coord
 
     public int hashCode()
     {
-        return this.x + this.z << 8 + this.y << 16 + this.dim << 24;
+        return this.x + (this.z << 8) + (this.y << 16) + (this.dim << 24);
     }
 
     public boolean equals(Object obj)
