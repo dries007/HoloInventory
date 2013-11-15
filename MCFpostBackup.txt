@@ -11,6 +11,7 @@ To use this on a server, the server needs to have the mod.
 
 [u][size=5]News:[/size][/u]
 
+► Version 1.1: Added update checker, disableable in the config. ◄
 ► [url="http://www.dries007.net/holoinventory/?name=NoTextAndMultiple.png"]You can now toggle the rendering of the text and the multiple items per stack to indicate stack size. (Toggleable separately).[/url] ◄
 ► [url="http://www.dries007.net/holoinventory/?name=EnderChest.png"]JukeBoxes?! [/url] ◄
 ► [url="http://www.dries007.net/holoinventory/?name=JukeBox.png"]Enderchests?! [/url] ◄

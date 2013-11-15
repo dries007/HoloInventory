@@ -2,10 +2,8 @@
 
 Adds Holographic inventory screen for all blocks with an inventory.
 
-[Screenshots?!](http://www.dries007.net/holoinventory/)
-
+[Screenshots & Downloads](http://www.dries007.net/holoinventory/)
 Make sure to check the config file for options!
-[Click for the latest download.](http://jenkins.dries007.net/job/HoloInventory/)
 
 Based on idea of [this reddit thread](http://www.reddit.com/r/Minecraft/comments/1prvo4) by [aleqsio](http://www.reddit.com/user/aleqsio).
 
