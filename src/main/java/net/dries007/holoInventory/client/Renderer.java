@@ -112,7 +112,7 @@ public class Renderer
             translateAndScale(blockScale, collum, maxWith, row, maxHeight);
             GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
             customitem.setEntityItemStack(item);
-            HoloInventory.instance.clientHandler.itemRenderer.doRenderItem(customitem, 0, 0, 0, 0, 0);
+            ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
             GL11.glPopMatrix();
             collum++;
             if (collum >= 9)

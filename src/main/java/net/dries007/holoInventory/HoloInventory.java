@@ -24,6 +24,7 @@
 package net.dries007.holoInventory;
 
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -52,6 +53,9 @@ public class HoloInventory
     public ClientHandler clientHandler;
     public ServerHandler serverHandler;
 
+    @Mod.Metadata
+    private ModMetadata metadata;
+
     @Mod.EventHandler()
     public void fmlEvent(FMLPreInitializationEvent event)
     {
@@ -74,5 +78,10 @@ public class HoloInventory
     public void fmlEvent(FMLServerStartingEvent event)
     {
         serverHandler.init();
+    }
+
+    public String getVersion()
+    {
+        return metadata.version;
     }
 }

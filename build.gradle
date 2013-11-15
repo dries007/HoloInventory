@@ -11,7 +11,7 @@ apply plugin: "gmcp"
 
 group = 'net.dries007.holoInventory'
 ext.env = System.getenv()
-version = "1.0." + env.BUILD_NUMBER
+version = new File('version.txt').text + env.BUILD_NUMBER
 archivesBaseName = 'HoloInventory'
 minecraft {
 	minecraftVersion = "1.6.4"

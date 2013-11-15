@@ -40,6 +40,7 @@ public class Config
     public final int           syncFreq;
     public final boolean       renderText;
     public final boolean       renderMultiple;
+    public final boolean       doVersioncheck;
 
     public Config(File file)
     {
@@ -55,6 +56,8 @@ public class Config
 
         renderText = configuration.get(MODID, "renderText", true, "Render the stacksize as text on top of the items").getBoolean(true);
         renderMultiple = configuration.get(MODID, "renderMultiple", true, "Render multiple items depending on stacksize").getBoolean(true);
+
+        doVersioncheck = configuration.get(MODID, "doVersioncheck", true).getBoolean(true);
 
         syncFreq = configuration.get(MODID, "syncFreq", 5, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
