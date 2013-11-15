@@ -101,6 +101,12 @@ public class Renderer
         int collum = 0, row = 0;
         for (ItemStack item : itemStacks)
         {
+            if (!HoloInventory.instance.config.renderMultiple)
+            {
+                item = item.copy();
+                item.stackSize = 1;
+            }
+
             GL11.glPushMatrix();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
             translateAndScale(blockScale, collum, maxWith, row, maxHeight);
@@ -119,30 +125,36 @@ public class Renderer
         // Render stacksizes
         collum = 0;
         row = 0;
-        for (ItemStack item : itemStacks)
+        if (HoloInventory.instance.config.renderText)
         {
-            GL11.glPushMatrix();
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            translateAndScale(blockScale, collum, maxWith, row, maxHeight);
-            GL11.glScalef(0.03f, 0.03f, 0.03f);
-            GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
-            GL11.glTranslatef(-1f, 1f, 0f);
-            if (item.stackSize < 10) GL11.glTranslatef(6f, 0f, 0f);
-            if (item.stackSize > 99) GL11.glTranslatef(-6f, 0f, 0f);
-            if (item.stackSize > 999) GL11.glTranslatef(6f, 0f, 0f);
-            if (item.stackSize > 9999) GL11.glTranslatef(-6f, 0f, 0f);
-            RenderManager.instance.getFontRenderer().drawString(item.stackSize > 999 ? item.stackSize / 1000 + "K" : item.stackSize + "",
-                    0,
-                    0,
-                    255 + (255 << 8) + (255 << 16) + (170 << 24),
-                    true);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glPopMatrix();
-            collum++;
-            if (collum >= 9)
+            for (ItemStack item : itemStacks)
             {
-                collum = 0;
-                row++;
+                if (item.getMaxStackSize() != 1)
+                {
+                    GL11.glPushMatrix();
+                    GL11.glDisable(GL11.GL_DEPTH_TEST);
+                    translateAndScale(blockScale, collum, maxWith, row, maxHeight);
+                    GL11.glScalef(0.03f, 0.03f, 0.03f);
+                    GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
+                    GL11.glTranslatef(-1f, 1f, 0f);
+                    if (item.stackSize < 10) GL11.glTranslatef(6f, 0f, 0f);
+                    if (item.stackSize > 99) GL11.glTranslatef(-6f, 0f, 0f);
+                    if (item.stackSize > 999) GL11.glTranslatef(6f, 0f, 0f);
+                    if (item.stackSize > 9999) GL11.glTranslatef(-6f, 0f, 0f);
+                    RenderManager.instance.getFontRenderer().drawString(item.stackSize > 999 ? item.stackSize / 1000 + "K" : item.stackSize + "",
+                            0,
+                            0,
+                            255 + (255 << 8) + (255 << 16) + (170 << 24),
+                            true);
+                    GL11.glDisable(GL11.GL_BLEND);
+                    GL11.glPopMatrix();
+                }
+                collum++;
+                if (collum >= 9)
+                {
+                    collum = 0;
+                    row++;
+                }
             }
         }
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);

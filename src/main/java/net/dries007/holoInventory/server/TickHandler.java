@@ -30,8 +30,12 @@ import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.InventoryData;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.tileentity.TileEntityNote;
+import net.minecraft.tileentity.TileEntityRecordPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.WorldServer;
 
@@ -68,27 +72,34 @@ public class TickHandler implements ITickHandler
 
                     if (te instanceof IInventory)
                     {
-                        doStuff(coord.hashCode(), (IInventory) te, player);
+                        doStuff(coord.hashCode(), player, (IInventory) te);
                     }
                     else if (te instanceof TileEntityEnderChest)
                     {
-                        doStuff(coord.hashCode(), player.getInventoryEnderChest(), player);
+                        doStuff(coord.hashCode(), player, player.getInventoryEnderChest());
+                    }
+                    else if (te instanceof TileEntityRecordPlayer)
+                    {
+                        doStuff(coord.hashCode(), player, ((TileEntityRecordPlayer) te).func_96097_a());
                     }
                     break;
                 case ENTITY:
-                    System.out.println(mo.entityHit.entityId);
                     if (mo.entityHit instanceof IInventory)
                     {
-                        doStuff(mo.entityHit.entityId, (IInventory) mo.entityHit, player);
+                        doStuff(mo.entityHit.entityId, player, (IInventory) mo.entityHit);
                     }
                     break;
             }
         }
     }
 
-    private void doStuff(int id, IInventory inventory, EntityPlayerMP player)
+    private void doStuff(int id, EntityPlayerMP player, ItemStack... itemStacks)
     {
+        doStuff(id, player, Helper.getInventory(itemStacks));
+    }
 
+    private void doStuff(int id, EntityPlayerMP player, IInventory inventory)
+    {
         boolean empty = idEmpty(inventory);
         if (empty && !blockMap.containsKey(id)) return;
         InventoryData inventoryData = blockMap.get(id);

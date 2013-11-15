@@ -38,6 +38,8 @@ public class Config
     public final int           colorG;
     public final int           colorB;
     public final int           syncFreq;
+    public final boolean       renderText;
+    public final boolean       renderMultiple;
 
     public Config(File file)
     {
@@ -50,6 +52,9 @@ public class Config
         colorR = configuration.get(MODID, "colorRed", 14, "0-255").getInt();
         colorG = configuration.get(MODID, "colorGreen", 157, "0-255").getInt();
         colorB = configuration.get(MODID, "colorBlue", 196, "0-255").getInt();
+
+        renderText = configuration.get(MODID, "renderText", true, "Render the stacksize as text on top of the items").getBoolean(true);
+        renderMultiple = configuration.get(MODID, "renderMultiple", true, "Render multiple items depending on stacksize").getBoolean(true);
 
         syncFreq = configuration.get(MODID, "syncFreq", 5, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
