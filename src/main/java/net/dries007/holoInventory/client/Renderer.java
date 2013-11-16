@@ -113,6 +113,10 @@ public class Renderer
             GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
             customitem.setEntityItemStack(item);
             ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
+
+            if (item.hasEffect())
+                GL11.glDisable(GL11.GL_LIGHTING);
+
             GL11.glPopMatrix();
             collum++;
             if (collum >= 9)
