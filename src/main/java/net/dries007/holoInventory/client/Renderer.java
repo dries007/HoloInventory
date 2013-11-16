@@ -74,10 +74,11 @@ public class Renderer
         final ItemStack[] itemStacks = dataMap.get(coord.hashCode());
         if (itemStacks.length == 0) return;
         final double distance = distance(coord);
-        if (distance < 2) return;
+        if (distance < 1.5) return;
 
         // Move to right position and rotate to face the player
         GL11.glPushMatrix();
+
         GL11.glTranslated(coord.x + 0.5 - RenderManager.renderPosX, coord.y + 0.5 - RenderManager.renderPosY, coord.z + 0.5 - RenderManager.renderPosZ);
         GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
         GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
@@ -108,7 +109,6 @@ public class Renderer
             }
 
             GL11.glPushMatrix();
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
             translateAndScale(blockScale, collum, maxWith, row, maxHeight);
             GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
             customitem.setEntityItemStack(item);
@@ -146,7 +146,7 @@ public class Renderer
                             0,
                             255 + (255 << 8) + (255 << 16) + (170 << 24),
                             true);
-                    GL11.glDisable(GL11.GL_BLEND);
+
                     GL11.glPopMatrix();
                 }
                 collum++;
