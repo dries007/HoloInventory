@@ -54,9 +54,9 @@ public class Coord
                 this.z = mop.blockZ;
                 break;
             case ENTITY:
-                this.x = mop.entityHit.chunkCoordX;
-                this.y = mop.entityHit.chunkCoordY;
-                this.z = mop.entityHit.chunkCoordZ;
+                this.x = (int) mop.entityHit.posX;
+                this.y = (int) mop.entityHit.posY;
+                this.z = (int) mop.entityHit.posZ;
                 break;
         }
     }

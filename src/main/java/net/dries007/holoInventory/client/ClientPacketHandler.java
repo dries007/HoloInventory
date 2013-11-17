@@ -25,7 +25,6 @@ package net.dries007.holoInventory.client;
 
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
-import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Helper;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
@@ -43,7 +42,15 @@ public class ClientPacketHandler implements IPacketHandler
             ByteArrayInputStream streambyte = new ByteArrayInputStream(packet.data);
             DataInputStream stream = new DataInputStream(streambyte);
 
-            Helper.read(Helper.readNBTTagCompound(stream));
+            switch (stream.read())
+            {
+                case 0:
+                    Helper.readTile(Helper.readNBTTagCompound(stream));
+                    break;
+                case 1:
+                    Helper.readEntity(Helper.readNBTTagCompound(stream));
+                    break;
+            }
 
             stream.close();
             streambyte.close();
@@ -52,6 +59,5 @@ public class ClientPacketHandler implements IPacketHandler
         {
             e.printStackTrace();
         }
-
     }
 }

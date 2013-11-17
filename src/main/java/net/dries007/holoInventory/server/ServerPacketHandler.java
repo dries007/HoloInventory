@@ -25,10 +25,14 @@ package net.dries007.holoInventory.server;
 
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
+import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.InventoryData;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 
 public class ServerPacketHandler implements IPacketHandler
 {
@@ -37,7 +41,21 @@ public class ServerPacketHandler implements IPacketHandler
     @Override
     public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player)
     {
+        try
+        {
+            ByteArrayInputStream streambyte = new ByteArrayInputStream(packet.data);
+            DataInputStream stream = new DataInputStream(streambyte);
 
+            if (stream.read() == 1)
+                Helper.respond(stream.readInt(), stream.readInt(), player);
+
+            stream.close();
+            streambyte.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void send(EntityPlayerMP playerMP, InventoryData inventoryData)

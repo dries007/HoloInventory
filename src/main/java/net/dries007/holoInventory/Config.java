@@ -59,7 +59,7 @@ public class Config
 
         doVersioncheck = configuration.get(MODID, "doVersioncheck", true).getBoolean(true);
 
-        syncFreq = configuration.get(MODID, "syncFreq", 5, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
+        syncFreq = configuration.get(MODID, "syncFreq", 2, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
         configuration.save();
     }

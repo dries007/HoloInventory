@@ -62,6 +62,7 @@ public class InventoryData
         DataOutputStream stream = new DataOutputStream(streambyte);
         try
         {
+            stream.write(0);
             Helper.writeNBTTagCompound(toNBT(), stream);
             stream.close();
             streambyte.close();

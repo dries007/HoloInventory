@@ -25,11 +25,12 @@ package net.dries007.holoInventory.client;
 
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Coord;
-import net.dries007.holoInventory.util.Data;
+import net.dries007.holoInventory.util.Helper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -40,46 +41,51 @@ import java.util.HashMap;
 
 public class Renderer
 {
+    public static final HashMap<Integer, ItemStack[]>   tileMap   = new HashMap<>();
+    public static final HashMap<Integer, ItemStack[]>   entityMap = new HashMap<>();
+    public static final HashMap<Integer, Long>          requestMap = new HashMap<>();
+
     @ForgeSubscribe
     public void renderEvent(RenderWorldLastEvent event)
     {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null)
             return;
-        Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)
         {
             case TILE:
-                if (!dataMap.containsKey(coord.hashCode())) return;
+                Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
+                if (tileMap.containsKey(coord.hashCode())) renderHologram(mc, mc.objectMouseOver.blockX + 0.5, mc.objectMouseOver.blockY + 0.5, mc.objectMouseOver.blockZ + 0.5, tileMap.get(coord.hashCode()));
                 break;
             case ENTITY:
-                if (!dataMap.containsKey(mc.objectMouseOver.entityHit.entityId)) return;
+                if (!(mc.objectMouseOver.entityHit instanceof IInventory)) break;
+                if (!requestMap.containsKey(mc.objectMouseOver.entityHit.entityId))
+                {
+                    Helper.request(mc.theWorld.provider.dimensionId, mc.objectMouseOver.entityHit.entityId);
+                    requestMap.put(mc.objectMouseOver.entityHit.entityId, mc.theWorld.getTotalWorldTime());
+                }
+                else if (mc.theWorld.getTotalWorldTime() > requestMap.get(mc.objectMouseOver.entityHit.entityId) + 20 * HoloInventory.instance.config.syncFreq)
+                {
+                    requestMap.remove(mc.objectMouseOver.entityHit.entityId);
+                }
+                if (entityMap.containsKey(mc.objectMouseOver.entityHit.entityId))
+                {
+                    renderHologram(mc, mc.objectMouseOver.entityHit.posX, mc.objectMouseOver.entityHit.posY, mc.objectMouseOver.entityHit.posZ, entityMap.get(mc.objectMouseOver.entityHit.entityId));
+                }
                 break;
-        }
-        try
-        {
-            renderHologram(mc, coord);
-        }
-        catch (Exception e)
-        {
-            System.out.println(Data.MODID + " had an unexpected issue... Please make an issue on github for this.");
-            e.printStackTrace();
         }
     }
 
-    public static final HashMap<Integer, ItemStack[]> dataMap = new HashMap<>();
-
-    public void renderHologram(Minecraft mc, Coord coord) throws Exception
+    public void renderHologram(Minecraft mc, double x, double y, double z, ItemStack[] itemStacks)
     {
-        final ItemStack[] itemStacks = dataMap.get(coord.hashCode());
         if (itemStacks.length == 0) return;
-        final double distance = distance(coord);
+        final double distance = distance(x, y, z);
         if (distance < 1.5) return;
 
         // Move to right position and rotate to face the player
         GL11.glPushMatrix();
 
-        GL11.glTranslated(coord.x + 0.5 - RenderManager.renderPosX, coord.y + 0.5 - RenderManager.renderPosY, coord.z + 0.5 - RenderManager.renderPosZ);
+        GL11.glTranslated(x - RenderManager.renderPosX, y - RenderManager.renderPosY, z - RenderManager.renderPosZ);
         GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
         GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
         GL11.glTranslated(0, 0, -1);
@@ -114,8 +120,7 @@ public class Renderer
             customitem.setEntityItemStack(item);
             ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
 
-            if (item.hasEffect())
-                GL11.glDisable(GL11.GL_LIGHTING);
+            if (item.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
 
             GL11.glPopMatrix();
             collum++;
@@ -201,10 +206,10 @@ public class Renderer
         GL11.glPopMatrix();
     }
 
-    public double distance(Coord coord)
+    public double distance(double x, double y, double z)
     {
-        return Math.sqrt((coord.x + 0.5 - RenderManager.renderPosX) * (coord.x + 0.5 - RenderManager.renderPosX) +
-                (coord.y + 0.5 - RenderManager.renderPosY) * (coord.y + 0.5 - RenderManager.renderPosY) +
-                (coord.z + 0.5 - RenderManager.renderPosZ) * (coord.z + 0.5 - RenderManager.renderPosZ));
+        return Math.sqrt((x - RenderManager.renderPosX) * (x - RenderManager.renderPosX) +
+                (y - RenderManager.renderPosY) * (y - RenderManager.renderPosY) +
+                (z - RenderManager.renderPosZ) * (z - RenderManager.renderPosZ));
     }
 }

@@ -35,6 +35,10 @@ import net.dries007.holoInventory.client.Glasses;
 import net.dries007.holoInventory.lib.developercapes.DevCapesUtil;
 import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;
+import net.dries007.holoInventory.util.Data;
+import org.mcstats.Metrics;
+
+import java.io.IOException;
 
 import static net.dries007.holoInventory.util.Data.*;
 
@@ -52,6 +56,7 @@ public class HoloInventory
     public Config        config;
     public ClientHandler clientHandler;
     public ServerHandler serverHandler;
+    public Metrics metrics;
 
     @Mod.Metadata
     private ModMetadata metadata;
@@ -65,6 +70,16 @@ public class HoloInventory
 
         if (event.getSide().isClient()) clientHandler = new ClientHandler();
         serverHandler = new ServerHandler();
+
+        try
+        {
+            metrics = new Metrics(Data.MODID, event.getModMetadata().version);
+            metrics.start();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Mod.EventHandler()

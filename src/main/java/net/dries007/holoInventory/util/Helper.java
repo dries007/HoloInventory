@@ -23,7 +23,10 @@
 
 package net.dries007.holoInventory.util;
 
+import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 import net.dries007.holoInventory.client.Renderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -31,13 +34,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.DimensionManager;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
+
+import static net.dries007.holoInventory.util.Data.MODID;
 
 public class Helper
 {
@@ -71,7 +76,7 @@ public class Helper
         }
     }
 
-    public static void read(NBTTagCompound tag)
+    public static void readTile(NBTTagCompound tag)
     {
         NBTTagList list = tag.getTagList("list");
         ItemStack[] itemStacks = new ItemStack[list.tagCount()];
@@ -79,7 +84,77 @@ public class Helper
         {
             itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
         }
-        Renderer.dataMap.put(tag.getInteger("id"), itemStacks);
+        Renderer.tileMap.put(tag.getInteger("id"), itemStacks);
+    }
+
+    public static void readEntity(NBTTagCompound tag)
+    {
+        NBTTagList list = tag.getTagList("list");
+        ItemStack[] itemStacks = new ItemStack[list.tagCount()];
+        for (int i = 0; i < list.tagCount(); i++)
+        {
+            itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
+        }
+        Renderer.entityMap.put(tag.getInteger("id"), itemStacks);
+    }
+
+    public static void respond(int dim, int entityId, Player player)
+    {
+        Entity entity = DimensionManager.getWorld(dim).getEntityByID(entityId);
+
+        if (entity instanceof IInventory)
+        {
+            IInventory inventory = (IInventory) entity;
+            NBTTagCompound root = new NBTTagCompound();
+            root.setInteger("id", entityId);
+            NBTTagList list = new NBTTagList();
+            for (int i = 0; i < inventory.getSizeInventory(); i++)
+            {
+                if (inventory.getStackInSlot(i) != null)
+                {
+                    list.appendTag(inventory.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
+                }
+            }
+            root.setTag("list", list);
+
+            ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
+            DataOutputStream stream = new DataOutputStream(streambyte);
+            try
+            {
+                stream.write(1);
+                Helper.writeNBTTagCompound(root, stream);
+                stream.close();
+                streambyte.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), player);
+        }
+    }
+
+    public static void request(int dim, int entityId)
+    {
+        ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
+        DataOutputStream stream = new DataOutputStream(streambyte);
+        try
+        {
+            stream.write(1);
+
+            stream.writeInt(dim);
+            stream.writeInt(entityId);
+
+            stream.close();
+            streambyte.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()));
     }
 
     public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer)

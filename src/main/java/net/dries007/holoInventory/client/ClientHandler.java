@@ -41,7 +41,7 @@ public class ClientHandler
 {
     public final Renderer renderer;
     public static final VersionCheck VERSION_CHECK = new VersionCheck();
-    public static final RenderItem RENDER_ITEM = new RenderItem()
+    public static final RenderItem   RENDER_ITEM   = new RenderItem()
     {
         @Override
         public void doRenderItem(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
