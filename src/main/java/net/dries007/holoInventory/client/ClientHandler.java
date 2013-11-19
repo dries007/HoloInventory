@@ -23,6 +23,7 @@
 
 package net.dries007.holoInventory.client;
 
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.IPlayerTracker;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.dries007.holoInventory.HoloInventory;
@@ -41,6 +42,7 @@ public class ClientHandler
 {
     public final Renderer renderer;
     public static final VersionCheck VERSION_CHECK = new VersionCheck();
+    public static final KeyManager   KEY_MANAGER   = new KeyManager();
     public static final RenderItem   RENDER_ITEM   = new RenderItem()
     {
         @Override
@@ -138,6 +140,11 @@ public class ClientHandler
     public void init()
     {
         MinecraftForge.EVENT_BUS.register(renderer);
+
+        if (HoloInventory.instance.config.keyMode != 0)
+        {
+            KeyBindingRegistry.registerKeyBinding(KEY_MANAGER);
+        }
 
         if (HoloInventory.instance.config.doVersioncheck)
         {

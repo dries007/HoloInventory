@@ -56,7 +56,7 @@ public class HoloInventory
     public Config        config;
     public ClientHandler clientHandler;
     public ServerHandler serverHandler;
-    public Metrics metrics;
+    public Metrics       metrics;
 
     @Mod.Metadata
     private ModMetadata metadata;

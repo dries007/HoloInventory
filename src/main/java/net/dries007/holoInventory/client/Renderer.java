@@ -41,13 +41,16 @@ import java.util.HashMap;
 
 public class Renderer
 {
-    public static final HashMap<Integer, ItemStack[]>   tileMap   = new HashMap<>();
-    public static final HashMap<Integer, ItemStack[]>   entityMap = new HashMap<>();
-    public static final HashMap<Integer, Long>          requestMap = new HashMap<>();
+    public static final HashMap<Integer, ItemStack[]> tileMap    = new HashMap<>();
+    public static final HashMap<Integer, ItemStack[]> entityMap  = new HashMap<>();
+    public static final HashMap<Integer, Long>        requestMap = new HashMap<>();
+
+    public static boolean enabled = true;
 
     @ForgeSubscribe
     public void renderEvent(RenderWorldLastEvent event)
     {
+        if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null)
             return;
@@ -55,7 +58,11 @@ public class Renderer
         {
             case TILE:
                 Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
-                if (tileMap.containsKey(coord.hashCode())) renderHologram(mc, mc.objectMouseOver.blockX + 0.5, mc.objectMouseOver.blockY + 0.5, mc.objectMouseOver.blockZ + 0.5, tileMap.get(coord.hashCode()));
+                if (tileMap.containsKey(coord.hashCode())) renderHologram(mc,
+                        mc.objectMouseOver.blockX + 0.5,
+                        mc.objectMouseOver.blockY + 0.5,
+                        mc.objectMouseOver.blockZ + 0.5,
+                        tileMap.get(coord.hashCode()));
                 break;
             case ENTITY:
                 if (!(mc.objectMouseOver.entityHit instanceof IInventory)) break;
@@ -70,7 +77,11 @@ public class Renderer
                 }
                 if (entityMap.containsKey(mc.objectMouseOver.entityHit.entityId))
                 {
-                    renderHologram(mc, mc.objectMouseOver.entityHit.posX, mc.objectMouseOver.entityHit.posY, mc.objectMouseOver.entityHit.posZ, entityMap.get(mc.objectMouseOver.entityHit.entityId));
+                    renderHologram(mc,
+                            mc.objectMouseOver.entityHit.posX,
+                            mc.objectMouseOver.entityHit.posY,
+                            mc.objectMouseOver.entityHit.posZ,
+                            entityMap.get(mc.objectMouseOver.entityHit.entityId));
                 }
                 break;
         }

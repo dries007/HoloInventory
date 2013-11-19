@@ -46,8 +46,7 @@ public class ServerPacketHandler implements IPacketHandler
             ByteArrayInputStream streambyte = new ByteArrayInputStream(packet.data);
             DataInputStream stream = new DataInputStream(streambyte);
 
-            if (stream.read() == 1)
-                Helper.respond(stream.readInt(), stream.readInt(), player);
+            if (stream.read() == 1) Helper.respond(stream.readInt(), stream.readInt(), player);
 
             stream.close();
             streambyte.close();

@@ -41,6 +41,7 @@ public class Config
     public final boolean       renderText;
     public final boolean       renderMultiple;
     public final boolean       doVersioncheck;
+    public final int           keyMode;
 
     public Config(File file)
     {
@@ -53,6 +54,13 @@ public class Config
         colorR = configuration.get(MODID, "colorRed", 14, "0-255").getInt();
         colorG = configuration.get(MODID, "colorGreen", 157, "0-255").getInt();
         colorB = configuration.get(MODID, "colorBlue", 196, "0-255").getInt();
+
+        keyMode = configuration.get(MODID,"keyMode", 0,
+                "Valid modes:\n" +
+                        "0: Always display hologram.\n" +
+                        "1: The key toggles the rendering.\n" +
+                        "2: Only render hologram while key pressed.\n" +
+                        "3: Don't render hologram while key pressed.").getInt();
 
         renderText = configuration.get(MODID, "renderText", true, "Render the stacksize as text on top of the items").getBoolean(true);
         renderMultiple = configuration.get(MODID, "renderMultiple", true, "Render multiple items depending on stacksize").getBoolean(true);
