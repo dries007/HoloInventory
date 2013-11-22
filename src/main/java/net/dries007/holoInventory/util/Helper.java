@@ -23,9 +23,12 @@
 
 package net.dries007.holoInventory.util;
 
+import com.google.common.collect.HashMultimap;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
+import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.client.Renderer;
+import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -97,12 +100,36 @@ public class Helper
         Renderer.entityMap.put(tag.getInteger("id"), itemStacks);
     }
 
-    public static void respond(int dim, int entityId, Player player)
+    public static void readRemove(NBTTagCompound tag)
+    {
+        switch (tag.getByte("type"))
+        {
+            case 0:
+                Renderer.tileMap.remove(tag.getInteger("id"));
+            case 1:
+                Renderer.entityMap.remove(tag.getInteger("id"));
+        }
+    }
+
+    public static HashMultimap<Integer, String> map = HashMultimap.create();
+
+    public static void respond(int dim, int entityId, EntityPlayer player)
     {
         Entity entity = DimensionManager.getWorld(dim).getEntityByID(entityId);
 
         if (entity instanceof IInventory)
         {
+            if (HoloInventory.instance.config.bannedEntities.contains(entity.getClass().getCanonicalName()))
+            {
+                if (map.containsEntry(entityId, player.getDisplayName()))
+                {
+                    map.remove(entityId, player.getDisplayName());
+                    ServerPacketHandler.INSTANCE.sendRemove((Player) player, (byte) 1, entityId);
+                }
+                return;
+            }
+
+            map.put(entityId, player.getDisplayName());
             IInventory inventory = (IInventory) entity;
             NBTTagCompound root = new NBTTagCompound();
             root.setInteger("id", entityId);
@@ -130,7 +157,7 @@ public class Helper
                 e.printStackTrace();
             }
 
-            PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), player);
+            PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
         }
     }
 

@@ -24,8 +24,8 @@
 package net.dries007.holoInventory.util;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -53,6 +53,7 @@ public class InventoryData
 
     public boolean isOld(EntityPlayer player)
     {
+        if (!playerSet.containsKey(player)) return true;
         return player.worldObj.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.instance.config.syncFreq;
     }
 
@@ -94,6 +95,6 @@ public class InventoryData
     public void send(EntityPlayerMP player)
     {
         playerSet.put(player, player.worldObj.getTotalWorldTime());
-        ServerPacketHandler.INSTANCE.send(player, this);
+        PacketDispatcher.sendPacketToPlayer(this.getPacket(), (Player) player);
     }
 }

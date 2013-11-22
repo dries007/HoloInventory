@@ -33,6 +33,7 @@ import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.client.ClientPacketHandler;
 import net.dries007.holoInventory.client.Glasses;
 import net.dries007.holoInventory.lib.developercapes.DevCapesUtil;
+import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.dries007.holoInventory.util.Data;
@@ -92,6 +93,7 @@ public class HoloInventory
     @Mod.EventHandler()
     public void fmlEvent(FMLServerStartingEvent event)
     {
+        event.registerServerCommand(new CommandHoloInventory());
         serverHandler.init();
     }
 

@@ -11,6 +11,7 @@ To use this on a server, the server needs to have the mod.
 
 [u][size=5]News:[/size][/u]
 
+► Version 1.3: Added banning of types of blocks and entitys. Use this to block lets say personal safes. ◄
 ► Version 1.3: Added keybinding. See the config file for options. Basic you can now control when it renders with keys. ◄
 ► Version 1.2: [url=http://www.dries007.net/holoinventory/?name=Minecart.png]Added support for entitys. (minecarts and such)[/url] ◄
 ► Version 1.1: Added update checker, disableable in the config. ◄

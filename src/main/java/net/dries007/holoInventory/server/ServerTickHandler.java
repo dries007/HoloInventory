@@ -25,6 +25,8 @@ package net.dries007.holoInventory.server;
 
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.network.Player;
+import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.InventoryData;
@@ -42,7 +44,7 @@ import java.util.HashMap;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-public class TickHandler implements ITickHandler
+public class ServerTickHandler implements ITickHandler
 {
     public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
 
@@ -57,7 +59,7 @@ public class TickHandler implements ITickHandler
     {
         EntityPlayerMP player = (EntityPlayerMP) tickData[0];
         WorldServer world = player.getServerForPlayer();
-        if (world == null) return;
+        if (world == null || HoloInventory.instance.config == null) return;
         MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
 
         if (mo != null)
@@ -68,7 +70,12 @@ public class TickHandler implements ITickHandler
                     Coord coord = new Coord(world.provider.dimensionId, mo);
                     TileEntity te = world.getBlockTileEntity(coord.x, coord.y, coord.z);
 
-                    if (te instanceof IInventory)
+                    if (te != null && HoloInventory.instance.config.bannedTiles.contains(te.getClass().getCanonicalName()))
+                    {
+                        // BANNED THING
+                        cleanup(coord, player);
+                    }
+                    else if (te instanceof IInventory)
                     {
                         doStuff(coord.hashCode(), player, (IInventory) te);
                     }
@@ -80,6 +87,10 @@ public class TickHandler implements ITickHandler
                     {
                         doStuff(coord.hashCode(), player, ((TileEntityRecordPlayer) te).func_96097_a());
                     }
+                    else
+                    {
+                        cleanup(coord, player);
+                    }
                     break;
                 case ENTITY:
                     if (mo.entityHit instanceof IInventory)
@@ -88,6 +99,17 @@ public class TickHandler implements ITickHandler
                     }
                     break;
             }
+        }
+    }
+
+    private void cleanup(Coord coord, EntityPlayerMP player)
+    {
+        if (blockMap.containsKey(coord.hashCode()))
+        {
+            InventoryData inventoryData = blockMap.get(coord.hashCode());
+            inventoryData.playerSet.remove(player);
+            if (inventoryData.playerSet.isEmpty()) blockMap.remove(coord.hashCode());
+            ServerPacketHandler.INSTANCE.sendRemove((Player) player, (byte) 0, coord.hashCode());
         }
     }
 

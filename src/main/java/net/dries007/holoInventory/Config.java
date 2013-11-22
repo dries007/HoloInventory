@@ -26,48 +26,83 @@ package net.dries007.holoInventory;
 import net.minecraftforge.common.Configuration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
 public class Config
 {
-    final        Configuration configuration;
-    public final boolean       colorEnable;
-    public final int           colorAlpha;
-    public final int           colorR;
-    public final int           colorG;
-    public final int           colorB;
-    public final int           syncFreq;
-    public final boolean       renderText;
-    public final boolean       renderMultiple;
-    public final boolean       doVersioncheck;
-    public final int           keyMode;
+    final Configuration configuration;
+    public boolean colorEnable    = false;
+    public int     colorAlpha     = 200;
+    public int     colorR         = 14;
+    public int     colorG         = 157;
+    public int     colorB         = 196;
+    public boolean doVersionCheck = true;
+    public int     syncFreq       = 2;
+    public boolean renderText     = true;
+    public boolean renderMultiple = true;
+
+    public int keyMode;
+    public ArrayList<String> bannedTiles    = new ArrayList<>();
+    public ArrayList<String> bannedEntities = new ArrayList<>();
 
     public Config(File file)
     {
         configuration = new Configuration(file);
+        doConfig();
+    }
 
+    public void overrideBannedThings()
+    {
+        configuration.get(MODID,
+                "bannedTiles",
+                bannedTiles.toArray(new String[0]),
+                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[0]));
+        configuration.get(MODID,
+                "bannedEntities",
+                bannedEntities.toArray(new String[0]),
+                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedEntities.toArray(new String[0]));
+        configuration.save();
+    }
+
+    public void doConfig()
+    {
         configuration.addCustomCategoryComment(MODID, "All our settings are in here, as you might expect...");
 
-        colorEnable = configuration.get(MODID, "colorEnable", false, "Enable a BG color").getBoolean(false);
-        colorAlpha = configuration.get(MODID, "colorAlpha", 200, "The BG transparancy (0-255)").getInt();
-        colorR = configuration.get(MODID, "colorRed", 14, "0-255").getInt();
-        colorG = configuration.get(MODID, "colorGreen", 157, "0-255").getInt();
-        colorB = configuration.get(MODID, "colorBlue", 196, "0-255").getInt();
+        colorEnable = configuration.get(MODID, "colorEnable", colorEnable, "Enable a BG color").getBoolean(false);
+        colorAlpha = configuration.get(MODID, "colorAlpha", colorAlpha, "The BG transparancy (0-255)").getInt();
+        colorR = configuration.get(MODID, "colorRed", colorR, "0-255").getInt();
+        colorG = configuration.get(MODID, "colorGreen", colorG, "0-255").getInt();
+        colorB = configuration.get(MODID, "colorBlue", colorB, "0-255").getInt();
 
-        keyMode = configuration.get(MODID,"keyMode", 0,
-                "Valid modes:\n" +
-                        "0: Always display hologram.\n" +
-                        "1: The key toggles the rendering.\n" +
-                        "2: Only render hologram while key pressed.\n" +
-                        "3: Don't render hologram while key pressed.").getInt();
+        keyMode = configuration.get(MODID, "keyMode", keyMode, "Valid modes:\n" +
+                "0: Always display hologram.\n" +
+                "1: The key toggles the rendering.\n" +
+                "2: Only render hologram while key pressed.\n" +
+                "3: Don't render hologram while key pressed.").getInt();
 
-        renderText = configuration.get(MODID, "renderText", true, "Render the stacksize as text on top of the items").getBoolean(true);
-        renderMultiple = configuration.get(MODID, "renderMultiple", true, "Render multiple items depending on stacksize").getBoolean(true);
+        renderText = configuration.get(MODID, "renderText", renderText, "Render the stacksize as text on top of the items").getBoolean(true);
+        renderMultiple = configuration.get(MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
 
-        doVersioncheck = configuration.get(MODID, "doVersioncheck", true).getBoolean(true);
+        doVersionCheck = configuration.get(MODID, "doVersionCheck", doVersionCheck).getBoolean(true);
 
-        syncFreq = configuration.get(MODID, "syncFreq", 2, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
+        syncFreq = configuration.get(MODID,
+                "syncFreq",
+                syncFreq,
+                "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
+
+        bannedTiles.clear();
+        bannedTiles.addAll(Arrays.asList(configuration.get(MODID,
+                "bannedTiles",
+                bannedTiles.toArray(new String[0]),
+                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
+        bannedEntities.clear();
+        bannedEntities.addAll(Arrays.asList(configuration.get(MODID,
+                "bannedEntities",
+                bannedEntities.toArray(new String[0]),
+                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
 
         configuration.save();
     }

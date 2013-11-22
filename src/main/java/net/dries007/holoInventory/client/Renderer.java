@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
@@ -58,6 +59,8 @@ public class Renderer
         {
             case TILE:
                 Coord coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
+                if (mc.theWorld.getBlockTileEntity(mc.objectMouseOver.blockX, mc.objectMouseOver.blockY, mc.objectMouseOver.blockZ) == null)
+                    tileMap.remove(coord.hashCode());
                 if (tileMap.containsKey(coord.hashCode())) renderHologram(mc,
                         mc.objectMouseOver.blockX + 0.5,
                         mc.objectMouseOver.blockY + 0.5,
@@ -222,5 +225,13 @@ public class Renderer
         return Math.sqrt((x - RenderManager.renderPosX) * (x - RenderManager.renderPosX) +
                 (y - RenderManager.renderPosY) * (y - RenderManager.renderPosY) +
                 (z - RenderManager.renderPosZ) * (z - RenderManager.renderPosZ));
+    }
+
+    public static boolean enableDebugText = false;
+
+    @ForgeSubscribe
+    public void renderEvent(RenderGameOverlayEvent.Text event)
+    {
+
     }
 }

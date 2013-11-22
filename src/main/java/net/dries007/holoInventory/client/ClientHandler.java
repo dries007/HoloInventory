@@ -146,7 +146,7 @@ public class ClientHandler
             KeyBindingRegistry.registerKeyBinding(KEY_MANAGER);
         }
 
-        if (HoloInventory.instance.config.doVersioncheck)
+        if (HoloInventory.instance.config.doVersionCheck)
         {
             Thread vc = new Thread(VERSION_CHECK);
             vc.setDaemon(true);

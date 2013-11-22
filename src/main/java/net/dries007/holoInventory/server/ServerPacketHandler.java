@@ -24,15 +24,20 @@
 package net.dries007.holoInventory.server;
 
 import cpw.mods.fml.common.network.IPacketHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import net.dries007.holoInventory.util.Helper;
-import net.dries007.holoInventory.util.InventoryData;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
+import static net.dries007.holoInventory.util.Data.MODID;
 
 public class ServerPacketHandler implements IPacketHandler
 {
@@ -46,7 +51,7 @@ public class ServerPacketHandler implements IPacketHandler
             ByteArrayInputStream streambyte = new ByteArrayInputStream(packet.data);
             DataInputStream stream = new DataInputStream(streambyte);
 
-            if (stream.read() == 1) Helper.respond(stream.readInt(), stream.readInt(), player);
+            if (stream.read() == 1) Helper.respond(stream.readInt(), stream.readInt(), (EntityPlayer) player);
 
             stream.close();
             streambyte.close();
@@ -57,8 +62,26 @@ public class ServerPacketHandler implements IPacketHandler
         }
     }
 
-    public void send(EntityPlayerMP playerMP, InventoryData inventoryData)
+    public void sendRemove(Player player, byte type, int id)
     {
-        playerMP.playerNetServerHandler.sendPacketToPlayer(inventoryData.getPacket());
+        NBTTagCompound root = new NBTTagCompound();
+        root.setByte("type", type);
+        root.setInteger("id", id);
+
+        ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
+        DataOutputStream stream = new DataOutputStream(streambyte);
+        try
+        {
+            stream.write(4);
+            Helper.writeNBTTagCompound(root, stream);
+            stream.close();
+            streambyte.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), player);
     }
 }

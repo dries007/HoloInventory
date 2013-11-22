@@ -25,10 +25,12 @@ package net.dries007.holoInventory.server;
 
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.common.MinecraftForge;
 
 public class ServerHandler
 {
-    public TickHandler tickHandler;
+    public static ServerTickHandler  serverTickHandler;
+    public static ServerEventHandler serverEventHandler;
 
     public ServerHandler()
     {
@@ -37,11 +39,17 @@ public class ServerHandler
 
     public void init()
     {
-        if (tickHandler == null)
+        if (serverEventHandler == null)
         {
-            tickHandler = new TickHandler();
-            TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
+            serverEventHandler = new ServerEventHandler();
+            MinecraftForge.EVENT_BUS.register(serverEventHandler);
         }
-        else tickHandler.clear();
+
+        if (serverTickHandler == null)
+        {
+            serverTickHandler = new ServerTickHandler();
+            TickRegistry.registerTickHandler(serverTickHandler, Side.SERVER);
+        }
+        else serverTickHandler.clear();
     }
 }
