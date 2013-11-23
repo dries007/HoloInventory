@@ -52,12 +52,12 @@ import static net.dries007.holoInventory.util.Data.*;
 public class HoloInventory
 {
     @Mod.Instance(value = MODID)
-    public static HoloInventory instance;
+    private static HoloInventory instance;
 
-    public Config        config;
-    public ClientHandler clientHandler;
-    public ServerHandler serverHandler;
-    public Metrics       metrics;
+    private Config        config;
+    private ClientHandler clientHandler;
+    private ServerHandler serverHandler;
+    private Metrics       metrics;
 
     @Mod.Metadata
     private ModMetadata metadata;
@@ -100,5 +100,15 @@ public class HoloInventory
     public String getVersion()
     {
         return metadata.version;
+    }
+
+    public static Config getConfig()
+    {
+        return instance.config;
+    }
+
+    public static HoloInventory getInstance()
+    {
+        return instance;
     }
 }

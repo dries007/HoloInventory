@@ -39,7 +39,7 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
     public KeyManager()
     {
         super(new KeyBinding[] {key}, new boolean[] {false});
-        if (HoloInventory.instance.config.keyMode == 2) Renderer.enabled = false;
+        if (HoloInventory.getConfig().keyMode == 2) Renderer.enabled = false;
     }
 
     /**
@@ -54,7 +54,7 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
     public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
     {
         if (tickEnd) return;
-        switch (HoloInventory.instance.config.keyMode)
+        switch (HoloInventory.getConfig().keyMode)
         {
             case 1:
                 Renderer.enabled = !Renderer.enabled;
@@ -72,7 +72,7 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
     public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd)
     {
         if (tickEnd) return;
-        switch (HoloInventory.instance.config.keyMode)
+        switch (HoloInventory.getConfig().keyMode)
         {
             case 2:
                 Renderer.enabled = false;

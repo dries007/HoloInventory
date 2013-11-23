@@ -38,7 +38,11 @@ import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Renderer
 {
@@ -74,7 +78,7 @@ public class Renderer
                     Helper.request(mc.theWorld.provider.dimensionId, mc.objectMouseOver.entityHit.entityId);
                     requestMap.put(mc.objectMouseOver.entityHit.entityId, mc.theWorld.getTotalWorldTime());
                 }
-                else if (mc.theWorld.getTotalWorldTime() > requestMap.get(mc.objectMouseOver.entityHit.entityId) + 20 * HoloInventory.instance.config.syncFreq)
+                else if (mc.theWorld.getTotalWorldTime() > requestMap.get(mc.objectMouseOver.entityHit.entityId) + 20 * HoloInventory.getConfig().syncFreq)
                 {
                     requestMap.remove(mc.objectMouseOver.entityHit.entityId);
                 }
@@ -90,12 +94,39 @@ public class Renderer
         }
     }
 
-    public void renderHologram(Minecraft mc, double x, double y, double z, ItemStack[] itemStacks)
+    private void renderHologram(Minecraft mc, double x, double y, double z, ItemStack[] itemStacks)
     {
         if (itemStacks.length == 0) return;
         final double distance = distance(x, y, z);
         if (distance < 1.5) return;
 
+        if (HoloInventory.getConfig().enableStacking)
+        {
+            ArrayList<ItemStack> list = new ArrayList<>();
+            for (ItemStack stackToAdd : Arrays.asList(itemStacks))
+            {
+                boolean f = false;
+                for (ItemStack stackInList : list)
+                {
+                    if (stackToAdd.isItemEqual(stackInList) && ItemStack.areItemStackTagsEqual(stackToAdd, stackInList))
+                    {
+                        stackInList.stackSize += stackToAdd.stackSize;
+                        f = true;
+                        break;
+                    }
+                }
+                if (!f) list.add(stackToAdd.copy());
+            }
+            doRenderHologram(mc, x, y, z, list, distance);
+        }
+        else
+        {
+            doRenderHologram(mc, x, y, z, Arrays.asList(itemStacks), distance);
+        }
+    }
+
+    private void doRenderHologram(Minecraft mc, double x, double y, double z, List<ItemStack> itemStacks, double distance)
+    {
         // Move to right position and rotate to face the player
         GL11.glPushMatrix();
 
@@ -109,9 +140,9 @@ public class Renderer
         EntityItem customitem = new EntityItem(mc.theWorld);
         customitem.hoverStart = 0f;
 
-        final int maxCollums = (itemStacks.length > 9) ? 9 : itemStacks.length;
-        final int maxRows = (itemStacks.length % 9 == 0) ? (itemStacks.length / 9) - 1 : itemStacks.length / 9;
-        final float blockScale = 0.2f + (float) (0.1f * distance);
+        final int maxCollums = getMaxCollums(itemStacks.size());
+        final int maxRows = (itemStacks.size() % maxCollums == 0) ? (itemStacks.size() / maxCollums) - 1 : itemStacks.size() / maxCollums;
+        final float blockScale = getBlockScaleModifier(maxCollums) + (float) (0.1f * distance);
         final float maxWith = maxCollums * blockScale * 0.7f * 0.4f;
         final float maxHeight = maxRows * blockScale * 0.7f * 0.4f;
 
@@ -122,7 +153,7 @@ public class Renderer
         int collum = 0, row = 0;
         for (ItemStack item : itemStacks)
         {
-            if (!HoloInventory.instance.config.renderMultiple)
+            if (!HoloInventory.getConfig().renderMultiple)
             {
                 item = item.copy();
                 item.stackSize = 1;
@@ -138,7 +169,7 @@ public class Renderer
 
             GL11.glPopMatrix();
             collum++;
-            if (collum >= 9)
+            if (collum >= maxCollums)
             {
                 collum = 0;
                 row++;
@@ -148,11 +179,11 @@ public class Renderer
         // Render stacksizes
         collum = 0;
         row = 0;
-        if (HoloInventory.instance.config.renderText)
+        if (HoloInventory.getConfig().renderText)
         {
             for (ItemStack item : itemStacks)
             {
-                if (item.getMaxStackSize() != 1)
+                if (item.getMaxStackSize() != 1 || item.stackSize != 1)
                 {
                     GL11.glPushMatrix();
                     GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -160,11 +191,7 @@ public class Renderer
                     GL11.glScalef(0.03f, 0.03f, 0.03f);
                     GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
                     GL11.glTranslatef(-1f, 1f, 0f);
-                    if (item.stackSize < 10) GL11.glTranslatef(6f, 0f, 0f);
-                    if (item.stackSize > 99) GL11.glTranslatef(-6f, 0f, 0f);
-                    if (item.stackSize > 999) GL11.glTranslatef(6f, 0f, 0f);
-                    if (item.stackSize > 9999) GL11.glTranslatef(-6f, 0f, 0f);
-                    RenderManager.instance.getFontRenderer().drawString(item.stackSize > 999 ? item.stackSize / 1000 + "K" : item.stackSize + "",
+                    RenderManager.instance.getFontRenderer().drawString(doStacksizeCrap(item.stackSize),
                             0,
                             0,
                             255 + (255 << 8) + (255 << 16) + (170 << 24),
@@ -173,7 +200,7 @@ public class Renderer
                     GL11.glPopMatrix();
                 }
                 collum++;
-                if (collum >= 9)
+                if (collum >= maxCollums)
                 {
                     collum = 0;
                     row++;
@@ -185,6 +212,36 @@ public class Renderer
         GL11.glPopMatrix();
     }
 
+    private float getBlockScaleModifier(int maxCollums)
+    {
+        if (maxCollums > 9) return 0.2f - maxCollums * 0.005f;
+        else return 0.2f + (9 - maxCollums) * 0.05f;
+    }
+
+    private int getMaxCollums(int size)
+    {
+        if (size < 9) return size;
+        else if (size <= 27) return 9;
+        else if (size <= 54) return 11;
+        else if (size <= 90) return 14;
+        else if (size <= 109) return 18;
+        else return 21;
+    }
+
+    private static final DecimalFormat DF = new DecimalFormat("#.#");
+
+    private String doStacksizeCrap(int stackSize)
+    {
+        if (stackSize < 10) GL11.glTranslatef(6f, 0f, 0f);
+        if (stackSize > 99 && stackSize < 999) GL11.glTranslatef(-6f, 0f, 0f);
+        if (stackSize < 1000) return stackSize + "";
+
+        if (stackSize > 999) GL11.glTranslatef(-6f, 0f, 0f);
+        if (stackSize > 9999) GL11.glTranslatef(-6f, 0f, 0f);
+
+        return DF.format((double) stackSize / 1000) + "K";
+    }
+
     private void translateAndScale(float blockScale, int collum, float maxWith, int row, float maxHeight)
     {
         GL11.glTranslatef(maxWith - ((collum + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
@@ -193,7 +250,7 @@ public class Renderer
 
     public void renderBG(float blockScale, float maxWith, float maxHeight)
     {
-        if (!HoloInventory.instance.config.colorEnable) return;
+        if (!HoloInventory.getConfig().colorEnable) return;
 
         GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -203,10 +260,10 @@ public class Renderer
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL11.GL_QUADS);
-        tess.setColorRGBA(HoloInventory.instance.config.colorR,
-                HoloInventory.instance.config.colorG,
-                HoloInventory.instance.config.colorB,
-                HoloInventory.instance.config.colorAlpha);
+        tess.setColorRGBA(HoloInventory.getConfig().colorR,
+                HoloInventory.getConfig().colorG,
+                HoloInventory.getConfig().colorB,
+                HoloInventory.getConfig().colorAlpha);
         double d = blockScale / 3;
         tess.addVertex(maxWith + d, -d - maxHeight, 0);
         tess.addVertex(-maxWith - d, -d - maxHeight, 0);
@@ -225,13 +282,5 @@ public class Renderer
         return Math.sqrt((x - RenderManager.renderPosX) * (x - RenderManager.renderPosX) +
                 (y - RenderManager.renderPosY) * (y - RenderManager.renderPosY) +
                 (z - RenderManager.renderPosZ) * (z - RenderManager.renderPosZ));
-    }
-
-    public static boolean enableDebugText = false;
-
-    @ForgeSubscribe
-    public void renderEvent(RenderGameOverlayEvent.Text event)
-    {
-
     }
 }

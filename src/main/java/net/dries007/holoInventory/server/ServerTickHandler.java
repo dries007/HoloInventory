@@ -59,7 +59,7 @@ public class ServerTickHandler implements ITickHandler
     {
         EntityPlayerMP player = (EntityPlayerMP) tickData[0];
         WorldServer world = player.getServerForPlayer();
-        if (world == null || HoloInventory.instance.config == null) return;
+        if (world == null) return;
         MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
 
         if (mo != null)
@@ -70,7 +70,7 @@ public class ServerTickHandler implements ITickHandler
                     Coord coord = new Coord(world.provider.dimensionId, mo);
                     TileEntity te = world.getBlockTileEntity(coord.x, coord.y, coord.z);
 
-                    if (te != null && HoloInventory.instance.config.bannedTiles.contains(te.getClass().getCanonicalName()))
+                    if (te != null && HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
                     {
                         // BANNED THING
                         cleanup(coord, player);

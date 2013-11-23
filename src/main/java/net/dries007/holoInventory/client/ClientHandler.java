@@ -90,7 +90,7 @@ public class ClientHandler
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 latest = reader.readLine();
 
-                if (latest.equals(HoloInventory.instance.getVersion())) result = Result.OK;
+                if (latest.equals(HoloInventory.getInstance().getVersion())) result = Result.OK;
                 else result = Result.OLD;
             }
             catch (Exception e)
@@ -112,7 +112,7 @@ public class ClientHandler
 
             done = true;
             if (VERSION_CHECK.result.equals(VersionCheck.Result.OLD))
-                player.addChatMessage("[HoloInventory] You are running " + HoloInventory.instance.getVersion() + ", newest available is " + VERSION_CHECK.latest + ". Please update :)");
+                player.addChatMessage("[HoloInventory] You are running " + HoloInventory.getInstance().getVersion() + ", newest available is " + VERSION_CHECK.latest + ". Please update :)");
         }
 
         @Override
@@ -141,12 +141,12 @@ public class ClientHandler
     {
         MinecraftForge.EVENT_BUS.register(renderer);
 
-        if (HoloInventory.instance.config.keyMode != 0)
+        if (HoloInventory.getConfig().keyMode != 0)
         {
             KeyBindingRegistry.registerKeyBinding(KEY_MANAGER);
         }
 
-        if (HoloInventory.instance.config.doVersionCheck)
+        if (HoloInventory.getConfig().doVersionCheck)
         {
             Thread vc = new Thread(VERSION_CHECK);
             vc.setDaemon(true);

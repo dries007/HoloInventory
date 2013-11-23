@@ -43,10 +43,12 @@ public class Config
     public int     syncFreq       = 2;
     public boolean renderText     = true;
     public boolean renderMultiple = true;
+    public boolean enableStacking = true;
 
     public int keyMode;
     public ArrayList<String> bannedTiles    = new ArrayList<>();
     public ArrayList<String> bannedEntities = new ArrayList<>();
+
 
     public Config(File file)
     {
@@ -92,6 +94,8 @@ public class Config
                 "syncFreq",
                 syncFreq,
                 "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
+
+        enableStacking = configuration.get(MODID, "enableStacking", enableStacking, "Stack items, even above 64.").getBoolean(enableStacking);
 
         bannedTiles.clear();
         bannedTiles.addAll(Arrays.asList(configuration.get(MODID,

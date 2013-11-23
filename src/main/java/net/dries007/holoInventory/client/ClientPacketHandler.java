@@ -55,9 +55,6 @@ public class ClientPacketHandler implements IPacketHandler
                     Renderer.requestMap.clear();
                     Renderer.tileMap.clear();
                     break;
-                case 3:
-                    Renderer.enableDebugText = !Renderer.enableDebugText;
-                    break;
                 case 4:
                     Helper.readRemove(Helper.readNBTTagCompound(stream));
                     break;

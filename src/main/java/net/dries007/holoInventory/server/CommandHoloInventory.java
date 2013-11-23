@@ -81,8 +81,8 @@ public class CommandHoloInventory extends CommandBase
     private List<String> getAllList()
     {
         ArrayList<String> temp = new ArrayList<>();
-        temp.addAll(HoloInventory.instance.config.bannedEntities);
-        temp.addAll(HoloInventory.instance.config.bannedTiles);
+        temp.addAll(HoloInventory.getConfig().bannedEntities);
+        temp.addAll(HoloInventory.getConfig().bannedTiles);
         return temp;
     }
 
@@ -127,9 +127,9 @@ public class CommandHoloInventory extends CommandBase
             }
             else if (getAllList().contains(args[1]))
             {
-                HoloInventory.instance.config.bannedEntities.remove(args[1]);
-                HoloInventory.instance.config.bannedTiles.remove(args[1]);
-                HoloInventory.instance.config.overrideBannedThings();
+                HoloInventory.getConfig().bannedEntities.remove(args[1]);
+                HoloInventory.getConfig().bannedTiles.remove(args[1]);
+                HoloInventory.getConfig().overrideBannedThings();
             }
             else
             {

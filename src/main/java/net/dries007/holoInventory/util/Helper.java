@@ -119,7 +119,7 @@ public class Helper
 
         if (entity instanceof IInventory)
         {
-            if (HoloInventory.instance.config.bannedEntities.contains(entity.getClass().getCanonicalName()))
+            if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName()))
             {
                 if (map.containsEntry(entityId, player.getDisplayName()))
                 {
