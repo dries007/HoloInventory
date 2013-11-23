@@ -72,6 +72,7 @@ public class Glasses
     {
         if (users.containsKey(event.entityPlayer.getDisplayName()) && event.entityPlayer.inventory.armorInventory[3] == null)
         {
+            if (event.entityPlayer.isInvisible()) return;
             GL11.glPushMatrix();
             float f3 = event.entityPlayer.prevRotationYawHead + (event.entityPlayer.rotationYawHead - event.entityPlayer.prevRotationYawHead) - (event.entityPlayer.prevRenderYawOffset + (event.entityPlayer.renderYawOffset - event.entityPlayer.prevRenderYawOffset) * event.partialRenderTick);
             float f4 = event.entityPlayer.prevRotationPitch + (event.entityPlayer.rotationPitch - event.entityPlayer.prevRotationPitch);
