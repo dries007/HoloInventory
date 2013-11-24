@@ -29,9 +29,9 @@ import net.minecraftforge.common.ForgeDirection;
 public class Coord
 {
     public int dim;
-    public int x;
-    public int y;
-    public int z;
+    public double x;
+    public double y;
+    public double z;
 
     public Coord(int dim, MovingObjectPosition mop)
     {
@@ -45,9 +45,9 @@ public class Coord
                 this.z = mop.blockZ;
                 break;
             case ENTITY:
-                this.x = (int) mop.entityHit.posX;
-                this.y = (int) mop.entityHit.posY;
-                this.z = (int) mop.entityHit.posZ;
+                this.x = mop.entityHit.posX;
+                this.y = mop.entityHit.posY;
+                this.z = mop.entityHit.posZ;
                 break;
         }
     }
@@ -64,7 +64,7 @@ public class Coord
 
     public int hashCode()
     {
-        return this.x + (this.z << 8) + (this.y << 16) + (this.dim << 24);
+        return (int)this.x + ((int) this.z << 8) + ((int) this.y << 16) + (this.dim << 24);
     }
 
     public boolean equals(Object obj)
@@ -75,12 +75,5 @@ public class Coord
             return this.x == coord.x && this.y == coord.y && this.z == coord.z && this.dim == coord.dim;
         }
         return false;
-    }
-
-    public void add(double i)
-    {
-        x += i;
-        y += i;
-        z += i;
     }
 }

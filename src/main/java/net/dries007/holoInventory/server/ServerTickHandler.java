@@ -68,7 +68,7 @@ public class ServerTickHandler implements ITickHandler
             {
                 case TILE:
                     Coord coord = new Coord(world.provider.dimensionId, mo);
-                    TileEntity te = world.getBlockTileEntity(coord.x, coord.y, coord.z);
+                    TileEntity te = world.getBlockTileEntity((int)coord.x, (int)coord.y, (int)coord.z);
 
                     if (te != null && HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
                     {

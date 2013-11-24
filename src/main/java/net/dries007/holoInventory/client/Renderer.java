@@ -82,12 +82,16 @@ public class Renderer
         {
             case TILE:
                 // Remove if there is no longer a TE there
-                if (mc.theWorld.getBlockTileEntity(coord.x, coord.y, coord.z) == null) tileMap.remove(coord.hashCode());
+                if (mc.theWorld.getBlockTileEntity((int)coord.x, (int)coord.y, (int)coord.z) == null) tileMap.remove(coord.hashCode());
                 // Render if we know the content
                 if (tileMap.containsKey(coord.hashCode()))
                 {
-                    coord.add(0.5);
-                    renderHologram(tileMap.get(coord.hashCode()));
+                    int i = coord.hashCode();
+                    coord.x += 0.5;
+                    coord.y += 0.5;
+                    coord.z += 0.5;
+                    renderHologram(tileMap.get(i));
+
                 }
                 break;
             case ENTITY:
@@ -108,7 +112,10 @@ public class Renderer
                     }
 
                     // Render appropriate hologram
-                    if (entity instanceof IInventory && entityMap.containsKey(id)) renderHologram(entityMap.get(id));
+                    if (entity instanceof IInventory && entityMap.containsKey(id))
+                    {
+                        renderHologram(entityMap.get(id));
+                    }
                     if (entity instanceof IMerchant && merchantMap.containsKey(id)) renderMerchant(merchantMap.get(id));
                 }
                 break;
