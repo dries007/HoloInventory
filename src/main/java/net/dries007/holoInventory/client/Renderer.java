@@ -29,10 +29,12 @@ import net.dries007.holoInventory.util.Helper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
@@ -46,9 +48,10 @@ import java.util.List;
 
 public class Renderer
 {
-    public static final HashMap<Integer, ItemStack[]> tileMap    = new HashMap<>();
-    public static final HashMap<Integer, ItemStack[]> entityMap  = new HashMap<>();
-    public static final HashMap<Integer, Long>        requestMap = new HashMap<>();
+    public static final HashMap<Integer, ItemStack[]>        tileMap     = new HashMap<>();
+    public static final HashMap<Integer, ItemStack[]>        entityMap   = new HashMap<>();
+    public static final HashMap<Integer, MerchantRecipeList> merchantMap = new HashMap<>();
+    public static final HashMap<Integer, Long>               requestMap  = new HashMap<>();
 
     public static boolean enabled = true;
 
@@ -72,26 +75,97 @@ public class Renderer
                         tileMap.get(coord.hashCode()));
                 break;
             case ENTITY:
-                if (!(mc.objectMouseOver.entityHit instanceof IInventory)) break;
-                if (!requestMap.containsKey(mc.objectMouseOver.entityHit.entityId))
+                if (mc.objectMouseOver.entityHit instanceof IMerchant || mc.objectMouseOver.entityHit instanceof IInventory)
                 {
-                    Helper.request(mc.theWorld.provider.dimensionId, mc.objectMouseOver.entityHit.entityId);
-                    requestMap.put(mc.objectMouseOver.entityHit.entityId, mc.theWorld.getTotalWorldTime());
+                    if (!requestMap.containsKey(mc.objectMouseOver.entityHit.entityId))
+                    {
+                        Helper.request(mc.theWorld.provider.dimensionId, mc.objectMouseOver.entityHit.entityId);
+                        requestMap.put(mc.objectMouseOver.entityHit.entityId, mc.theWorld.getTotalWorldTime());
+                    }
+                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(mc.objectMouseOver.entityHit.entityId) + 20 * HoloInventory.getConfig().syncFreq)
+                    {
+                        requestMap.remove(mc.objectMouseOver.entityHit.entityId);
+                    }
+                    if (mc.objectMouseOver.entityHit instanceof IInventory && entityMap.containsKey(mc.objectMouseOver.entityHit.entityId))
+                    {
+                        renderHologram(mc,
+                                mc.objectMouseOver.entityHit.posX,
+                                mc.objectMouseOver.entityHit.posY,
+                                mc.objectMouseOver.entityHit.posZ,
+                                entityMap.get(mc.objectMouseOver.entityHit.entityId));
+                    }
+                    if (mc.objectMouseOver.entityHit instanceof IMerchant && merchantMap.containsKey(mc.objectMouseOver.entityHit.entityId))
+                    {
+                        renderMerchant(mc,
+                                mc.objectMouseOver.entityHit.posX,
+                                mc.objectMouseOver.entityHit.posY + 2,
+                                mc.objectMouseOver.entityHit.posZ,
+                                merchantMap.get(mc.objectMouseOver.entityHit.entityId));
+                    }
                 }
-                else if (mc.theWorld.getTotalWorldTime() > requestMap.get(mc.objectMouseOver.entityHit.entityId) + 20 * HoloInventory.getConfig().syncFreq)
-                {
-                    requestMap.remove(mc.objectMouseOver.entityHit.entityId);
-                }
-                if (entityMap.containsKey(mc.objectMouseOver.entityHit.entityId))
-                {
-                    renderHologram(mc,
-                            mc.objectMouseOver.entityHit.posX,
-                            mc.objectMouseOver.entityHit.posY,
-                            mc.objectMouseOver.entityHit.posZ,
-                            entityMap.get(mc.objectMouseOver.entityHit.entityId));
-                }
+
                 break;
         }
+    }
+
+    private void renderMerchant(Minecraft mc, double x, double y, double z, MerchantRecipeList list)
+    {
+        if (list.size() == 0) return;
+        final double distance = distance(x, y, z);
+        if (distance < 1) return;
+
+        // Move to right position and rotate to face the player
+        GL11.glPushMatrix();
+
+        GL11.glTranslated(x - RenderManager.renderPosX, y - RenderManager.renderPosY, z - RenderManager.renderPosZ);
+        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
+        GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
+        GL11.glTranslated(0, 0, -0.25);
+
+        // Calculate angle based on time (so items rotate)
+        float timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
+        EntityItem customitem = new EntityItem(mc.theWorld);
+        customitem.hoverStart = 0f;
+
+        final int maxCollums = 3;
+        final int maxRows = list.size();
+        final float blockScale = getBlockScaleModifier(maxCollums) + (float) (0.1f * distance);
+        final float maxWith = maxCollums * blockScale * 0.7f * 0.4f;
+        final float maxHeight = maxRows * blockScale * 0.7f * 0.4f;
+
+        // Render the BG
+        renderBG(blockScale, maxWith, maxHeight);
+
+        for (int row = 0; row < list.size(); row++)
+        {
+            MerchantRecipe recipe = (MerchantRecipe) list.get(row);
+            renderItem(customitem, recipe.getItemToBuy(), blockScale, 0, maxWith, row, maxHeight, timeD);
+            if (recipe.hasSecondItemToBuy()) renderItem(customitem, recipe.getSecondItemToBuy(), blockScale, 1, maxWith, row, maxHeight, timeD);
+            renderItem(customitem, recipe.getItemToSell(), blockScale, 2, maxWith, row, maxHeight, timeD);
+        }
+
+        GL11.glPopMatrix();
+    }
+
+    private void renderItem(EntityItem customitem, ItemStack itemStack, float blockScale, int collum, float maxWith, int row, float maxHeight, float timeD)
+    {
+        GL11.glPushMatrix();
+        translateAndScale(blockScale, collum, maxWith, row, maxHeight);
+        GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
+        customitem.setEntityItemStack(itemStack);
+        ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
+        if (itemStack.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glPopMatrix();
+        GL11.glPushMatrix();
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        translateAndScale(blockScale, collum, maxWith, row, maxHeight);
+        GL11.glScalef(0.03f, 0.03f, 0.03f);
+        GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
+        GL11.glTranslatef(-1f, 1f, 0f);
+        RenderManager.instance.getFontRenderer().drawString(itemStack.stackSize + "", 0, 0, 255 + (255 << 8) + (255 << 16) + (170 << 24), true);
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glPopMatrix();
     }
 
     private void renderHologram(Minecraft mc, double x, double y, double z, ItemStack[] itemStacks)

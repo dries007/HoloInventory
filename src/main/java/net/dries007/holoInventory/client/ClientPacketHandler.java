@@ -54,6 +54,10 @@ public class ClientPacketHandler implements IPacketHandler
                     Renderer.entityMap.clear();
                     Renderer.requestMap.clear();
                     Renderer.tileMap.clear();
+                    Renderer.merchantMap.clear();
+                    break;
+                case 3:
+                    Helper.readMerchant(Helper.readNBTTagCompound(stream));
                     break;
                 case 4:
                     Helper.readRemove(Helper.readNBTTagCompound(stream));

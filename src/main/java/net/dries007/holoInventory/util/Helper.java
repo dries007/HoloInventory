@@ -30,6 +30,7 @@ import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.client.Renderer;
 import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -40,6 +41,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.common.DimensionManager;
 
 import java.io.*;
@@ -100,6 +102,14 @@ public class Helper
         Renderer.entityMap.put(tag.getInteger("id"), itemStacks);
     }
 
+    public static void readMerchant(NBTTagCompound tag)
+    {
+        MerchantRecipeList list = new MerchantRecipeList();
+        list.readRecipiesFromTags(tag);
+
+        Renderer.merchantMap.put(tag.getInteger("id"), list);
+    }
+
     public static void readRemove(NBTTagCompound tag)
     {
         switch (tag.getByte("type"))
@@ -108,6 +118,8 @@ public class Helper
                 Renderer.tileMap.remove(tag.getInteger("id"));
             case 1:
                 Renderer.entityMap.remove(tag.getInteger("id"));
+            case 2:
+                Renderer.merchantMap.remove(tag.getInteger("id"));
         }
     }
 
@@ -117,7 +129,7 @@ public class Helper
     {
         Entity entity = DimensionManager.getWorld(dim).getEntityByID(entityId);
 
-        if (entity instanceof IInventory)
+        if (entity instanceof IInventory || entity instanceof IMerchant)
         {
             if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName()))
             {
@@ -130,34 +142,56 @@ public class Helper
             }
 
             map.put(entityId, player.getDisplayName());
-            IInventory inventory = (IInventory) entity;
-            NBTTagCompound root = new NBTTagCompound();
-            root.setInteger("id", entityId);
-            NBTTagList list = new NBTTagList();
-            for (int i = 0; i < inventory.getSizeInventory(); i++)
+
+            if (entity instanceof IInventory)
             {
-                if (inventory.getStackInSlot(i) != null)
+                IInventory inventory = (IInventory) entity;
+                NBTTagCompound root = new NBTTagCompound();
+                root.setInteger("id", entityId);
+                NBTTagList list = new NBTTagList();
+                for (int i = 0; i < inventory.getSizeInventory(); i++)
                 {
-                    list.appendTag(inventory.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
+                    if (inventory.getStackInSlot(i) != null)
+                    {
+                        list.appendTag(inventory.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
+                    }
                 }
-            }
-            root.setTag("list", list);
+                root.setTag("list", list);
 
-            ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
-            DataOutputStream stream = new DataOutputStream(streambyte);
-            try
-            {
-                stream.write(1);
-                Helper.writeNBTTagCompound(root, stream);
-                stream.close();
-                streambyte.close();
+                ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
+                DataOutputStream stream = new DataOutputStream(streambyte);
+                try
+                {
+                    stream.write(1);
+                    Helper.writeNBTTagCompound(root, stream);
+                    stream.close();
+                    streambyte.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
             }
-            catch (Exception e)
+            else if (entity instanceof IMerchant)
             {
-                e.printStackTrace();
+                NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
+                tag.setInteger("id", entityId);
+                ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
+                DataOutputStream stream = new DataOutputStream(streambyte);
+                try
+                {
+                    stream.write(3);
+                    Helper.writeNBTTagCompound(tag, stream);
+                    stream.close();
+                    streambyte.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
             }
-
-            PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
         }
     }
 
