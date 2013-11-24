@@ -28,7 +28,7 @@ import net.minecraftforge.common.ForgeDirection;
 
 public class Coord
 {
-    public int dim;
+    public int    dim;
     public double x;
     public double y;
     public double z;
@@ -64,7 +64,7 @@ public class Coord
 
     public int hashCode()
     {
-        return (int)this.x + ((int) this.z << 8) + ((int) this.y << 16) + (this.dim << 24);
+        return (int) this.x + ((int) this.z << 8) + ((int) this.y << 16) + (this.dim << 24);
     }
 
     public boolean equals(Object obj)

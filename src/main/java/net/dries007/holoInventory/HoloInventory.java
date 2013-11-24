@@ -23,6 +23,7 @@
 
 package net.dries007.holoInventory;
 
+import com.jadarstudios.developercapes.DevCapesUtil;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -32,7 +33,6 @@ import cpw.mods.fml.common.network.NetworkMod;
 import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.client.ClientPacketHandler;
 import net.dries007.holoInventory.client.Glasses;
-import com.jadarstudios.developercapes.DevCapesUtil;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;

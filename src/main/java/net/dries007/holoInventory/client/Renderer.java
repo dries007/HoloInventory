@@ -82,7 +82,7 @@ public class Renderer
         {
             case TILE:
                 // Remove if there is no longer a TE there
-                if (mc.theWorld.getBlockTileEntity((int)coord.x, (int)coord.y, (int)coord.z) == null) tileMap.remove(coord.hashCode());
+                if (mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z) == null) tileMap.remove(coord.hashCode());
                 // Render if we know the content
                 if (tileMap.containsKey(coord.hashCode()))
                 {
