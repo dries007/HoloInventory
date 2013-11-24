@@ -58,6 +58,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
+@SuppressWarnings("ALL")
 public class Metrics {
 
     /**

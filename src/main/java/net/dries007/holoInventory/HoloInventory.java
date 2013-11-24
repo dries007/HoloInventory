@@ -32,7 +32,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.client.ClientPacketHandler;
 import net.dries007.holoInventory.client.Glasses;
-import net.dries007.holoInventory.lib.developercapes.DevCapesUtil;
+import com.jadarstudios.developercapes.DevCapesUtil;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;
@@ -57,7 +57,6 @@ public class HoloInventory
     private Config        config;
     private ClientHandler clientHandler;
     private ServerHandler serverHandler;
-    private Metrics       metrics;
 
     @Mod.Metadata
     private ModMetadata metadata;
@@ -74,7 +73,7 @@ public class HoloInventory
 
         try
         {
-            metrics = new Metrics(Data.MODID, event.getModMetadata().version);
+            Metrics metrics = new Metrics(Data.MODID, event.getModMetadata().version);
             metrics.start();
         }
         catch (IOException e)

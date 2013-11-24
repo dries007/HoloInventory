@@ -39,7 +39,7 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
     public KeyManager()
     {
         super(new KeyBinding[] {key}, new boolean[] {false});
-        if (HoloInventory.getConfig().keyMode == 2) Renderer.enabled = false;
+        if (HoloInventory.getConfig().keyMode == 2) Renderer.INSTANCE.enabled = false;
     }
 
     /**
@@ -57,13 +57,13 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
         switch (HoloInventory.getConfig().keyMode)
         {
             case 1:
-                Renderer.enabled = !Renderer.enabled;
+                Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
                 break;
             case 2:
-                Renderer.enabled = true;
+                Renderer.INSTANCE.enabled = true;
                 break;
             case 3:
-                Renderer.enabled = false;
+                Renderer.INSTANCE.enabled = false;
                 break;
         }
     }
@@ -75,10 +75,10 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
         switch (HoloInventory.getConfig().keyMode)
         {
             case 2:
-                Renderer.enabled = false;
+                Renderer.INSTANCE.enabled = false;
                 break;
             case 3:
-                Renderer.enabled = true;
+                Renderer.INSTANCE.enabled = true;
                 break;
         }
     }

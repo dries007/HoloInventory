@@ -8,6 +8,15 @@ The background color is optional and fully configurable.
 To use this on a server, the server needs to have the mod.
 [u]For more info, issues and a todo list, click the like above.[/u]
 
+Options (see config file):[/center][spoiler]• (Server) I reccomend to use "/holoinventory" to ban things, not the config.
+• (Client) "colorAlpha, colorR, colorG, colorB, colorEnable" Background settings.
+• (Client) "doVersionCheck" Allows you to turn of the update please message.
+• (Client) "enableStacking" Stack all the same items, even over 64.
+• (Client) "keyMode" Allows you to enable an ingame key.
+• (Client) "renderMultiple" Render items like dropped items.
+• (Client) "renderText" Render the stacksize with the items.
+• (Both) "syncFreq" The amount of seconds that pass before updating the contents of an inventory.
+[/spoiler][center]
 
 [u][size=5]News:[/size][/u]
 

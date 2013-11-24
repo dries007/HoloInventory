@@ -109,6 +109,7 @@ public class CommandHoloInventory extends CommandBase
             PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(Data.MODID, new byte[] {2}), (Player) sender);
             for (InventoryData data : ServerHandler.serverTickHandler.blockMap.values())
             {
+                //noinspection SuspiciousMethodCalls
                 data.playerSet.remove(sender);
             }
         }

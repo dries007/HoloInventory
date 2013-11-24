@@ -3,7 +3,7 @@
  * License: MIT License (https://raw.github.com/jadar/DeveloperCapes/master/LICENSE)
  * version 2.1
  */
-package net.dries007.holoInventory.lib.developercapes;
+package com.jadarstudios.developercapes;
 
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -27,6 +27,7 @@ import java.util.HashMap;
  *
  * @author Jadar
  */
+@SuppressWarnings("ALL")
 public class DevCapes
 {
 

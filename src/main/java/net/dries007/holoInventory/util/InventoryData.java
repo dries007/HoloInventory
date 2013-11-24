@@ -53,8 +53,7 @@ public class InventoryData
 
     public boolean isOld(EntityPlayer player)
     {
-        if (!playerSet.containsKey(player)) return true;
-        return player.worldObj.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.getConfig().syncFreq;
+        return !playerSet.containsKey(player) || player.worldObj.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.getConfig().syncFreq;
     }
 
     public Packet getPacket()

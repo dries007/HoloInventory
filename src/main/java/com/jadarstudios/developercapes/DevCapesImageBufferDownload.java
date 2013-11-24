@@ -3,7 +3,7 @@
  * License: MIT License (https://raw.github.com/jadar/DeveloperCapes/master/LICENSE)
  * version 2.1
  */
-package net.dries007.holoInventory.lib.developercapes;
+package com.jadarstudios.developercapes;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
+@SuppressWarnings("ALL")
 @SideOnly(Side.CLIENT)
 public class DevCapesImageBufferDownload implements IImageBuffer
 {

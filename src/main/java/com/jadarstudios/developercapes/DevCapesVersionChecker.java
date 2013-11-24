@@ -3,7 +3,7 @@
  * License: MIT License (https://raw.github.com/jadar/DeveloperCapes/master/LICENSE)
  * version 2.1
  */
-package net.dries007.holoInventory.lib.developercapes;
+package com.jadarstudios.developercapes;
 
 import argo.jdom.JdomParser;
 
@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+@SuppressWarnings("ALL")
 public class DevCapesVersionChecker implements Runnable
 {
 

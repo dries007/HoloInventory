@@ -23,7 +23,6 @@
 
 package net.dries007.holoInventory.util;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -33,14 +32,6 @@ public class Coord
     public int x;
     public int y;
     public int z;
-
-    public Coord(int dim, int x, int y, int z)
-    {
-        this.dim = dim;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
 
     public Coord(int dim, MovingObjectPosition mop)
     {
@@ -59,22 +50,6 @@ public class Coord
                 this.z = (int) mop.entityHit.posZ;
                 break;
         }
-    }
-
-    public Coord(int hash)
-    {
-        this.dim = hash >> 24;
-        this.y = (hash >> 16) - (this.dim << 24);
-        this.z = (hash >> 8) - (this.dim << 24) - (this.y << 16);
-        this.x = hash - (this.dim << 24) - (this.y << 16) - (this.z << 8);
-    }
-
-    public Coord(NBTTagCompound coord)
-    {
-        this.dim = coord.getInteger("dim");
-        this.x = coord.getInteger("x");
-        this.y = coord.getInteger("y");
-        this.z = coord.getInteger("z");
     }
 
     public Coord offset(int side)
@@ -100,5 +75,12 @@ public class Coord
             return this.x == coord.x && this.y == coord.y && this.z == coord.z && this.dim == coord.dim;
         }
         return false;
+    }
+
+    public void add(double i)
+    {
+        x += i;
+        y += i;
+        z += i;
     }
 }

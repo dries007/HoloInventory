@@ -40,7 +40,6 @@ import java.net.URL;
 
 public class ClientHandler
 {
-    public final Renderer renderer;
     public static final VersionCheck VERSION_CHECK = new VersionCheck();
     public static final KeyManager   KEY_MANAGER   = new KeyManager();
     public static final RenderItem   RENDER_ITEM   = new RenderItem()
@@ -133,13 +132,12 @@ public class ClientHandler
 
     public ClientHandler()
     {
-        renderer = new Renderer();
         RENDER_ITEM.setRenderManager(RenderManager.instance);
     }
 
     public void init()
     {
-        MinecraftForge.EVENT_BUS.register(renderer);
+        MinecraftForge.EVENT_BUS.register(Renderer.INSTANCE);
 
         if (HoloInventory.getConfig().keyMode != 0)
         {

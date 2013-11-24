@@ -60,12 +60,12 @@ public class Config
     {
         configuration.get(MODID,
                 "bannedTiles",
-                bannedTiles.toArray(new String[0]),
-                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[0]));
+                bannedTiles.toArray(new String[bannedTiles.size()]),
+                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[bannedTiles.size()]));
         configuration.get(MODID,
                 "bannedEntities",
-                bannedEntities.toArray(new String[0]),
-                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedEntities.toArray(new String[0]));
+                bannedEntities.toArray(new String[bannedEntities.size()]),
+                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedEntities.toArray(new String[bannedEntities.size()]));
         configuration.save();
     }
 
@@ -100,12 +100,12 @@ public class Config
         bannedTiles.clear();
         bannedTiles.addAll(Arrays.asList(configuration.get(MODID,
                 "bannedTiles",
-                bannedTiles.toArray(new String[0]),
+                bannedTiles.toArray(new String[bannedTiles.size()]),
                 "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
         bannedEntities.clear();
         bannedEntities.addAll(Arrays.asList(configuration.get(MODID,
                 "bannedEntities",
-                bannedEntities.toArray(new String[0]),
+                bannedEntities.toArray(new String[bannedEntities.size()]),
                 "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
 
         configuration.save();

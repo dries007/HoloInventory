@@ -173,7 +173,7 @@ public class Helper
                 }
                 PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
             }
-            else if (entity instanceof IMerchant)
+            else
             {
                 NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
                 tag.setInteger("id", entityId);
@@ -238,7 +238,7 @@ public class Helper
             d3 = ((EntityPlayerMP) par2EntityPlayer).theItemInWorldManager.getBlockReachDistance();
         }
         Vec3 vec31 = vec3.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
-        return par2EntityPlayer.worldObj.rayTraceBlocks_do_do(vec3, vec31, false, !false);
+        return par2EntityPlayer.worldObj.rayTraceBlocks_do_do(vec3, vec31, false, true);
     }
 
     public static IInventory getInventory(final ItemStack... itemStacks)

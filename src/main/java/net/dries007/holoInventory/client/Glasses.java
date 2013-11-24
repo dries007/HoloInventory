@@ -31,7 +31,6 @@ import net.minecraft.client.model.ModelSkeletonHead;
 import net.minecraft.client.renderer.IImageBuffer;
 import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -40,7 +39,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,9 +49,8 @@ public class Glasses
 {
     public static final Glasses instance = new Glasses();
 
-    private HashMap<String, String>                  users           = new HashMap<>();
-    private HashMap<String, ResourceLocation>        resources       = new HashMap<>();
-    private HashMap<String, ThreadDownloadImageData> downloadThreads = new HashMap<>();
+    private HashMap<String, String>           users     = new HashMap<>();
+    private HashMap<String, ResourceLocation> resources = new HashMap<>();
 
     ModelSkeletonHead modelskeletonhead = new ModelSkeletonHead(0, 0, 64, 32);
 
@@ -86,7 +83,7 @@ public class Glasses
             GL11.glScalef(f5, f5, f5);
 
             Minecraft.getMinecraft().renderEngine.bindTexture(getResource(event.entityPlayer.getDisplayName()));
-            modelskeletonhead.render((Entity) null, 1.0F, 0.0F, 0.0F, 0F, 0.0F, 0.0625F);
+            modelskeletonhead.render(null, 1.0F, 0.0F, 0.0F, 0F, 0.0F, 0.0625F);
             GL11.glPopMatrix();
         }
     }
@@ -104,9 +101,9 @@ public class Glasses
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
             String line;
 
-            String username = "";
-            String group = "";
-            String capeUrl = "";
+            String username;
+            String group;
+            String capeUrl;
 
             while ((line = reader.readLine()) != null)
             {
@@ -122,10 +119,9 @@ public class Glasses
                         {
                             capeUrl = subLine;
                             ResourceLocation r = new ResourceLocation("Glasses/" + group);
-                            ThreadDownloadImageData t = makeDownloadThread(r, capeUrl, null, new ImageBufferDownload());
+                            makeDownloadThread(r, capeUrl, null, new ImageBufferDownload());
 
                             resources.put(group, r);
-                            downloadThreads.put(group, t);
                         }
                         else
                         {
@@ -166,13 +162,13 @@ public class Glasses
             }
             else
             {
-                this.imageWidth = (par1BufferedImage.getWidth((ImageObserver) null) <= 64) ? 64 : (par1BufferedImage.getWidth((ImageObserver) null));
-                this.imageHeight = (par1BufferedImage.getHeight((ImageObserver) null) <= 32) ? 32 : (par1BufferedImage.getHeight((ImageObserver) null));
+                this.imageWidth = (par1BufferedImage.getWidth(null) <= 64) ? 64 : (par1BufferedImage.getWidth(null));
+                this.imageHeight = (par1BufferedImage.getHeight(null) <= 32) ? 32 : (par1BufferedImage.getHeight(null));
 
                 BufferedImage capeImage = new BufferedImage(this.imageWidth, this.imageHeight, 2);
 
                 Graphics graphics = capeImage.getGraphics();
-                graphics.drawImage(par1BufferedImage, 0, 0, (ImageObserver) null);
+                graphics.drawImage(par1BufferedImage, 0, 0, null);
                 graphics.dispose();
 
                 return capeImage;

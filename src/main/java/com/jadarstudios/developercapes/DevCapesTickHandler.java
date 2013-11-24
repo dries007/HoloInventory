@@ -3,7 +3,7 @@
  * License: MIT License (https://raw.github.com/jadar/DeveloperCapes/master/LICENSE)
  * version 2.1
  */
-package net.dries007.holoInventory.lib.developercapes;
+package com.jadarstudios.developercapes;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.ITickHandler;
@@ -16,6 +16,7 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import java.util.EnumSet;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 @SideOnly(Side.CLIENT)
 public class DevCapesTickHandler implements ITickHandler
 {
