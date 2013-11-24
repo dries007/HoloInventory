@@ -215,7 +215,7 @@ public class Renderer
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
         maxColumns = getMaxColumns(itemStacks.size());
         maxRows = (itemStacks.size() % maxColumns == 0) ? (itemStacks.size() / maxColumns) - 1 : itemStacks.size() / maxColumns;
-        blockScale = getBlockScaleModifier(maxColumns) + (float) (0.1f * distance);
+        blockScale = getBlockScaleModifier(maxColumns) + (float) (0.05f * distance);
         maxWith = maxColumns * blockScale * 0.7f * 0.4f;
         maxHeight = maxRows * blockScale * 0.7f * 0.4f;
         renderText = HoloInventory.getConfig().renderText;
@@ -325,7 +325,7 @@ public class Renderer
         ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
         if (itemStack.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
-        if (renderText)
+        if (renderText && !(itemStack.getMaxStackSize() == 1 || itemStack.stackSize == 1))
         {
             GL11.glPushMatrix();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
