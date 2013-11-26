@@ -20,7 +20,8 @@ Options (see config file):[/center][spoiler]• (Server) I reccomend to use "/ho
 
 [u][size=5]News:[/size][/u]
 
-► v1.5 [url=http://www.dries007.net/holoinventory/Villagers.png]Villagers?![/url]
+► v1.5.1: Fixed rendering on fast graphics.
+► v1.5: [url=http://www.dries007.net/holoinventory/Villagers.png]Villagers?![/url]
 ► v1.4.1: Added:
 - [url=http://www.dries007.net/holoinventory/Stacking.png]Stacking (2 stacks of same block will combine, config)[/url]
 - [url=http://www.dries007.net/holoinventory/Scaling.png]Dynamic scaling (Bigger inventories have smaller icons)[/url]
