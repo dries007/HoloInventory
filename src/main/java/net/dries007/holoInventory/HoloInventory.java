@@ -26,6 +26,7 @@ package net.dries007.holoInventory;
 import com.jadarstudios.developercapes.DevCapesUtil;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -36,6 +37,7 @@ import net.dries007.holoInventory.client.Glasses;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;
+import net.dries007.holoInventory.util.CommonProxy;
 import net.dries007.holoInventory.util.Data;
 import org.mcstats.Metrics;
 
@@ -55,50 +57,38 @@ public class HoloInventory
     private static HoloInventory instance;
 
     private Config        config;
-    private ClientHandler clientHandler;
-    private ServerHandler serverHandler;
+
 
     @Mod.Metadata
     private ModMetadata metadata;
+
+    @SidedProxy(serverSide = "net.dries007.holoInventory.util.CommonProxy", clientSide = "net.dries007.holoInventory.util.ClientProxy")
+    public static CommonProxy proxy;
 
     @Mod.EventHandler()
     public void fmlEvent(FMLPreInitializationEvent event)
     {
         config = new Config(event.getSuggestedConfigurationFile());
-        DevCapesUtil.addFileUrl(CAPES);
-        Glasses.addFileUrl(GLASSES);
-
-        if (event.getSide().isClient()) clientHandler = new ClientHandler();
-        serverHandler = new ServerHandler();
-
-        try
-        {
-            Metrics metrics = new Metrics(Data.MODID, event.getModMetadata().version);
-            metrics.start();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        proxy.preInit();
     }
 
     @Mod.EventHandler()
     public void fmlEvent(FMLInitializationEvent event)
     {
-        if (event.getSide().isClient()) clientHandler.init();
-        serverHandler.init();
+        proxy.init();
     }
 
     @Mod.EventHandler()
     public void fmlEvent(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new CommandHoloInventory());
-        serverHandler.init();
+
+        proxy.serverStarting();
     }
 
-    public String getVersion()
+    public static String getVersion()
     {
-        return metadata.version;
+        return getInstance().metadata.version;
     }
 
     public static Config getConfig()

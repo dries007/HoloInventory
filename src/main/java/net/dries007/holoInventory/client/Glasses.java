@@ -24,6 +24,7 @@
 package net.dries007.holoInventory.client;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -45,6 +46,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 
+@SideOnly(Side.CLIENT)
 public class Glasses
 {
     public static final Glasses instance = new Glasses();
@@ -67,6 +69,7 @@ public class Glasses
     @ForgeSubscribe
     public void renderEvent(RenderPlayerEvent.Specials.Pre event)
     {
+        if (!FMLCommonHandler.instance().getSide().isClient()) return;
         if (users.containsKey(event.entityPlayer.getDisplayName()) && event.entityPlayer.inventory.armorInventory[3] == null)
         {
             if (event.entityPlayer.isInvisible()) return;
@@ -95,6 +98,7 @@ public class Glasses
 
     private void addFileUrlInternal(String parTxtUrl)
     {
+        if (!FMLCommonHandler.instance().getSide().isClient()) return;
         try
         {
             URL url = new URL(parTxtUrl);
@@ -138,7 +142,7 @@ public class Glasses
         }
     }
 
-    public static ThreadDownloadImageData makeDownloadThread(ResourceLocation par0ResourceLocation, String par1Str, ResourceLocation par2ResourceLocation, IImageBuffer par3IImageBuffer)
+    private static ThreadDownloadImageData makeDownloadThread(ResourceLocation par0ResourceLocation, String par1Str, ResourceLocation par2ResourceLocation, IImageBuffer par3IImageBuffer)
     {
         TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
         ThreadDownloadImageData threadDownloadImageData = new ThreadDownloadImageData(par1Str, par2ResourceLocation, par3IImageBuffer);
@@ -147,9 +151,8 @@ public class Glasses
     }
 
     @SideOnly(Side.CLIENT)
-    public static class ImageBufferDownload implements IImageBuffer
+    private static class ImageBufferDownload implements IImageBuffer
     {
-
         private int imageWidth;
         private int imageHeight;
 
