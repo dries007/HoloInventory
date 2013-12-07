@@ -148,6 +148,7 @@ public class Helper
                 IInventory inventory = (IInventory) entity;
                 NBTTagCompound root = new NBTTagCompound();
                 root.setInteger("id", entityId);
+                root.setString("name", inventory.getInvName());
                 NBTTagList list = new NBTTagList();
                 for (int i = 0; i < inventory.getSizeInventory(); i++)
                 {
@@ -177,6 +178,7 @@ public class Helper
             {
                 NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
                 tag.setInteger("id", entityId);
+                tag.setString("name", entity.getTranslatedEntityName());
                 ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
                 DataOutputStream stream = new DataOutputStream(streambyte);
                 try
@@ -241,7 +243,7 @@ public class Helper
         return par2EntityPlayer.worldObj.rayTraceBlocks_do_do(vec3, vec31, false, true);
     }
 
-    public static IInventory getInventory(final ItemStack... itemStacks)
+    public static IInventory getInventory(final String name, final ItemStack... itemStacks)
     {
         return new IInventory()
         {
@@ -277,13 +279,13 @@ public class Helper
             @Override
             public String getInvName()
             {
-                return "";
+                return name;
             }
 
             @Override
             public boolean isInvNameLocalized()
             {
-                return false;
+                return true;
             }
 
             @Override

@@ -53,6 +53,12 @@ public class CommandHoloInventory extends CommandBase
     }
 
     @Override
+    public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender)
+    {
+        return true;
+    }
+
+    @Override
     public String getCommandUsage(ICommandSender icommandsender)
     {
         return "Use to reset local cache (<reset>), get tile and entity names (<getNames>).";
@@ -68,7 +74,7 @@ public class CommandHoloInventory extends CommandBase
                 if (isOp(sender)) return getListOfStringsMatchingLastWord(args, "reset", "ban", "unban");
                 else return getListOfStringsMatchingLastWord(args, "reset");
             case 2:
-                if (args[0].equalsIgnoreCase("unban")) return getListOfStringsFromIterableMatchingLastWord(args, getAllList());
+                if (isOp(sender) && args[0].equalsIgnoreCase("unban")) return getListOfStringsFromIterableMatchingLastWord(args, getAllList());
                 else return null;
         }
     }
@@ -113,28 +119,43 @@ public class CommandHoloInventory extends CommandBase
                 data.playerSet.remove(sender);
             }
         }
-        else if (isOp(sender) && args[0].equalsIgnoreCase("ban"))
+        else if (args[0].equalsIgnoreCase("ban"))
         {
-            ServerHandler.serverEventHandler.banUsers.add(sender.getCommandSenderName());
-            sender.sendChatToPlayer(ChatMessageComponent.createFromText("RIGHTclick a block or entity to ban the hologram on that type."));
-        }
-        else if (isOp(sender) && args[0].equalsIgnoreCase("unban"))
-        {
-            if (args.length == 1)
+            if (isOp(sender))
             {
-                if (getAllList().size() == 0) sender.sendChatToPlayer(ChatMessageComponent.createFromText("You didn't ban any inventories yet..."));
-                else
-                    sender.sendChatToPlayer(ChatMessageComponent.createFromText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
-            }
-            else if (getAllList().contains(args[1]))
-            {
-                HoloInventory.getConfig().bannedEntities.remove(args[1]);
-                HoloInventory.getConfig().bannedTiles.remove(args[1]);
-                HoloInventory.getConfig().overrideBannedThings();
+                ServerHandler.serverEventHandler.banUsers.add(sender.getCommandSenderName());
+                sender.sendChatToPlayer(ChatMessageComponent.createFromText("RIGHTclick a block or entity to ban the hologram on that type."));
             }
             else
             {
-                sender.sendChatToPlayer(ChatMessageComponent.createFromText("That thing is not on any banlist I know of...").setColor(EnumChatFormatting.RED));
+                sender.sendChatToPlayer(ChatMessageComponent.createFromText("You are not opped. Ban stuff in SSP to block it client side."));
+            }
+        }
+        else if (args[0].equalsIgnoreCase("unban"))
+        {
+            if (isOp(sender))
+            {
+                if (args.length == 1)
+                {
+                    if (getAllList().size() == 0) sender.sendChatToPlayer(ChatMessageComponent.createFromText("You didn't ban any inventories yet..."));
+                    else
+                        sender.sendChatToPlayer(ChatMessageComponent.createFromText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
+                }
+                else if (getAllList().contains(args[1]))
+                {
+                    HoloInventory.getConfig().bannedEntities.remove(args[1]);
+                    HoloInventory.getConfig().bannedTiles.remove(args[1]);
+                    HoloInventory.getConfig().overrideBannedThings();
+                }
+                else
+                {
+                    sender.sendChatToPlayer(ChatMessageComponent.createFromText("That thing is not on any banlist I know of...").setColor(EnumChatFormatting.RED));
+                }
+            }
+            else
+            {
+                sender.sendChatToPlayer(ChatMessageComponent.createFromText("You are not opped. Unban stuff in SSP to unblock it client side."));
+                sender.sendChatToPlayer(ChatMessageComponent.createFromText("If you think this ban is stupid, ask a server admin to remove it."));
             }
         }
         else

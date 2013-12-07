@@ -51,7 +51,7 @@ public class ServerEventHandler
             if (te instanceof IInventory)
             {
                 HoloInventory.getConfig().bannedTiles.add(te.getClass().getCanonicalName());
-                event.entityPlayer.sendChatToPlayer(ChatMessageComponent.createFromText(event.entity.getClass().getCanonicalName() + " will no longer display a hologram."));
+                event.entityPlayer.sendChatToPlayer(ChatMessageComponent.createFromText(te.getClass().getCanonicalName() + " will no longer display a hologram."));
             }
             else
             {
@@ -73,7 +73,7 @@ public class ServerEventHandler
             if (event.target instanceof IInventory)
             {
                 HoloInventory.getConfig().bannedEntities.add(event.target.getClass().getCanonicalName());
-                event.entityPlayer.sendChatToPlayer(ChatMessageComponent.createFromText(event.entity.getClass().getCanonicalName() + " will no longer display a hologram."));
+                event.entityPlayer.sendChatToPlayer(ChatMessageComponent.createFromText(event.target.getClass().getCanonicalName() + " will no longer display a hologram."));
             }
             else
             {

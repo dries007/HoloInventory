@@ -86,6 +86,8 @@ public class Renderer
                 // Render if we know the content
                 if (tileMap.containsKey(coord.hashCode()))
                 {
+                    // Check for local ban
+                    if (HoloInventory.getConfig().bannedTiles.contains(mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z).getClass().getCanonicalName())) return;
                     int i = coord.hashCode();
                     coord.x += 0.5;
                     coord.y += 0.5;
@@ -98,6 +100,9 @@ public class Renderer
                 Entity entity = mc.objectMouseOver.entityHit;
                 if (entity instanceof IMerchant || entity instanceof IInventory)
                 {
+                    // Check for local ban
+                    if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName())) return;
+
                     int id = entity.entityId;
                     // Make & store request
                     if (!requestMap.containsKey(id))

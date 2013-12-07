@@ -37,6 +37,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.tileentity.TileEntityRecordPlayer;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldServer;
 
 import java.util.EnumSet;
@@ -85,7 +86,8 @@ public class ServerTickHandler implements ITickHandler
                     }
                     else if (te instanceof TileEntityRecordPlayer)
                     {
-                        doStuff(coord.hashCode(), player, ((TileEntityRecordPlayer) te).func_96097_a());
+                        TileEntityRecordPlayer realTe = ((TileEntityRecordPlayer) te);
+                        doStuff(coord.hashCode(), player, StatCollector.translateToLocal(realTe.blockType.getLocalizedName()), realTe.func_96097_a());
                     }
                     else
                     {
@@ -113,9 +115,9 @@ public class ServerTickHandler implements ITickHandler
         }
     }
 
-    private void doStuff(int id, EntityPlayerMP player, ItemStack... itemStacks)
+    private void doStuff(int id, EntityPlayerMP player, String name, ItemStack... itemStacks)
     {
-        doStuff(id, player, Helper.getInventory(itemStacks));
+        doStuff(id, player, Helper.getInventory(name, itemStacks));
     }
 
     private void doStuff(int id, EntityPlayerMP player, IInventory inventory)
