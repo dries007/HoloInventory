@@ -44,10 +44,12 @@ public class Config
     public boolean renderText     = true;
     public boolean renderMultiple = true;
     public boolean enableStacking = true;
+    public boolean renderName     = true;
 
     public int keyMode;
     public ArrayList<String> bannedTiles    = new ArrayList<>();
     public ArrayList<String> bannedEntities = new ArrayList<>();
+
 
 
     public Config(File file)
@@ -85,6 +87,7 @@ public class Config
                 "2: Only render hologram while key pressed.\n" +
                 "3: Don't render hologram while key pressed.").getInt();
 
+        renderName = configuration.get(MODID, "renderName", renderName, "Renders the inv name above the hologram").getBoolean(true);
         renderText = configuration.get(MODID, "renderText", renderText, "Render the stacksize as text on top of the items").getBoolean(true);
         renderMultiple = configuration.get(MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
 

@@ -88,7 +88,7 @@ public class Helper
         {
             itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
         }
-        Renderer.tileMap.put(tag.getInteger("id"), itemStacks);
+        Renderer.tileMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
     }
 
     public static void readEntity(NBTTagCompound tag)
@@ -99,7 +99,7 @@ public class Helper
         {
             itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
         }
-        Renderer.entityMap.put(tag.getInteger("id"), itemStacks);
+        Renderer.entityMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
     }
 
     public static void readMerchant(NBTTagCompound tag)
@@ -107,7 +107,7 @@ public class Helper
         MerchantRecipeList list = new MerchantRecipeList();
         list.readRecipiesFromTags(tag);
 
-        Renderer.merchantMap.put(tag.getInteger("id"), list);
+        Renderer.merchantMap.put(tag.getInteger("id"), new NamedData<MerchantRecipeList>(tag.getString("name"), list));
     }
 
     public static void readRemove(NBTTagCompound tag)

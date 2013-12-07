@@ -44,11 +44,13 @@ public class InventoryData
     public int        id;
     public IInventory te;
     public HashMap<EntityPlayer, Long> playerSet = new HashMap<>();
+    public String     name;
 
     public InventoryData(IInventory te, int id)
     {
         this.id = id;
         this.te = te;
+        this.name = te.getInvName();
     }
 
     public boolean isOld(EntityPlayer player)
@@ -79,6 +81,7 @@ public class InventoryData
     {
         NBTTagCompound root = new NBTTagCompound();
         root.setInteger("id", this.id);
+        root.setString("name", name);
         NBTTagList list = new NBTTagList();
         for (int i = 0; i < te.getSizeInventory(); i++)
         {

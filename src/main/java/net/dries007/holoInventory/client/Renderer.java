@@ -23,9 +23,11 @@
 
 package net.dries007.holoInventory.client;
 
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
+import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -34,6 +36,7 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -49,12 +52,12 @@ import java.util.List;
 
 public class Renderer
 {
-    private static final DecimalFormat                        DF          = new DecimalFormat("#.#");
-    private static final int                                  TEXTCOLOR   = 255 + (255 << 8) + (255 << 16) + (170 << 24);
-    public static final  HashMap<Integer, ItemStack[]>        tileMap     = new HashMap<>();
-    public static final  HashMap<Integer, ItemStack[]>        entityMap   = new HashMap<>();
-    public static final  HashMap<Integer, MerchantRecipeList> merchantMap = new HashMap<>();
-    public static final  HashMap<Integer, Long>               requestMap  = new HashMap<>();
+    private static final DecimalFormat                                      DF          = new DecimalFormat("#.#");
+    private static final int                                                TEXTCOLOR   = 255 + (255 << 8) + (255 << 16) + (170 << 24);
+    public static final  HashMap<Integer, NamedData<ItemStack[]>>           tileMap     = new HashMap<>();
+    public static final  HashMap<Integer, NamedData<ItemStack[]>>           entityMap   = new HashMap<>();
+    public static final  HashMap<Integer, NamedData<MerchantRecipeList>>    merchantMap = new HashMap<>();
+    public static final  HashMap<Integer, Long>                             requestMap  = new HashMap<>();
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
@@ -87,7 +90,9 @@ public class Renderer
                 if (tileMap.containsKey(coord.hashCode()))
                 {
                     // Check for local ban
-                    if (HoloInventory.getConfig().bannedTiles.contains(mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z).getClass().getCanonicalName())) return;
+                    if (HoloInventory.getConfig().bannedTiles.contains(mc.theWorld.getBlockTileEntity((int) coord.x,
+                            (int) coord.y,
+                            (int) coord.z).getClass().getCanonicalName())) return;
                     int i = coord.hashCode();
                     coord.x += 0.5;
                     coord.y += 0.5;
@@ -130,12 +135,12 @@ public class Renderer
     /**
      * Render a villagers hologram
      *
-     * @param list The things to render
+     * @param namedData The things to render
      */
-    private void renderMerchant(MerchantRecipeList list)
+    private void renderMerchant(NamedData<MerchantRecipeList> namedData)
     {
         coord.y += 2; //Adjust for villager height
-        if (list.size() == 0) return;
+        if (namedData.data.size() == 0) return;
         final double distance = distance();
         if (distance < 1) return;
 
@@ -145,17 +150,21 @@ public class Renderer
         // Values for later
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
         maxColumns = 3;
-        maxRows = list.size();
+        maxRows = namedData.data.size();
         blockScale = getBlockScaleModifier(maxColumns) + (float) (0.1f * distance);
         maxWith = maxColumns * blockScale * 0.7f * 0.4f;
         maxHeight = maxRows * blockScale * 0.7f * 0.4f;
         renderText = true;
 
-        renderBG();
+        // Render the BG
+        if (HoloInventory.getConfig().colorEnable) renderBG();
 
-        for (int row = 0; row < list.size(); row++)
+        // Render the inv name
+        if (HoloInventory.getConfig().renderName) renderName(namedData.name);
+
+        for (int row = 0; row < namedData.data.size(); row++)
         {
-            MerchantRecipe recipe = (MerchantRecipe) list.get(row);
+            MerchantRecipe recipe = (MerchantRecipe) namedData.data.get(row);
 
             renderItem(recipe.getItemToBuy(), 0, row, recipe.getItemToBuy().stackSize);
             if (recipe.hasSecondItemToBuy()) renderItem(recipe.getSecondItemToBuy(), 1, row, recipe.getSecondItemToBuy().stackSize);
@@ -169,11 +178,11 @@ public class Renderer
      * Render a regular hologram
      * Does stacking first if user wants it
      *
-     * @param itemStacks Array of items in the inventory
+     * @param namedData Array of items in the inventory
      */
-    private void renderHologram(ItemStack[] itemStacks)
+    private void renderHologram(NamedData<ItemStack[]> namedData)
     {
-        if (itemStacks.length == 0) return;
+        if (namedData.data.length == 0) return;
         final double distance = distance();
         if (distance < 1.5) return;
 
@@ -181,7 +190,7 @@ public class Renderer
         {
             // Stack same items together
             ArrayList<ItemStack> list = new ArrayList<>();
-            for (ItemStack stackToAdd : Arrays.asList(itemStacks))
+            for (ItemStack stackToAdd : Arrays.asList(namedData.data))
             {
                 boolean f = false;
                 for (ItemStack stackInList : list)
@@ -196,11 +205,11 @@ public class Renderer
                 if (!f) list.add(stackToAdd.copy());
             }
 
-            doRenderHologram(list, distance);
+            doRenderHologram(namedData.name, list, distance);
         }
         else
         {
-            doRenderHologram(Arrays.asList(itemStacks), distance);
+            doRenderHologram(namedData.name, Arrays.asList(namedData.data), distance);
         }
     }
 
@@ -210,7 +219,7 @@ public class Renderer
      * @param itemStacks The itemStacks that will be rendered
      * @param distance   The distance the player is from the hologram, passed to avoid 2th calculation.
      */
-    private void doRenderHologram(List<ItemStack> itemStacks, double distance)
+    private void doRenderHologram(String name, List<ItemStack> itemStacks, double distance)
     {
         // Move to right position and rotate to face the player
         GL11.glPushMatrix();
@@ -226,7 +235,10 @@ public class Renderer
         renderText = HoloInventory.getConfig().renderText;
 
         // Render the BG
-        renderBG();
+        if (HoloInventory.getConfig().colorEnable) renderBG();
+
+        // Render the inv name
+        if (HoloInventory.getConfig().renderName) renderName(name);
 
         // Render items
         int column = 0, row = 0;
@@ -349,8 +361,6 @@ public class Renderer
 
     private void renderBG()
     {
-        if (!HoloInventory.getConfig().colorEnable) return;
-
         GL11.glPushMatrix();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -373,6 +383,29 @@ public class Renderer
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPopMatrix();
+    }
+
+    private void renderName(String name)
+    {
+        name = StatCollector.translateToLocal(name);
+        GL11.glPushMatrix();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+
+        GL11.glTranslated(0f, maxHeight + blockScale/1.25, 0f);
+
+        GL11.glScaled(blockScale, blockScale, blockScale);
+        if (blockScale < 0.5) GL11.glScalef(1.5f, 1.5f, 1.5f);
+        GL11.glScalef(0.03f, 0.03f, 0.03f);
+        GL11.glTranslated(3f * name.length(), 0f, 0f);
+        GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
+        GL11.glTranslatef(-1f, 1f, 0f);
+        RenderManager.instance.getFontRenderer().drawString(name, 0, 0, TEXTCOLOR, true);
+
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glPopMatrix();
     }
 
