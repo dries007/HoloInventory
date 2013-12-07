@@ -15,11 +15,13 @@ Options (see config file):[/center][spoiler]• (Server) I reccomend to use "/ho
 • (Client) "keyMode" Allows you to enable an ingame key.
 • (Client) "renderMultiple" Render items like dropped items.
 • (Client) "renderText" Render the stacksize with the items.
+• (Client) "renderName" Render the stacksize with the items.
 • (Both) "syncFreq" The amount of seconds that pass before updating the contents of an inventory.
 [/spoiler][center]
 
 [u][size=5]News:[/size][/u]
 
+► v1.5.4: [url=http://www.dries007.net/holoinventory/Names.png]Inventory names[/url]
 ► v1.5.1: Fixed rendering on fast graphics.
 ► v1.5: [url=http://www.dries007.net/holoinventory/Villagers.png]Villagers?![/url]
 ► v1.4.1: Added:
