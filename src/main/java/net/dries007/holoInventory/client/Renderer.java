@@ -331,7 +331,7 @@ public class Renderer
         ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
         if (itemStack.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
-        if (renderText && !(itemStack.getMaxStackSize() == 1 || itemStack.stackSize == 1))
+        if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1))
         {
             GL11.glPushMatrix();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
