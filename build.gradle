@@ -11,6 +11,8 @@ apply plugin: "gmcp"
 
 ext.env = System.getenv()
 version = new File('version.txt').text + env.BUILD_NUMBER
+
+println 'Version: ' + project.version
 archivesBaseName = 'HoloInventory'
 minecraft {
 	minecraftVersion = "1.6.4"
