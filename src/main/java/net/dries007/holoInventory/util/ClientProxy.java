@@ -1,8 +1,6 @@
 package net.dries007.holoInventory.util;
 
 import com.jadarstudios.developercapes.DevCapesUtil;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.client.Glasses;
 

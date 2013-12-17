@@ -23,7 +23,6 @@
 
 package net.dries007.holoInventory;
 
-import com.jadarstudios.developercapes.DevCapesUtil;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.SidedProxy;
@@ -31,19 +30,12 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.client.ClientPacketHandler;
-import net.dries007.holoInventory.client.Glasses;
 import net.dries007.holoInventory.server.CommandHoloInventory;
-import net.dries007.holoInventory.server.ServerHandler;
 import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.dries007.holoInventory.util.CommonProxy;
-import net.dries007.holoInventory.util.Data;
-import org.mcstats.Metrics;
 
-import java.io.IOException;
-
-import static net.dries007.holoInventory.util.Data.*;
+import static net.dries007.holoInventory.util.Data.MODID;
 
 @NetworkMod(channels = {MODID},
         clientPacketHandlerSpec = @NetworkMod.SidedPacketHandler(channels = {MODID},
@@ -56,7 +48,7 @@ public class HoloInventory
     @Mod.Instance(value = MODID)
     private static HoloInventory instance;
 
-    private Config        config;
+    private Config config;
 
 
     @Mod.Metadata

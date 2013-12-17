@@ -138,8 +138,7 @@ public class CommandHoloInventory extends CommandBase
                 if (args.length == 1)
                 {
                     if (getAllList().size() == 0) sender.sendChatToPlayer(ChatMessageComponent.createFromText("You didn't ban any inventories yet..."));
-                    else
-                        sender.sendChatToPlayer(ChatMessageComponent.createFromText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
+                    else sender.sendChatToPlayer(ChatMessageComponent.createFromText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
                 }
                 else if (getAllList().contains(args[1]))
                 {

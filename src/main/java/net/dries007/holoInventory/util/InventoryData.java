@@ -44,7 +44,7 @@ public class InventoryData
     public int        id;
     public IInventory te;
     public HashMap<EntityPlayer, Long> playerSet = new HashMap<>();
-    public String     name;
+    public String name;
 
     public InventoryData(IInventory te, int id)
     {

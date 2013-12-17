@@ -51,7 +51,6 @@ public class Config
     public ArrayList<String> bannedEntities = new ArrayList<>();
 
 
-
     public Config(File file)
     {
         configuration = new Configuration(file);
@@ -64,10 +63,8 @@ public class Config
                 "bannedTiles",
                 bannedTiles.toArray(new String[bannedTiles.size()]),
                 "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[bannedTiles.size()]));
-        configuration.get(MODID,
-                "bannedEntities",
-                bannedEntities.toArray(new String[bannedEntities.size()]),
-                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedEntities.toArray(new String[bannedEntities.size()]));
+        configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(
+                bannedEntities.toArray(new String[bannedEntities.size()]));
         configuration.save();
     }
 
@@ -93,10 +90,7 @@ public class Config
 
         doVersionCheck = configuration.get(MODID, "doVersionCheck", doVersionCheck).getBoolean(true);
 
-        syncFreq = configuration.get(MODID,
-                "syncFreq",
-                syncFreq,
-                "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
+        syncFreq = configuration.get(MODID, "syncFreq", syncFreq, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
         enableStacking = configuration.get(MODID, "enableStacking", enableStacking, "Stack items, even above 64.").getBoolean(enableStacking);
 

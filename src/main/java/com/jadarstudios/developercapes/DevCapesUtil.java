@@ -50,8 +50,7 @@ public class DevCapesUtil
         if (FMLCommonHandler.instance().getSide().equals(Side.CLIENT)) return DevCapes.getInstance();
         else
         {
-            System.out.println(
-                    "[SEVERE] [DevCapes] **Someone tried to call DevCapesUtil.getInstance() on a server! If you are attempting to add a file url then use DevCapesUtil.addFileUrl().**");
+            System.out.println("[SEVERE] [DevCapes] **Someone tried to call DevCapesUtil.getInstance() on a server! If you are attempting to add a file url then use DevCapesUtil.addFileUrl().**");
             return null;
         }
     }

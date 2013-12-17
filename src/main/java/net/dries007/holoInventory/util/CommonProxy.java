@@ -1,10 +1,6 @@
 package net.dries007.holoInventory.util;
 
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.client.ClientHandler;
 import net.dries007.holoInventory.server.ServerHandler;
 import org.mcstats.Metrics;
 

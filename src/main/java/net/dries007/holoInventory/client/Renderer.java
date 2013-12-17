@@ -23,7 +23,6 @@
 
 package net.dries007.holoInventory.client;
 
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
@@ -52,12 +51,12 @@ import java.util.List;
 
 public class Renderer
 {
-    private static final DecimalFormat                                      DF          = new DecimalFormat("#.#");
-    private static final int                                                TEXTCOLOR   = 255 + (255 << 8) + (255 << 16) + (170 << 24);
-    public static final  HashMap<Integer, NamedData<ItemStack[]>>           tileMap     = new HashMap<>();
-    public static final  HashMap<Integer, NamedData<ItemStack[]>>           entityMap   = new HashMap<>();
-    public static final  HashMap<Integer, NamedData<MerchantRecipeList>>    merchantMap = new HashMap<>();
-    public static final  HashMap<Integer, Long>                             requestMap  = new HashMap<>();
+    private static final DecimalFormat                                   DF          = new DecimalFormat("#.#");
+    private static final int                                             TEXTCOLOR   = 255 + (255 << 8) + (255 << 16) + (170 << 24);
+    public static final  HashMap<Integer, NamedData<ItemStack[]>>        tileMap     = new HashMap<>();
+    public static final  HashMap<Integer, NamedData<ItemStack[]>>        entityMap   = new HashMap<>();
+    public static final  HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<>();
+    public static final  HashMap<Integer, Long>                          requestMap  = new HashMap<>();
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
@@ -78,8 +77,7 @@ public class Renderer
     {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null)
-            return;
+        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)
         {
@@ -90,9 +88,7 @@ public class Renderer
                 if (tileMap.containsKey(coord.hashCode()))
                 {
                     // Check for local ban
-                    if (HoloInventory.getConfig().bannedTiles.contains(mc.theWorld.getBlockTileEntity((int) coord.x,
-                            (int) coord.y,
-                            (int) coord.z).getClass().getCanonicalName())) return;
+                    if (HoloInventory.getConfig().bannedTiles.contains(mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z).getClass().getCanonicalName())) return;
                     int i = coord.hashCode();
                     coord.x += 0.5;
                     coord.y += 0.5;
@@ -369,10 +365,7 @@ public class Renderer
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL11.GL_QUADS);
-        tess.setColorRGBA(HoloInventory.getConfig().colorR,
-                HoloInventory.getConfig().colorG,
-                HoloInventory.getConfig().colorB,
-                HoloInventory.getConfig().colorAlpha);
+        tess.setColorRGBA(HoloInventory.getConfig().colorR, HoloInventory.getConfig().colorG, HoloInventory.getConfig().colorB, HoloInventory.getConfig().colorAlpha);
         double d = blockScale / 3;
         tess.addVertex(maxWith + d, -d - maxHeight, 0);
         tess.addVertex(-maxWith - d, -d - maxHeight, 0);
@@ -393,7 +386,7 @@ public class Renderer
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-        GL11.glTranslated(0f, maxHeight + blockScale/1.25, 0f);
+        GL11.glTranslated(0f, maxHeight + blockScale / 1.25, 0f);
 
         GL11.glScaled(blockScale, blockScale, blockScale);
         if (blockScale < 0.5) GL11.glScalef(1.5f, 1.5f, 1.5f);
