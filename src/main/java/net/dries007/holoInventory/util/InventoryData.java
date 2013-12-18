@@ -43,7 +43,7 @@ public class InventoryData
 {
     public int        id;
     public IInventory te;
-    public HashMap<EntityPlayer, Long> playerSet = new HashMap<>();
+    public HashMap<EntityPlayer, Long> playerSet = new HashMap<EntityPlayer, Long>();
     public String name;
 
     public InventoryData(IInventory te, int id)

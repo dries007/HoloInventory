@@ -86,7 +86,7 @@ public class CommandHoloInventory extends CommandBase
 
     private List<String> getAllList()
     {
-        ArrayList<String> temp = new ArrayList<>();
+        ArrayList<String> temp = new ArrayList<String>();
         temp.addAll(HoloInventory.getConfig().bannedEntities);
         temp.addAll(HoloInventory.getConfig().bannedTiles);
         return temp;

@@ -47,7 +47,7 @@ import static net.dries007.holoInventory.util.Data.MODID;
 
 public class ServerTickHandler implements ITickHandler
 {
-    public HashMap<Integer, InventoryData> blockMap = new HashMap<>();
+    public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
 
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData)

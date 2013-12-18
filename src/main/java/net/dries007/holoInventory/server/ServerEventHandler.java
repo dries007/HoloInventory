@@ -36,7 +36,7 @@ import java.util.List;
 
 public class ServerEventHandler
 {
-    public List<String> banUsers = new ArrayList<>();
+    public List<String> banUsers = new ArrayList<String>();
 
     @ForgeSubscribe()
     public void event(PlayerInteractEvent event)

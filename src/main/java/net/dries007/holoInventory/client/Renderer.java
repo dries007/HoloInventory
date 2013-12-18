@@ -53,10 +53,10 @@ public class Renderer
 {
     private static final DecimalFormat                                   DF          = new DecimalFormat("#.#");
     private static final int                                             TEXTCOLOR   = 255 + (255 << 8) + (255 << 16) + (170 << 24);
-    public static final  HashMap<Integer, NamedData<ItemStack[]>>        tileMap     = new HashMap<>();
-    public static final  HashMap<Integer, NamedData<ItemStack[]>>        entityMap   = new HashMap<>();
-    public static final  HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<>();
-    public static final  HashMap<Integer, Long>                          requestMap  = new HashMap<>();
+    public static final  HashMap<Integer, NamedData<ItemStack[]>>        tileMap     = new HashMap<Integer, NamedData<ItemStack[]>>();
+    public static final  HashMap<Integer, NamedData<ItemStack[]>>        entityMap   = new HashMap<Integer, NamedData<ItemStack[]>>();
+    public static final  HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
+    public static final  HashMap<Integer, Long>                          requestMap  = new HashMap<Integer, Long>();
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
@@ -185,7 +185,7 @@ public class Renderer
         if (HoloInventory.getConfig().enableStacking)
         {
             // Stack same items together
-            ArrayList<ItemStack> list = new ArrayList<>();
+            ArrayList<ItemStack> list = new ArrayList<ItemStack>();
             for (ItemStack stackToAdd : Arrays.asList(namedData.data))
             {
                 boolean f = false;

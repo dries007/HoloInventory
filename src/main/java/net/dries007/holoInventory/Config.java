@@ -47,8 +47,8 @@ public class Config
     public boolean renderName     = true;
 
     public int keyMode;
-    public ArrayList<String> bannedTiles    = new ArrayList<>();
-    public ArrayList<String> bannedEntities = new ArrayList<>();
+    public ArrayList<String> bannedTiles    = new ArrayList<String>();
+    public ArrayList<String> bannedEntities = new ArrayList<String>();
 
 
     public Config(File file)

@@ -50,8 +50,8 @@ public class Glasses
 {
     public static final Glasses instance = new Glasses();
 
-    private HashMap<String, String>           users     = new HashMap<>();
-    private HashMap<String, ResourceLocation> resources = new HashMap<>();
+    private HashMap<String, String>           users     = new HashMap<String, String>();
+    private HashMap<String, ResourceLocation> resources = new HashMap<String, ResourceLocation>();
 
     ModelSkeletonHead modelskeletonhead = new ModelSkeletonHead(0, 0, 64, 32);
 
