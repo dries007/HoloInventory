@@ -19,7 +19,6 @@ println 'Version: ' + project.version
 archivesBaseName = 'HoloInventory'
 minecraft {
 	minecraftVersion = "1.6.4"
-    accessTransformers += 'src/main/resources/devcapes.at'
 }
 
 processResources

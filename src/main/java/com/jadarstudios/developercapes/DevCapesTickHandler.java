@@ -12,11 +12,12 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
 
+import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 @SideOnly(Side.CLIENT)
 public class DevCapesTickHandler implements ITickHandler
 {
@@ -27,6 +28,8 @@ public class DevCapesTickHandler implements ITickHandler
     // Keep at false when packaging..
     private boolean debug = false;
 
+    private static Field downloadImageCapeField = getHackField(2);
+    private static Field locationCapeField      = getHackField(4);
 
     private int     counter  = 0;
     private boolean notified = false;
@@ -34,58 +37,63 @@ public class DevCapesTickHandler implements ITickHandler
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData)
     {
-
-
-        // Will not run if there is no world, and if there are no player entities
-        // in the playerEntities list.
-        if ((mc.theWorld != null) && (mc.theWorld.playerEntities.size() > 0))
+        try
         {
-            // List of players.
-            @SuppressWarnings("unchecked") List<AbstractClientPlayer> players = mc.theWorld.playerEntities;
-
-            // resets the counter if it is too high.
-            if (counter >= players.size()) counter = 0;
-
-            AbstractClientPlayer p = players.get(counter);
-            if (p != null)
+            // Will not run if there is no world, and if there are no player entities
+            // in the playerEntities list.
+            if ((mc.theWorld != null) && (mc.theWorld.playerEntities.size() > 0))
             {
+                // List of players.
+                @SuppressWarnings("unchecked") List<AbstractClientPlayer> players = mc.theWorld.playerEntities;
 
-                String lowerUsername = p.username.toLowerCase();
+                // resets the counter if it is too high.
+                if (counter >= players.size()) counter = 0;
 
-                if (instance.getUserGroup(lowerUsername) != null)
+                AbstractClientPlayer p = players.get(counter);
+                if (p != null)
                 {
-                    // If the player had no cape before, (or is some cases
-                    // has a cape from another mod,) then it will be true.
-                    // This statement checks for false. Will not replace any
-                    // capes.
-                    if (!p.downloadImageCape.isTextureUploaded())
-                    {
-                        String userGroup = instance.getUserGroup(lowerUsername);
 
-                        if (debug) System.out.println("Changing the cape of: " + p.username);
-                        // Sets the cape URL.
-                        p.locationCape = instance.getCapeResource(userGroup);
-                        p.downloadImageCape = instance.getDownloadThread(userGroup);
-                    }
+                    String lowerUsername = p.username.toLowerCase();
 
-                    //notifies qualified user that developer capes is outdated.
-                    if (!notified)
+                    if (instance.getUserGroup(lowerUsername) != null)
                     {
-                        if (FMLClientHandler.instance().getClient().currentScreen == null)
+                        // If the player had no cape before, (or is some cases
+                        // has a cape from another mod,) then it will be true.
+                        // This statement checks for false. Will not replace any
+                        // capes.
+                        if (!((ThreadDownloadImageData) downloadImageCapeField.get(p)).isTextureUploaded())
                         {
-                            if (instance.versionChecker.getResult() == 1)
+                            String userGroup = instance.getUserGroup(lowerUsername);
+
+                            if (debug) System.out.println("Changing the cape of: " + p.username);
+                            // Sets the cape URL.
+                            locationCapeField.set(p, instance.getCapeResource(userGroup));
+                            downloadImageCapeField.set(p, instance.getDownloadThread(userGroup));
+                        }
+
+                        //notifies qualified user that developer capes is outdated.
+                        if (!notified)
+                        {
+                            if (FMLClientHandler.instance().getClient().currentScreen == null)
                             {
+                                if (instance.versionChecker.getResult() == 1)
+                                {
 
-                                notified = true;
+                                    notified = true;
 
-                                FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage("§6[DevCapes]: §fDevCapes is outdated.");
+                                    FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage("§6[DevCapes]: §fDevCapes is outdated.");
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            counter++;
+                counter++;
+            }
+        }
+        catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -105,5 +113,15 @@ public class DevCapesTickHandler implements ITickHandler
     public String getLabel()
     {
         return "DeveloperCapesTickHandler";
+    }
+
+    /**
+     * Them cheaty ways...
+     */
+    private static Field getHackField(int i)
+    {
+        Field f = AbstractClientPlayer.class.getDeclaredFields()[i];
+        f.setAccessible(true);
+        return f;
     }
 }
