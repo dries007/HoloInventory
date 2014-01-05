@@ -43,7 +43,7 @@ public class InventoryData
 {
     public int        id;
     public IInventory te;
-    public HashMap<EntityPlayer, Long> playerSet = new HashMap<EntityPlayer, Long>();
+    public HashMap<EntityPlayer, NBTTagCompound> playerSet = new HashMap<EntityPlayer, NBTTagCompound>();
     public String name;
 
     public InventoryData(IInventory te, int id)
@@ -53,19 +53,24 @@ public class InventoryData
         this.name = te.getInvName();
     }
 
-    public boolean isOld(EntityPlayer player)
+    public void sendIfOld(EntityPlayerMP player)
     {
-        return !playerSet.containsKey(player) || player.worldObj.getTotalWorldTime() > playerSet.get(player) + 20 * HoloInventory.getConfig().syncFreq;
+        NBTTagCompound data = toNBT();
+        if (!playerSet.containsKey(player) || !playerSet.get(player).equals(data))
+        {
+            playerSet.put(player, data);
+            PacketDispatcher.sendPacketToPlayer(this.getPacket(data), (Player) player);
+        }
     }
 
-    public Packet getPacket()
+    public Packet getPacket(NBTTagCompound data)
     {
         ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
         DataOutputStream stream = new DataOutputStream(streambyte);
         try
         {
             stream.write(0);
-            Helper.writeNBTTagCompound(toNBT(), stream);
+            Helper.writeNBTTagCompound(data, stream);
             stream.close();
             streambyte.close();
         }
@@ -94,9 +99,8 @@ public class InventoryData
         return root;
     }
 
-    public void send(EntityPlayerMP player)
+    public void update(IInventory inventory)
     {
-        playerSet.put(player, player.worldObj.getTotalWorldTime());
-        PacketDispatcher.sendPacketToPlayer(this.getPacket(), (Player) player);
+        te = inventory;
     }
 }

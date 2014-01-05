@@ -122,26 +122,11 @@ public class ServerTickHandler implements ITickHandler
 
     private void doStuff(int id, EntityPlayerMP player, IInventory inventory)
     {
-        boolean empty = idEmpty(inventory);
-        if (empty && !blockMap.containsKey(id)) return;
         InventoryData inventoryData = blockMap.get(id);
-        if (inventoryData == null || inventoryData.isOld(player) || empty)
-        {
-            inventoryData = new InventoryData(inventory, id);
-            inventoryData.send(player);
-            blockMap.put(id, inventoryData);
-        }
-        if (empty && blockMap.containsKey(id)) blockMap.remove(id);
-    }
-
-    private boolean idEmpty(IInventory te)
-    {
-        for (int i = 0; i < te.getSizeInventory(); i++)
-        {
-            if (te.getStackInSlot(i) != null) return false;
-        }
-
-        return true;
+        if (inventoryData == null) inventoryData = new InventoryData(inventory, id);
+        else inventoryData.update(inventory);
+        inventoryData.sendIfOld(player);
+        blockMap.put(id, inventoryData);
     }
 
     @Override

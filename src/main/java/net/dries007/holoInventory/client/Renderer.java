@@ -389,7 +389,7 @@ public class Renderer
         GL11.glTranslated(0f, maxHeight + blockScale / 1.25, 0f);
 
         GL11.glScaled(blockScale, blockScale, blockScale);
-        if (blockScale < 0.5) GL11.glScalef(1.5f, 1.5f, 1.5f);
+        GL11.glScalef(1.5f, 1.5f, 1.5f);
         GL11.glScalef(0.03f, 0.03f, 0.03f);
         GL11.glTranslated(3f * name.length(), 0f, 0f);
         GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
