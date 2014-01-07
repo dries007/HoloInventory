@@ -1,14 +1,15 @@
 [center][size=7]HoloInventory[/size]
 [size=5]Adding holograms to Minecraft since 2013![/size]
-[b][size=4][url="https://github.com/dries007/HoloInventory"]> My up to date status page, source code & downloads <[/url][/size][/b]
-This mod adds a holographic content display to Minecraft. You cant interact with it, its just for show :p
+[b][size=4][url="https://github.com/dries007/HoloInventory"]> My up to date status page, source code &amp; downloads <[/url][/size][/b]
+This mod adds a holographic content display to Minecraft. You cant interact with it, its just for show [img]http://static.minecraftforum.net//public/style_emoticons/default/tongue.png[/img]
 
 The hologram displays whenever you hover over a block with an inventory.
 The background color is optional and fully configurable.
 To use this on a server, the server needs to have the mod.
 [u]For more info, issues and a todo list, click the like above.[/u]
 
-Options (see config file):[/center][spoiler]• (Server) I reccomend to use "/holoinventory" to ban things, not the config.
+Options (see config file):[/center]
+[spoiler]• (Server) I reccomend to use "/holoinventory" to ban things, not the config.
 • (Client) "colorAlpha, colorR, colorG, colorB, colorEnable" Background settings.
 • (Client) "doVersionCheck" Allows you to turn of the update please message.
 • (Client) "enableStacking" Stack all the same items, even over 64.
@@ -17,23 +18,25 @@ Options (see config file):[/center][spoiler]• (Server) I reccomend to use "/ho
 • (Client) "renderText" Render the stacksize with the items.
 • (Client) "renderName" Render the stacksize with the items.
 • (Both) "syncFreq" The amount of seconds that pass before updating the contents of an inventory.
-[/spoiler][center]
+[/spoiler]
+[center]
 
 [u][size=5]News:[/size][/u]
-
-► v1.5.4: [url=http://www.dries007.net/holoinventory/Names.png]Inventory names[/url]
+► v1.6.1: Fixed issue #2 (NPE with inv name) + Improved sync for servers
+► v1.6.0: Fixed server syncing (now works properly with +1 person on SMP)
+► v1.5.4: [url="http://www.dries007.net/holoinventory/Names.png"]Inventory names[/url]
 ► v1.5.1: Fixed rendering on fast graphics.
-► v1.5: [url=http://www.dries007.net/holoinventory/Villagers.png]Villagers?![/url]
+► v1.5: [url="http://www.dries007.net/holoinventory/Villagers.png"]Villagers?![/url]
 ► v1.4.1: Added:
-- [url=http://www.dries007.net/holoinventory/Stacking.png]Stacking (2 stacks of same block will combine, config)[/url]
-- [url=http://www.dries007.net/holoinventory/Scaling.png]Dynamic scaling (Bigger inventories have smaller icons)[/url]
+- [url="http://www.dries007.net/holoinventory/Stacking.png"]Stacking (2 stacks of same block will combine, config)[/url]
+- [url="http://www.dries007.net/holoinventory/Scaling.png"]Dynamic scaling (Bigger inventories have smaller icons)[/url]
 ► v1.4: Added banning of types of blocks and entitys. Use this to block lets say personal safes.
 ► v1.3: Added keybinding. See the config file for options. Basic you can now control when it renders with keys.
-► v1.2: [url=http://www.dries007.net/holoinventory/?name=Minecart.png]Added support for entitys. (minecarts and such)[/url]
+► v1.2: [url="http://www.dries007.net/holoinventory/?name=Minecart.png"]Added support for entitys. (minecarts and such)[/url]
 ► v1.1: Added update checker, disableable in the config.
 ► [url="http://www.dries007.net/holoinventory/?name=NoTextAndMultiple.png"]You can now toggle the rendering of the text and the multiple items per stack to indicate stack size. (Toggleable separately).[/url]
-► [url="http://www.dries007.net/holoinventory/?name=EnderChest.png"]JukeBoxes?! [/url]
-► [url="http://www.dries007.net/holoinventory/?name=JukeBox.png"]Enderchests?! [/url]
+► [url="http://www.dries007.net/holoinventory/?name=EnderChest.png"]JukeBoxes?![/url]
+► [url="http://www.dries007.net/holoinventory/?name=JukeBox.png"]Enderchests?![/url]
 ► [url="http://www.dries007.net/holoinventory/?name=Stacksize.png"]Non stackable items don't render the stacksize.[/url]
 
 [u][size=5]A fan made mod spotlight:[/size][/u]

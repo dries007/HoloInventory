@@ -37,7 +37,7 @@ import net.dries007.holoInventory.util.CommonProxy;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-@NetworkMod(channels = {MODID},
+@NetworkMod(
         clientPacketHandlerSpec = @NetworkMod.SidedPacketHandler(channels = {MODID},
                 packetHandler = ClientPacketHandler.class),
         serverPacketHandlerSpec = @NetworkMod.SidedPacketHandler(channels = {MODID},

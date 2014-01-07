@@ -45,12 +45,14 @@ public class InventoryData
     public IInventory te;
     public HashMap<EntityPlayer, NBTTagCompound> playerSet = new HashMap<EntityPlayer, NBTTagCompound>();
     public String name;
+    public String type;
 
     public InventoryData(IInventory te, int id)
     {
         this.id = id;
         this.te = te;
         this.name = te.getInvName();
+        this.type = te.getClass().getCanonicalName();
     }
 
     public void sendIfOld(EntityPlayerMP player)
@@ -86,6 +88,7 @@ public class InventoryData
     {
         NBTTagCompound root = new NBTTagCompound();
         root.setInteger("id", this.id);
+        if (name == null) name = ""; //Really mod authors? Really? Null is not a good name.
         root.setString("name", name);
         NBTTagList list = new NBTTagList();
         for (int i = 0; i < te.getSizeInventory(); i++)
@@ -102,5 +105,10 @@ public class InventoryData
     public void update(IInventory inventory)
     {
         te = inventory;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 }

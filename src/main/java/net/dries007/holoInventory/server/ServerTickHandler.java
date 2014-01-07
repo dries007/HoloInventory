@@ -28,8 +28,10 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.network.Player;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Coord;
+import net.dries007.holoInventory.util.FakeInventory;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.InventoryData;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -71,27 +73,33 @@ public class ServerTickHandler implements ITickHandler
                     Coord coord = new Coord(world.provider.dimensionId, mo);
                     TileEntity te = world.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
 
-                    if (te != null && HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
+                    if (te != null)
                     {
-                        // BANNED THING
-                        cleanup(coord, player);
-                    }
-                    else if (te instanceof IInventory)
-                    {
-                        doStuff(coord.hashCode(), player, (IInventory) te);
-                    }
-                    else if (te instanceof TileEntityEnderChest)
-                    {
-                        doStuff(coord.hashCode(), player, player.getInventoryEnderChest());
-                    }
-                    else if (te instanceof TileEntityRecordPlayer)
-                    {
-                        TileEntityRecordPlayer realTe = ((TileEntityRecordPlayer) te);
-                        doStuff(coord.hashCode(), player, StatCollector.translateToLocal(realTe.blockType.getLocalizedName()), realTe.func_96097_a());
-                    }
-                    else
-                    {
-                        cleanup(coord, player);
+                        checkForChangedType(coord.hashCode(), te);
+                        if (HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
+                        {
+                            // BANNED THING
+                            cleanup(coord, player);
+                        }
+                        else if (te instanceof IInventory)
+                        {
+                            doStuff(coord.hashCode(), player, (IInventory) te);
+                        }
+                        else if (te instanceof TileEntityEnderChest)
+                        {
+                            doStuff(coord.hashCode(), player, player.getInventoryEnderChest());
+                        }
+                        else if (te instanceof TileEntityRecordPlayer)
+                        {
+                            TileEntityRecordPlayer realTe = ((TileEntityRecordPlayer) te);
+                            Block b = realTe.blockType != null ? realTe.blockType : Block.blocksList[world.getBlockId((int) coord.x, (int) coord.y, (int) coord.z)];
+                            String name = b == null ? "" : b.getLocalizedName();
+                            doStuff(coord.hashCode(), player, name, realTe.func_96097_a());
+                        }
+                        else
+                        {
+                            cleanup(coord, player);
+                        }
                     }
                     break;
                 case ENTITY:
@@ -101,6 +109,15 @@ public class ServerTickHandler implements ITickHandler
                     }
                     break;
             }
+        }
+    }
+
+    private void checkForChangedType(int id, TileEntity te)
+    {
+        if (blockMap.containsKey(id))
+        {
+            InventoryData data = blockMap.get(id);
+            if (!te.getClass().getCanonicalName().equals(data.getType())) blockMap.remove(id);
         }
     }
 
@@ -117,7 +134,7 @@ public class ServerTickHandler implements ITickHandler
 
     private void doStuff(int id, EntityPlayerMP player, String name, ItemStack... itemStacks)
     {
-        doStuff(id, player, Helper.getInventory(name, itemStacks));
+        doStuff(id, player, new FakeInventory(name, itemStacks));
     }
 
     private void doStuff(int id, EntityPlayerMP player, IInventory inventory)
