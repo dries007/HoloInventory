@@ -178,7 +178,7 @@ public class Renderer
      */
     private void renderHologram(NamedData<ItemStack[]> namedData)
     {
-        if (namedData.data.length == 0) return;
+        if (namedData.data == null || namedData.name == null || namedData.data.length == 0) return;
         final double distance = distance();
         if (distance < 1.5) return;
 
@@ -191,6 +191,7 @@ public class Renderer
                 boolean f = false;
                 for (ItemStack stackInList : list)
                 {
+                    if (stackInList == null) continue;
                     if (stackToAdd.isItemEqual(stackInList) && ItemStack.areItemStackTagsEqual(stackToAdd, stackInList))
                     {
                         stackInList.stackSize += stackToAdd.stackSize;
