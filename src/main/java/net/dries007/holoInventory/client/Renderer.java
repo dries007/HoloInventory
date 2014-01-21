@@ -85,7 +85,7 @@ public class Renderer
             case TILE:
                 // Remove if there is no longer a TE there
                 TileEntity te = mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
-                if (te != null)
+                if (Helper.weWant(te))
                 {
                     String clazz = te.getClass().getCanonicalName();
                     // Check for local ban
@@ -109,7 +109,7 @@ public class Renderer
                 break;
             case ENTITY:
                 Entity entity = mc.objectMouseOver.entityHit;
-                if (entity instanceof IMerchant || entity instanceof IInventory)
+                if (Helper.weWant(entity))
                 {
                     // Check for local ban
                     if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName())) return;
@@ -128,10 +128,7 @@ public class Renderer
                     }
 
                     // Render appropriate hologram
-                    if (entity instanceof IInventory && entityMap.containsKey(id))
-                    {
-                        renderHologram(entityMap.get(id));
-                    }
+                    if (entity instanceof IInventory && entityMap.containsKey(id)) renderHologram(entityMap.get(id));
                     if (entity instanceof IMerchant && merchantMap.containsKey(id)) renderMerchant(merchantMap.get(id));
                 }
                 break;

@@ -24,6 +24,7 @@
 package net.dries007.holoInventory.server;
 
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.util.Helper;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatMessageComponent;
@@ -48,7 +49,7 @@ public class ServerEventHandler
             event.setCanceled(true);
 
             TileEntity te = event.entity.worldObj.getBlockTileEntity(event.x, event.y, event.z);
-            if (te instanceof IInventory)
+            if (Helper.weWant(te))
             {
                 HoloInventory.getConfig().bannedTiles.add(te.getClass().getCanonicalName());
                 event.entityPlayer.sendChatToPlayer(ChatMessageComponent.createFromText(te.getClass().getCanonicalName() + " will no longer display a hologram."));
@@ -70,7 +71,7 @@ public class ServerEventHandler
             banUsers.remove(event.entityPlayer.getDisplayName());
             event.setCanceled(true);
 
-            if (event.target instanceof IInventory)
+            if (Helper.weWant(event.target))
             {
                 HoloInventory.getConfig().bannedEntities.add(event.target.getClass().getCanonicalName());
                 event.entityPlayer.sendChatToPlayer(ChatMessageComponent.createFromText(event.target.getClass().getCanonicalName() + " will no longer display a hologram."));

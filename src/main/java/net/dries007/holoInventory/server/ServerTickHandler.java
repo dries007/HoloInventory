@@ -73,7 +73,7 @@ public class ServerTickHandler implements ITickHandler
                     Coord coord = new Coord(world.provider.dimensionId, mo);
                     TileEntity te = world.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
 
-                    if (te != null)
+                    if (Helper.weWant(te))
                     {
                         checkForChangedType(coord.hashCode(), te);
                         if (HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
@@ -103,7 +103,7 @@ public class ServerTickHandler implements ITickHandler
                     }
                     break;
                 case ENTITY:
-                    if (mo.entityHit instanceof IInventory)
+                    if (Helper.weWant(mo.entityHit))
                     {
                         doStuff(mo.entityHit.entityId, player, (IInventory) mo.entityHit);
                     }

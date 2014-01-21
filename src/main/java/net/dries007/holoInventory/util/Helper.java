@@ -38,6 +38,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.tileentity.TileEntityRecordPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -50,6 +52,11 @@ import static net.dries007.holoInventory.util.Data.MODID;
 
 public class Helper
 {
+    public static boolean weWant(Object o)
+    {
+        return o != null && (o instanceof IInventory || o instanceof IMerchant || o instanceof TileEntityEnderChest || o instanceof TileEntityRecordPlayer);
+    }
+
     public static void writeNBTTagCompound(NBTTagCompound par0NBTTagCompound, DataOutput par1DataOutput) throws IOException
     {
         if (par0NBTTagCompound == null)
