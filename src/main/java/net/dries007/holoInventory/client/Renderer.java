@@ -35,6 +35,7 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
@@ -83,19 +84,28 @@ public class Renderer
         {
             case TILE:
                 // Remove if there is no longer a TE there
-                if (mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z) == null) tileMap.remove(coord.hashCode());
-                // Render if we know the content
-                if (tileMap.containsKey(coord.hashCode()))
+                TileEntity te = mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
+                if (te != null)
                 {
+                    String clazz = te.getClass().getCanonicalName();
                     // Check for local ban
-                    if (HoloInventory.getConfig().bannedTiles.contains(mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z).getClass().getCanonicalName())) return;
-                    int i = coord.hashCode();
-                    coord.x += 0.5;
-                    coord.y += 0.5;
-                    coord.z += 0.5;
-                    renderHologram(tileMap.get(i));
+                    if (HoloInventory.getConfig().bannedTiles.contains(clazz)) return;
+                    NamedData<ItemStack[]> data = tileMap.get(coord.hashCode());
 
+                    if (data != null)
+                    {
+                        if (data.clazz == null || data.clazz.equals(clazz))
+                        {
+                            // Render if we know the content
+                            coord.x += 0.5;
+                            coord.y += 0.5;
+                            coord.z += 0.5;
+                            renderHologram(data);
+                            return;
+                        }
+                    }
                 }
+                tileMap.remove(coord.hashCode());
                 break;
             case ENTITY:
                 Entity entity = mc.objectMouseOver.entityHit;

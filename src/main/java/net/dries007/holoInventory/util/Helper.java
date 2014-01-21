@@ -88,7 +88,10 @@ public class Helper
         {
             itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
         }
-        Renderer.tileMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
+        if (tag.hasKey("class"))
+            Renderer.tileMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), tag.getString("class"), itemStacks));
+        else
+            Renderer.tileMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
     }
 
     public static void readEntity(NBTTagCompound tag)
@@ -99,7 +102,10 @@ public class Helper
         {
             itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
         }
-        Renderer.entityMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
+        if (tag.hasKey("class"))
+            Renderer.entityMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), tag.getString("class"), itemStacks));
+        else
+            Renderer.entityMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
     }
 
     public static void readMerchant(NBTTagCompound tag)
@@ -107,7 +113,10 @@ public class Helper
         MerchantRecipeList list = new MerchantRecipeList();
         list.readRecipiesFromTags(tag);
 
-        Renderer.merchantMap.put(tag.getInteger("id"), new NamedData<MerchantRecipeList>(tag.getString("name"), list));
+        if (tag.hasKey("class"))
+            Renderer.merchantMap.put(tag.getInteger("id"), new NamedData<MerchantRecipeList>(tag.getString("name"), tag.getString("class"), list));
+        else
+            Renderer.merchantMap.put(tag.getInteger("id"), new NamedData<MerchantRecipeList>(tag.getString("name"), list));
     }
 
     public static void readRemove(NBTTagCompound tag)
@@ -149,6 +158,7 @@ public class Helper
                 NBTTagCompound root = new NBTTagCompound();
                 root.setInteger("id", entityId);
                 root.setString("name", inventory.getInvName());
+                root.setString("class", entity.getClass().getCanonicalName());
                 NBTTagList list = new NBTTagList();
                 for (int i = 0; i < inventory.getSizeInventory(); i++)
                 {
@@ -179,6 +189,7 @@ public class Helper
                 NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
                 tag.setInteger("id", entityId);
                 tag.setString("name", entity.getTranslatedEntityName());
+                tag.setString("class", entity.getClass().getCanonicalName());
                 ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
                 DataOutputStream stream = new DataOutputStream(streambyte);
                 try
