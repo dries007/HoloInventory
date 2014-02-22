@@ -252,6 +252,13 @@ public class Renderer
             if (list.size() > wantedSize) list = list.subList(0, wantedSize);
         }
 
+        if (HoloInventory.getConfig().cycle != 0)
+        {
+            int i = (int) ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() / HoloInventory.getConfig().cycle) % list.size());
+            list = Arrays.asList(list.get(i));
+        }
+
+
         doRenderHologram(namedData.name, list, distance);
     }
 

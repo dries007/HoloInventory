@@ -25,7 +25,8 @@ Options (see config file):[/center]
 [center]
 
 [u][size=5]News:[/size][/u]
-► v1.6.5: Added different modes such as "Sorted" and "most abundant", version will bump to 1.7 when a cycle gets added
+► v1.7.0: Added cycle mode
+► v1.6.5: Added different modes such as "Sorted" and "most abundant"
 ► v1.6.3: Fixed error in log with capes
 ► v1.6.2: Fixed issue with command in SSP
 ► v1.6.1: Fixed issue #2 (NPE with inv name) + Improved sync for servers

@@ -47,11 +47,11 @@ public class Config
     public boolean enableStacking = true;
     public boolean renderName     = true;
     public int     mode           = 0;
+    public int     cycle          = 0;
 
     public int keyMode;
     public ArrayList<String> bannedTiles    = new ArrayList<String>();
     public ArrayList<String> bannedEntities = new ArrayList<String>();
-
 
     public Config(File file)
     {
@@ -100,6 +100,8 @@ public class Config
                 "4: Same as 1, but with 5 items.\n" +
                 "5: Same as 1, but with 7 items.\n" +
                 "6: Same as 1, but with 9 items.").getInt();
+
+        cycle = configuration.get(MODID, "cycle", cycle, "Cycle trough all the items one by one. Set to the delay time wanted in ticks. If 0, cycle mode is off. Still takes into a count the mode.").getInt();
 
         bannedTiles.clear();
         bannedTiles.addAll(Arrays.asList(configuration.get(MODID,
