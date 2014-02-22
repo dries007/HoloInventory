@@ -27,5 +27,5 @@ public class Data
 {
     public static final String MODID   = "HoloInventory";
     public static final String CAPES   = "http://www.dries007.net/capes/capes.txt";
-    public static final String VERSION = "http://www.dries007.net/holoinventory/version.txt";
+    public static final String VERSION = "http://www.dries007.net/holoinventory/version.MCVERSION.txt";
 }

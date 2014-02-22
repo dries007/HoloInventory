@@ -21,6 +21,8 @@ minecraft {
 	minecraftVersion = "1.6.4"
 }
 
+file('version.' + minecraft.minecraftVersion + '.txt').write version
+
 processResources
 {
     from(sourceSets.main.resources.srcDirs) {

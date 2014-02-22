@@ -24,12 +24,14 @@
 package net.dries007.holoInventory.client;
 
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IPlayerTracker;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Data;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.crash.CallableMinecraftVersion;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
@@ -85,7 +87,7 @@ public class ClientHandler
         {
             try
             {
-                URL url = new URL(Data.VERSION);
+                URL url = new URL(Data.VERSION.replace("MCVERSION", new CallableMinecraftVersion(null).minecraftVersion()));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 latest = reader.readLine();
 
