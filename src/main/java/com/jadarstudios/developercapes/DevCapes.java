@@ -33,7 +33,6 @@ public class DevCapes
     private static DevCapes instance;
     public static final double version = 2.2;
 
-    public  DevCapesVersionChecker                   versionChecker;
     private HashMap<String, String>                  users;
     private HashMap<String, ResourceLocation>        capeResources;
     private HashMap<String, ThreadDownloadImageData> downloadThreads;
@@ -48,12 +47,6 @@ public class DevCapes
         users = new HashMap<String, String>();
         capeResources = new HashMap<String, ResourceLocation>();
         downloadThreads = new HashMap<String, ThreadDownloadImageData>();
-
-        versionChecker = new DevCapesVersionChecker();
-        Thread vc = new Thread(versionChecker);
-        vc.setDaemon(true);
-        vc.setName("DevCapesVersionChecker");
-        vc.run();
     }
 
     /**
