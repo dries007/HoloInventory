@@ -32,7 +32,6 @@ public class DevCapesTickHandler implements ITickHandler
     private static Field locationCapeField      = getHackField(4);
 
     private int     counter  = 0;
-    private boolean notified = false;
 
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData)
@@ -69,21 +68,6 @@ public class DevCapesTickHandler implements ITickHandler
                             // Sets the cape URL.
                             locationCapeField.set(p, instance.getCapeResource(userGroup));
                             downloadImageCapeField.set(p, instance.getDownloadThread(userGroup));
-                        }
-
-                        //notifies qualified user that developer capes is outdated.
-                        if (!notified)
-                        {
-                            if (FMLClientHandler.instance().getClient().currentScreen == null)
-                            {
-                                if (instance.versionChecker.getResult() == 1)
-                                {
-
-                                    notified = true;
-
-                                    FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage("§6[DevCapes]: §fDevCapes is outdated.");
-                                }
-                            }
                         }
                     }
                 }

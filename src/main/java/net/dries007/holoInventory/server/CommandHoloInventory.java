@@ -81,7 +81,7 @@ public class CommandHoloInventory extends CommandBase
 
     private boolean isOp(ICommandSender sender)
     {
-        return MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(sender.getCommandSenderName());
+        return MinecraftServer.getServer().isSinglePlayer() || MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(sender.getCommandSenderName());
     }
 
     private List<String> getAllList()
