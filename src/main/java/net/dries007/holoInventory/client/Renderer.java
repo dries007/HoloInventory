@@ -45,10 +45,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Renderer
 {
@@ -189,10 +186,12 @@ public class Renderer
         final double distance = distance();
         if (distance < 1.5) return;
 
+        List<ItemStack> list;
+
         if (HoloInventory.getConfig().enableStacking)
         {
+            list = new ArrayList<ItemStack>();
             // Stack same items together
-            ArrayList<ItemStack> list = new ArrayList<ItemStack>();
             for (ItemStack stackToAdd : Arrays.asList(namedData.data))
             {
                 boolean f = false;
@@ -208,13 +207,52 @@ public class Renderer
                 }
                 if (!f) list.add(stackToAdd.copy());
             }
-
-            doRenderHologram(namedData.name, list, distance);
         }
         else
         {
-            doRenderHologram(namedData.name, Arrays.asList(namedData.data), distance);
+            list = Arrays.asList(namedData.data);
         }
+
+        int wantedSize = list.size();
+
+        switch (HoloInventory.getConfig().mode)
+        {
+            // Most abundant, 1 item
+            case 2:
+                wantedSize = 1;
+                break;
+            // Most abundant, 3 items
+            case 3:
+                wantedSize = 3;
+                break;
+            // Most abundant, 5 items
+            case 4:
+                wantedSize = 5;
+                break;
+            // Most abundant, 7 items
+            case 5:
+                wantedSize = 7;
+                break;
+            // Most abundant, 9 items
+            case 6:
+                wantedSize = 9;
+                break;
+        }
+
+        if (HoloInventory.getConfig().mode != 0)
+        {
+            Collections.sort(list, new Comparator<ItemStack>()
+            {
+                @Override
+                public int compare(ItemStack o1, ItemStack o2)
+                {
+                    return o2.stackSize - o1.stackSize;
+                }
+            });
+            if (list.size() > wantedSize) list = list.subList(0, wantedSize);
+        }
+
+        doRenderHologram(namedData.name, list, distance);
     }
 
     /**

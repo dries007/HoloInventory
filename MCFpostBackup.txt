@@ -1,6 +1,6 @@
 [center][size=7]HoloInventory[/size]
 [size=5]Adding holograms to Minecraft since 2013![/size]
-[b][size=4][url="https://github.com/dries007/HoloInventory"]> My up to date status page, source code &amp; downloads <[/url][/size][/b]
+[b][size=4][url="https://github.com/dries007/HoloInventory"]> My up to date status page, source code & downloads <[/url][/size][/b]
 This mod adds a holographic content display to Minecraft. You cant interact with it, its just for show [img]http://static.minecraftforum.net//public/style_emoticons/default/tongue.png[/img]
 
 The hologram displays whenever you hover over a block with an inventory.
@@ -8,8 +8,11 @@ The background color is optional and fully configurable.
 To use this on a server, the server needs to have the mod.
 [u]For more info, issues and a todo list, click the like above.[/u]
 
+[size=6][b]MC 1.7 update in progress[/b][/size]
+
 Options (see config file):[/center]
 [spoiler]• (Server) I reccomend to use "/holoinventory" to ban things, not the config.
+• (Client) "mode" Allows items to be shown in different ways, see config for exact possibilities.
 • (Client) "colorAlpha, colorR, colorG, colorB, colorEnable" Background settings.
 • (Client) "doVersionCheck" Allows you to turn of the update please message.
 • (Client) "enableStacking" Stack all the same items, even over 64.
@@ -22,6 +25,9 @@ Options (see config file):[/center]
 [center]
 
 [u][size=5]News:[/size][/u]
+► v1.6.5: Added different modes such as "Sorted" and "most abundant", version will bump to 1.7 when a cycle gets added
+► v1.6.3: Fixed error in log with capes
+► v1.6.2: Fixed issue with command in SSP
 ► v1.6.1: Fixed issue #2 (NPE with inv name) + Improved sync for servers
 ► v1.6.0: Fixed server syncing (now works properly with +1 person on SMP)
 ► v1.5.4: [url="http://www.dries007.net/holoinventory/Names.png"]Inventory names[/url]

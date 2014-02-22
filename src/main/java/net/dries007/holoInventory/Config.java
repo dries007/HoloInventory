@@ -34,6 +34,7 @@ import static net.dries007.holoInventory.util.Data.MODID;
 public class Config
 {
     final Configuration configuration;
+
     public boolean colorEnable    = false;
     public int     colorAlpha     = 200;
     public int     colorR         = 14;
@@ -45,6 +46,7 @@ public class Config
     public boolean renderMultiple = true;
     public boolean enableStacking = true;
     public boolean renderName     = true;
+    public int     mode           = 0;
 
     public int keyMode;
     public ArrayList<String> bannedTiles    = new ArrayList<String>();
@@ -59,12 +61,8 @@ public class Config
 
     public void overrideBannedThings()
     {
-        configuration.get(MODID,
-                "bannedTiles",
-                bannedTiles.toArray(new String[bannedTiles.size()]),
-                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[bannedTiles.size()]));
-        configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(
-                bannedEntities.toArray(new String[bannedEntities.size()]));
+        configuration.get(MODID, "bannedTiles", bannedTiles.toArray(new String[bannedTiles.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[bannedTiles.size()]));
+        configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedEntities.toArray(new String[bannedEntities.size()]));
         configuration.save();
     }
 
@@ -93,6 +91,15 @@ public class Config
         syncFreq = configuration.get(MODID, "syncFreq", syncFreq, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
         enableStacking = configuration.get(MODID, "enableStacking", enableStacking, "Stack items, even above 64.").getBoolean(enableStacking);
+
+        mode = configuration.get(MODID, "mode", mode, "Valid modes:\n" +
+                "0: Default mode (Display all items).\n" +
+                "1: Sorting mode, biggest stack size first.\n" +
+                "2: Most abundant mode (Only display the item the most abundant in the chest.\n" +
+                "3: Same as 1, but with 3 items.\n" +
+                "4: Same as 1, but with 5 items.\n" +
+                "5: Same as 1, but with 7 items.\n" +
+                "6: Same as 1, but with 9 items.").getInt();
 
         bannedTiles.clear();
         bannedTiles.addAll(Arrays.asList(configuration.get(MODID,
