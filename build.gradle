@@ -30,6 +30,9 @@ minecraft {
     version = "1.7.2-10.12.0.1034"
     assetDir = "jars/assets"
 }
+
+file('version.' + project.minecraft.version + '.txt').write version
+
 processResources
 {
     // replace stuff in mcmod.info, nothing else
