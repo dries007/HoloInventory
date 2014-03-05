@@ -161,4 +161,10 @@ public class CommandHoloInventory extends CommandBase
             sendHelp(sender);
         }
     }
+
+    @Override
+    public int compareTo(Object par1Obj)
+    {
+        return super.compareTo(par1Obj);
+    }
 }
