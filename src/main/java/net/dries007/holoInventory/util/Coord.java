@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,7 +22,7 @@
 package net.dries007.holoInventory.util;
 
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class Coord
 {
@@ -39,7 +37,7 @@ public class Coord
 
         switch (mop.typeOfHit)
         {
-            case TILE:
+            case BLOCK:
                 this.x = mop.blockX;
                 this.y = mop.blockY;
                 this.z = mop.blockZ;

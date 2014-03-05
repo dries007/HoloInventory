@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -27,21 +25,15 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkMod;
-import net.dries007.holoInventory.client.ClientPacketHandler;
+import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.server.CommandHoloInventory;
-import net.dries007.holoInventory.server.ServerPacketHandler;
 import net.dries007.holoInventory.util.CommonProxy;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-@NetworkMod(
-        clientPacketHandlerSpec = @NetworkMod.SidedPacketHandler(channels = {MODID},
-                packetHandler = ClientPacketHandler.class),
-        serverPacketHandlerSpec = @NetworkMod.SidedPacketHandler(channels = {MODID},
-                packetHandler = ServerPacketHandler.class))
 @Mod(modid = MODID, name = MODID)
 public class HoloInventory
 {
@@ -49,7 +41,6 @@ public class HoloInventory
     private static HoloInventory instance;
 
     private Config config;
-
 
     @Mod.Metadata
     private ModMetadata metadata;
@@ -67,7 +58,14 @@ public class HoloInventory
     @Mod.EventHandler()
     public void fmlEvent(FMLInitializationEvent event)
     {
+        PacketPipeline.PIPELINE.initialise();
         proxy.init();
+    }
+
+    @Mod.EventHandler()
+    public void fmlEvent(FMLPostInitializationEvent event)
+    {
+        PacketPipeline.PIPELINE.postInitialise();
     }
 
     @Mod.EventHandler()

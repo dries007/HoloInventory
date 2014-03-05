@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,7 +21,7 @@
 
 package net.dries007.holoInventory;
 
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,8 +46,9 @@ public class Config
     public boolean renderName     = true;
     public int     mode           = 0;
     public int     cycle          = 0;
+    public int     keyMode        = 0;
+    public boolean enableEntities = true;
 
-    public int keyMode;
     public ArrayList<String> bannedTiles    = new ArrayList<String>();
     public ArrayList<String> bannedEntities = new ArrayList<String>();
 
@@ -85,6 +84,7 @@ public class Config
         renderName = configuration.get(MODID, "renderName", renderName, "Renders the inv name above the hologram").getBoolean(true);
         renderText = configuration.get(MODID, "renderText", renderText, "Render the stacksize as text on top of the items").getBoolean(true);
         renderMultiple = configuration.get(MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
+        enableEntities = configuration.get(MODID, "enableEntities", enableEntities, "Set to false to prevent all entities from rendering the hologram.").getBoolean(true);
 
         doVersionCheck = configuration.get(MODID, "doVersionCheck", doVersionCheck).getBoolean(true);
 
@@ -104,16 +104,21 @@ public class Config
         cycle = configuration.get(MODID, "cycle", cycle, "Cycle trough all the items one by one. Set to the delay time wanted in ticks. If 0, cycle mode is off. Still takes into a count the mode.").getInt();
 
         bannedTiles.clear();
-        bannedTiles.addAll(Arrays.asList(configuration.get(MODID,
-                "bannedTiles",
-                bannedTiles.toArray(new String[bannedTiles.size()]),
-                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
+        bannedTiles.addAll(Arrays.asList(configuration.get(MODID, "bannedTiles", bannedTiles.toArray(new String[bannedTiles.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
         bannedEntities.clear();
-        bannedEntities.addAll(Arrays.asList(configuration.get(MODID,
-                "bannedEntities",
-                bannedEntities.toArray(new String[bannedEntities.size()]),
-                "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
+        bannedEntities.addAll(Arrays.asList(configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
 
         configuration.save();
+    }
+
+    public void setKey(int p_151462_1_)
+    {
+        configuration.get(MODID, "keyCode", p_151462_1_, "You can set this ingame.").set(p_151462_1_);
+        configuration.save();
+    }
+
+    public int getKey()
+    {
+        return configuration.get(MODID, "keyCode", 0, "You can set this ingame.").getInt();
     }
 }

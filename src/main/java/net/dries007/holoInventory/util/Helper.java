@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,119 +22,30 @@
 package net.dries007.holoInventory.util;
 
 import com.google.common.collect.HashMultimap;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.client.Renderer;
-import net.dries007.holoInventory.server.ServerPacketHandler;
+import net.dries007.holoInventory.packet.EntityInventoryPacket;
+import net.dries007.holoInventory.packet.MerchantInventoryPacket;
+import net.dries007.holoInventory.packet.PacketPipeline;
+import net.dries007.holoInventory.packet.RemoveInventoryPacket;
+import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntityEnderChest;
-import net.minecraft.tileentity.TileEntityRecordPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.common.DimensionManager;
-
-import java.io.*;
-
-import static net.dries007.holoInventory.util.Data.MODID;
 
 public class Helper
 {
     public static boolean weWant(Object o)
     {
-        return o != null && (o instanceof IInventory || o instanceof IMerchant || o instanceof TileEntityEnderChest || o instanceof TileEntityRecordPlayer);
-    }
-
-    public static void writeNBTTagCompound(NBTTagCompound par0NBTTagCompound, DataOutput par1DataOutput) throws IOException
-    {
-        if (par0NBTTagCompound == null)
-        {
-            par1DataOutput.writeShort(-1);
-        }
-        else
-        {
-            byte[] abyte = CompressedStreamTools.compress(par0NBTTagCompound);
-            par1DataOutput.writeShort((short) abyte.length);
-            par1DataOutput.write(abyte);
-        }
-    }
-
-    public static NBTTagCompound readNBTTagCompound(DataInput par0DataInput) throws IOException
-    {
-        short short1 = par0DataInput.readShort();
-
-        if (short1 < 0)
-        {
-            return null;
-        }
-        else
-        {
-            byte[] abyte = new byte[short1];
-            par0DataInput.readFully(abyte);
-            return CompressedStreamTools.decompress(abyte);
-        }
-    }
-
-    public static void readTile(NBTTagCompound tag)
-    {
-        NBTTagList list = tag.getTagList("list");
-        ItemStack[] itemStacks = new ItemStack[list.tagCount()];
-        for (int i = 0; i < list.tagCount(); i++)
-        {
-            itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
-        }
-        if (tag.hasKey("class"))
-            Renderer.tileMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), tag.getString("class"), itemStacks));
-        else
-            Renderer.tileMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
-    }
-
-    public static void readEntity(NBTTagCompound tag)
-    {
-        NBTTagList list = tag.getTagList("list");
-        ItemStack[] itemStacks = new ItemStack[list.tagCount()];
-        for (int i = 0; i < list.tagCount(); i++)
-        {
-            itemStacks[i] = ItemStack.loadItemStackFromNBT((NBTTagCompound) list.tagAt(i));
-        }
-        if (tag.hasKey("class"))
-            Renderer.entityMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), tag.getString("class"), itemStacks));
-        else
-            Renderer.entityMap.put(tag.getInteger("id"), new NamedData<ItemStack[]>(tag.getString("name"), itemStacks));
-    }
-
-    public static void readMerchant(NBTTagCompound tag)
-    {
-        MerchantRecipeList list = new MerchantRecipeList();
-        list.readRecipiesFromTags(tag);
-
-        if (tag.hasKey("class"))
-            Renderer.merchantMap.put(tag.getInteger("id"), new NamedData<MerchantRecipeList>(tag.getString("name"), tag.getString("class"), list));
-        else
-            Renderer.merchantMap.put(tag.getInteger("id"), new NamedData<MerchantRecipeList>(tag.getString("name"), list));
-    }
-
-    public static void readRemove(NBTTagCompound tag)
-    {
-        switch (tag.getByte("type"))
-        {
-            case 0:
-                Renderer.tileMap.remove(tag.getInteger("id"));
-            case 1:
-                Renderer.entityMap.remove(tag.getInteger("id"));
-            case 2:
-                Renderer.merchantMap.remove(tag.getInteger("id"));
-        }
+        return o != null && (o instanceof IInventory || o instanceof IMerchant || o instanceof TileEntityEnderChest || o instanceof BlockJukebox.TileEntityJukebox);
     }
 
     public static HashMultimap<Integer, String> map = HashMultimap.create();
@@ -152,7 +61,10 @@ public class Helper
                 if (map.containsEntry(entityId, player.getDisplayName()))
                 {
                     map.remove(entityId, player.getDisplayName());
-                    ServerPacketHandler.INSTANCE.sendRemove((Player) player, (byte) 1, entityId);
+                    NBTTagCompound root = new NBTTagCompound();
+                    root.setByte("type", (byte) 1);
+                    root.setInteger("id", entityId);
+                    PacketPipeline.PIPELINE.sendTo(new RemoveInventoryPacket(root), (EntityPlayerMP) player);
                 }
                 return;
             }
@@ -164,7 +76,7 @@ public class Helper
                 IInventory inventory = (IInventory) entity;
                 NBTTagCompound root = new NBTTagCompound();
                 root.setInteger("id", entityId);
-                root.setString("name", inventory.getInvName());
+                root.setString("name", inventory.getInventoryName());
                 root.setString("class", entity.getClass().getCanonicalName());
                 NBTTagList list = new NBTTagList();
                 for (int i = 0; i < inventory.getSizeInventory(); i++)
@@ -176,65 +88,18 @@ public class Helper
                 }
                 root.setTag("list", list);
 
-                ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
-                DataOutputStream stream = new DataOutputStream(streambyte);
-                try
-                {
-                    stream.write(1);
-                    Helper.writeNBTTagCompound(root, stream);
-                    stream.close();
-                    streambyte.close();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
+                PacketPipeline.PIPELINE.sendTo(new EntityInventoryPacket(root), (EntityPlayerMP) player);
             }
             else
             {
                 NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
                 tag.setInteger("id", entityId);
-                tag.setString("name", entity.getTranslatedEntityName());
+                tag.setString("name", entity.getCommandSenderName());
                 tag.setString("class", entity.getClass().getCanonicalName());
-                ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
-                DataOutputStream stream = new DataOutputStream(streambyte);
-                try
-                {
-                    stream.write(3);
-                    Helper.writeNBTTagCompound(tag, stream);
-                    stream.close();
-                    streambyte.close();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()), (Player) player);
+
+                PacketPipeline.PIPELINE.sendTo(new MerchantInventoryPacket(tag), (EntityPlayerMP) player);
             }
         }
-    }
-
-    public static void request(int dim, int entityId)
-    {
-        ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
-        DataOutputStream stream = new DataOutputStream(streambyte);
-        try
-        {
-            stream.write(1);
-
-            stream.writeInt(dim);
-            stream.writeInt(entityId);
-
-            stream.close();
-            streambyte.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(MODID, streambyte.toByteArray()));
     }
 
     public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer)
@@ -258,6 +123,6 @@ public class Helper
             d3 = ((EntityPlayerMP) par2EntityPlayer).theItemInWorldManager.getBlockReachDistance();
         }
         Vec3 vec31 = vec3.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
-        return par2EntityPlayer.worldObj.rayTraceBlocks_do_do(vec3, vec31, false, true);
+        return par2EntityPlayer.worldObj.rayTraceBlocks(vec3, vec31);
     }
 }

@@ -19,29 +19,39 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.dries007.holoInventory.server;
+package net.dries007.holoInventory.packet;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import net.minecraftforge.common.MinecraftForge;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import net.dries007.holoInventory.client.Renderer;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class ServerHandler
+public class ResetPacket extends AbstractPacket
 {
-    public static ServerEventHandler serverEventHandler;
-
-    public ServerHandler()
+    @Override
+    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
     {
 
     }
 
-    public void init()
+    @Override
+    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
     {
-        if (serverEventHandler == null)
-        {
-            serverEventHandler = new ServerEventHandler();
-            MinecraftForge.EVENT_BUS.register(serverEventHandler);
-            FMLCommonHandler.instance().bus().register(serverEventHandler);
 
-        }
-        else serverEventHandler.clear();
+    }
+
+    @Override
+    public void handleClientSide(EntityPlayer player)
+    {
+        Renderer.entityMap.clear();
+        Renderer.requestMap.clear();
+        Renderer.tileMap.clear();
+        Renderer.merchantMap.clear();
+    }
+
+    @Override
+    public void handleServerSide(EntityPlayer player)
+    {
+
     }
 }

@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -30,7 +28,7 @@ import net.minecraft.item.ItemStack;
 public class FakeInventory implements IInventory
 {
     private final ItemStack[] itemStacks;
-    private final String name;
+    private final String      name;
 
     public FakeInventory(String name, ItemStack... itemStacks)
     {
@@ -69,15 +67,15 @@ public class FakeInventory implements IInventory
     }
 
     @Override
-    public String getInvName()
+    public String getInventoryName()
     {
-        return name;
+        return null;
     }
 
     @Override
-    public boolean isInvNameLocalized()
+    public boolean hasCustomInventoryName()
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -87,7 +85,7 @@ public class FakeInventory implements IInventory
     }
 
     @Override
-    public void onInventoryChanged()
+    public void markDirty()
     {
 
     }
@@ -99,13 +97,13 @@ public class FakeInventory implements IInventory
     }
 
     @Override
-    public void openChest()
+    public void openInventory()
     {
 
     }
 
     @Override
-    public void closeChest()
+    public void closeInventory()
     {
 
     }

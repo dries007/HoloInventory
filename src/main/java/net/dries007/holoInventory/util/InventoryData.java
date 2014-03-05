@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,21 +21,15 @@
 
 package net.dries007.holoInventory.util;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
-import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.packet.BlockInventoryPacket;
+import net.dries007.holoInventory.packet.PacketPipeline;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.packet.Packet;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.HashMap;
-
-import static net.dries007.holoInventory.util.Data.MODID;
 
 public class InventoryData
 {
@@ -51,7 +43,7 @@ public class InventoryData
     {
         this.id = id;
         this.te = te;
-        this.name = te.getInvName();
+        this.name = te.getInventoryName();
         this.type = te.getClass().getCanonicalName();
     }
 
@@ -61,27 +53,8 @@ public class InventoryData
         if (!playerSet.containsKey(player) || !playerSet.get(player).equals(data))
         {
             playerSet.put(player, data);
-            PacketDispatcher.sendPacketToPlayer(this.getPacket(data), (Player) player);
+            PacketPipeline.PIPELINE.sendTo(new BlockInventoryPacket(toNBT()), player);
         }
-    }
-
-    public Packet getPacket(NBTTagCompound data)
-    {
-        ByteArrayOutputStream streambyte = new ByteArrayOutputStream();
-        DataOutputStream stream = new DataOutputStream(streambyte);
-        try
-        {
-            stream.write(0);
-            Helper.writeNBTTagCompound(data, stream);
-            stream.close();
-            streambyte.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return PacketDispatcher.getPacket(MODID, streambyte.toByteArray());
     }
 
     private NBTTagCompound toNBT()

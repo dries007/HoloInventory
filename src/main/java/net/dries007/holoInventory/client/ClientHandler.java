@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,17 +21,16 @@
 
 package net.dries007.holoInventory.client;
 
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.IPlayerTracker;
-import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.util.Data;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.crash.CallableMinecraftVersion;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.io.BufferedReader;
@@ -47,11 +44,11 @@ public class ClientHandler
     public static final RenderItem   RENDER_ITEM   = new RenderItem()
     {
         @Override
-        public void doRenderItem(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
+        public void doRender(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
         {
             try
             {
-                super.doRenderItem(par1EntityItem, par2, par4, par6, par8, par9);
+                super.doRender(par1EntityItem, par2, par4, par6, par8, par9);
             }
             catch (Exception e)
             {
@@ -87,11 +84,12 @@ public class ClientHandler
         {
             try
             {
-                URL url = new URL(Data.VERSION.replace("MCVERSION", new CallableMinecraftVersion(null).minecraftVersion()));
+                Minecraft.getMinecraft();
+                URL url = new URL(Data.VERSION.replace("MCVERSION", MinecraftForge.MC_VERSION));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 latest = reader.readLine();
 
-                if (latest.equals(HoloInventory.getInstance().getVersion())) result = Result.OK;
+                if (latest.equals(HoloInventory.getVersion())) result = Result.OK;
                 else result = Result.OLD;
             }
             catch (Exception e)
@@ -102,36 +100,6 @@ public class ClientHandler
         }
     }
 
-    public static final IPlayerTracker PLAYER_TRACKER = new IPlayerTracker()
-    {
-        boolean done = false;
-
-        @Override
-        public void onPlayerLogin(EntityPlayer player)
-        {
-            if (done) return;
-
-            done = true;
-            if (VERSION_CHECK.result.equals(VersionCheck.Result.OLD))
-                player.addChatMessage("[HoloInventory] You are running " + HoloInventory.getInstance().getVersion() + ", newest available is " + VERSION_CHECK.latest + ". Please update :)");
-        }
-
-        @Override
-        public void onPlayerLogout(EntityPlayer player)
-        {
-        }
-
-        @Override
-        public void onPlayerChangedDimension(EntityPlayer player)
-        {
-        }
-
-        @Override
-        public void onPlayerRespawn(EntityPlayer player)
-        {
-        }
-    };
-
     public ClientHandler()
     {
         RENDER_ITEM.setRenderManager(RenderManager.instance);
@@ -140,11 +108,7 @@ public class ClientHandler
     public void init()
     {
         MinecraftForge.EVENT_BUS.register(Renderer.INSTANCE);
-
-        if (HoloInventory.getConfig().keyMode != 0)
-        {
-            KeyBindingRegistry.registerKeyBinding(KEY_MANAGER);
-        }
+        FMLCommonHandler.instance().bus().register(KEY_MANAGER);
 
         if (HoloInventory.getConfig().doVersionCheck)
         {
@@ -153,7 +117,17 @@ public class ClientHandler
             vc.setName(Data.MODID + "VersionCheckThread");
             vc.run();
 
-            GameRegistry.registerPlayerTracker(PLAYER_TRACKER);
+            FMLCommonHandler.instance().bus().register(this);
         }
+    }
+
+    boolean done = false;
+
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        if (done) return;
+        done = true;
+        if (VERSION_CHECK.result.equals(VersionCheck.Result.OLD)) event.player.addChatMessage(new ChatComponentText("[HoloInventory] You are running " + HoloInventory.getVersion() + ", newest available is " + VERSION_CHECK.latest + ". Please update :)"));
     }
 }

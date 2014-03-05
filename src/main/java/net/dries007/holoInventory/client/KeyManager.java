@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,22 +21,30 @@
 
 package net.dries007.holoInventory.client;
 
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 import net.dries007.holoInventory.HoloInventory;
 import net.minecraft.client.settings.KeyBinding;
+import org.lwjgl.input.Keyboard;
 
-import java.util.EnumSet;
-
-import static net.dries007.holoInventory.util.Data.MODID;
-
-public class KeyManager extends KeyBindingRegistry.KeyHandler
+public class KeyManager
 {
-    static final KeyBinding key = new KeyBinding("HoloInventory", 0);
+    public static final KeyBinding key = new KeyBinding("HoloInventory", 0, "key.categories.misc")
+    {
+        @Override
+        public void setKeyCode(int p_151462_1_)
+        {
+            HoloInventory.getConfig().setKey(p_151462_1_);
+            super.setKeyCode(p_151462_1_);
+        }
+    };
 
     public KeyManager()
     {
-        super(new KeyBinding[] {key}, new boolean[] {false});
+        ClientRegistry.registerKeyBinding(key);
+        key.setKeyCode(HoloInventory.getConfig().getKey());
         if (HoloInventory.getConfig().keyMode == 2) Renderer.INSTANCE.enabled = false;
     }
 
@@ -46,52 +52,20 @@ public class KeyManager extends KeyBindingRegistry.KeyHandler
      * Valid modes:
      * 0: Always display hologram.
      * 1: The key toggles the rendering.
-     * 2: Only render hologram while key pressed.
-     * 3: Don't render hologram while key pressed.
+     * 2: Only render hologram while key pressed. (Handled in Renderer)
+     * 3: Don't render hologram while key pressed. (Handled in Renderer)
      */
 
-    @Override
-    public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
+    @SubscribeEvent
+    public void input(InputEvent.KeyInputEvent event)
     {
-        if (tickEnd) return;
-        switch (HoloInventory.getConfig().keyMode)
+        if (key.getIsKeyPressed())
         {
-            case 1:
-                Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
-                break;
-            case 2:
-                Renderer.INSTANCE.enabled = true;
-                break;
-            case 3:
-                Renderer.INSTANCE.enabled = false;
-                break;
+            switch (HoloInventory.getConfig().keyMode)
+            {
+                case 1:
+                    Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
+            }
         }
-    }
-
-    @Override
-    public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd)
-    {
-        if (tickEnd) return;
-        switch (HoloInventory.getConfig().keyMode)
-        {
-            case 2:
-                Renderer.INSTANCE.enabled = false;
-                break;
-            case 3:
-                Renderer.INSTANCE.enabled = true;
-                break;
-        }
-    }
-
-    @Override
-    public EnumSet<TickType> ticks()
-    {
-        return EnumSet.of(TickType.CLIENT);
-    }
-
-    @Override
-    public String getLabel()
-    {
-        return MODID + "_KeyManager";
     }
 }

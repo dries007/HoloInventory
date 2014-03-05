@@ -19,29 +19,52 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.dries007.holoInventory.server;
+package net.dries007.holoInventory.packet;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import net.minecraftforge.common.MinecraftForge;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import net.dries007.holoInventory.util.Helper;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class ServerHandler
+public class EntityRequestPacket extends AbstractPacket
 {
-    public static ServerEventHandler serverEventHandler;
+    private int dim;
+    private int entityId;
 
-    public ServerHandler()
+    public EntityRequestPacket()
     {
 
     }
 
-    public void init()
+    public EntityRequestPacket(int dim, int entityId)
     {
-        if (serverEventHandler == null)
-        {
-            serverEventHandler = new ServerEventHandler();
-            MinecraftForge.EVENT_BUS.register(serverEventHandler);
-            FMLCommonHandler.instance().bus().register(serverEventHandler);
+        this.dim = dim;
+        this.entityId = entityId;
+    }
 
-        }
-        else serverEventHandler.clear();
+    @Override
+    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
+    {
+        buffer.writeInt(dim);
+        buffer.writeInt(entityId);
+    }
+
+    @Override
+    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
+    {
+        dim = buffer.readInt();
+        entityId = buffer.readInt();
+    }
+
+    @Override
+    public void handleClientSide(EntityPlayer player)
+    {
+
+    }
+
+    @Override
+    public void handleServerSide(EntityPlayer player)
+    {
+        Helper.respond(dim, entityId, player);
     }
 }

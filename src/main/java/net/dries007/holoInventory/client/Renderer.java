@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,7 +21,10 @@
 
 package net.dries007.holoInventory.client;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.packet.EntityRequestPacket;
+import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
@@ -40,7 +41,6 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -70,25 +70,26 @@ public class Renderer
         customitem.hoverStart = 0f;
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void renderEvent(RenderWorldLastEvent event)
     {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
+        if (HoloInventory.getConfig().keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;
+        if (HoloInventory.getConfig().keyMode == 3 && KeyManager.key.getIsKeyPressed()) return;
         if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)
         {
-            case TILE:
+            case BLOCK:
                 // Remove if there is no longer a TE there
-                TileEntity te = mc.theWorld.getBlockTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
+                TileEntity te = mc.theWorld.getTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
                 if (Helper.weWant(te))
                 {
                     String clazz = te.getClass().getCanonicalName();
                     // Check for local ban
                     if (HoloInventory.getConfig().bannedTiles.contains(clazz)) return;
                     NamedData<ItemStack[]> data = tileMap.get(coord.hashCode());
-
                     if (data != null)
                     {
                         if (data.clazz == null || data.clazz.equals(clazz))
@@ -105,17 +106,18 @@ public class Renderer
                 tileMap.remove(coord.hashCode());
                 break;
             case ENTITY:
+                if (!HoloInventory.getConfig().enableEntities) break;
                 Entity entity = mc.objectMouseOver.entityHit;
                 if (Helper.weWant(entity))
                 {
                     // Check for local ban
                     if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName())) return;
 
-                    int id = entity.entityId;
+                    int id = entity.getEntityId();
                     // Make & store request
                     if (!requestMap.containsKey(id))
                     {
-                        Helper.request(mc.theWorld.provider.dimensionId, id);
+                        PacketPipeline.PIPELINE.sendToServer(new EntityRequestPacket(mc.theWorld.provider.dimensionId, id));
                         requestMap.put(id, mc.theWorld.getTotalWorldTime());
                     }
                     // Remove old request so that we get updated info next render tick
@@ -389,7 +391,7 @@ public class Renderer
         if (Minecraft.getMinecraft().gameSettings.fancyGraphics) GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
         else GL11.glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
         customitem.setEntityItemStack(itemStack);
-        ClientHandler.RENDER_ITEM.doRenderItem(customitem, 0, 0, 0, 0, 0);
+        ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);
         if (itemStack.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
         if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1))

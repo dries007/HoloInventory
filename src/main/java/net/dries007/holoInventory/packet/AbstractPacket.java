@@ -19,29 +19,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.dries007.holoInventory.server;
+package net.dries007.holoInventory.packet;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import net.minecraftforge.common.MinecraftForge;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class ServerHandler
+/**
+ * AbstractPacket class. Should be the parent of all packets wishing to use the PacketPipeline.
+ *
+ * @author sirgingalot
+ *         http://www.minecraftforge.net/wiki/Netty_Packet_Handling
+ */
+public abstract class AbstractPacket
 {
-    public static ServerEventHandler serverEventHandler;
+    public abstract void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer);
 
-    public ServerHandler()
-    {
+    public abstract void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer);
 
-    }
+    public abstract void handleClientSide(EntityPlayer player);
 
-    public void init()
-    {
-        if (serverEventHandler == null)
-        {
-            serverEventHandler = new ServerEventHandler();
-            MinecraftForge.EVENT_BUS.register(serverEventHandler);
-            FMLCommonHandler.instance().bus().register(serverEventHandler);
-
-        }
-        else serverEventHandler.clear();
-    }
+    public abstract void handleServerSide(EntityPlayer player);
 }

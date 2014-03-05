@@ -1,7 +1,5 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2013 Dries K. Aka Dries007
+ * Copyright (c) 2014. Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,17 +21,18 @@
 
 package net.dries007.holoInventory.server;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.util.Data;
+import net.dries007.holoInventory.packet.PacketPipeline;
+import net.dries007.holoInventory.packet.ResetPacket;
 import net.dries007.holoInventory.util.InventoryData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.util.ArrayList;
@@ -94,7 +93,7 @@ public class CommandHoloInventory extends CommandBase
 
     private void sendHelp(ICommandSender sender)
     {
-        sender.sendChatToPlayer(ChatMessageComponent.createFromText("-= HoloInventory By Dries007 =-" +
+        sender.addChatMessage(new ChatComponentText("-= HoloInventory By Dries007 =-" +
                 "\nUse one of the following arguments with this command:" +
                 "\n  * <reset>             -> Reset the clients cache" +
                 "\n  * <ban>                -> Ban the next inventory you RIGHTclick" +
@@ -112,8 +111,8 @@ public class CommandHoloInventory extends CommandBase
         else if (args[0].equalsIgnoreCase("reset"))
         {
             if (!(sender instanceof EntityPlayer)) throw new WrongUsageException("You can't use this as the server...");
-            PacketDispatcher.sendPacketToPlayer(PacketDispatcher.getPacket(Data.MODID, new byte[] {2}), (Player) sender);
-            for (InventoryData data : ServerHandler.serverTickHandler.blockMap.values())
+            PacketPipeline.PIPELINE.sendTo(new ResetPacket(), (EntityPlayerMP) sender);
+            for (InventoryData data : ServerHandler.serverEventHandler.blockMap.values())
             {
                 //noinspection SuspiciousMethodCalls
                 data.playerSet.remove(sender);
@@ -124,11 +123,11 @@ public class CommandHoloInventory extends CommandBase
             if (isOp(sender))
             {
                 ServerHandler.serverEventHandler.banUsers.add(sender.getCommandSenderName());
-                sender.sendChatToPlayer(ChatMessageComponent.createFromText("RIGHTclick a block or entity to ban the hologram on that type."));
+                sender.addChatMessage(new ChatComponentText("RIGHTclick a block or entity to ban the hologram on that type."));
             }
             else
             {
-                sender.sendChatToPlayer(ChatMessageComponent.createFromText("You are not opped. Ban stuff in SSP to block it client side."));
+                sender.addChatMessage(new ChatComponentText("You are not opped. Ban stuff in SSP to block it client side."));
             }
         }
         else if (args[0].equalsIgnoreCase("unban"))
@@ -137,8 +136,8 @@ public class CommandHoloInventory extends CommandBase
             {
                 if (args.length == 1)
                 {
-                    if (getAllList().size() == 0) sender.sendChatToPlayer(ChatMessageComponent.createFromText("You didn't ban any inventories yet..."));
-                    else sender.sendChatToPlayer(ChatMessageComponent.createFromText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
+                    if (getAllList().size() == 0) sender.addChatMessage(new ChatComponentText("You didn't ban any inventories yet..."));
+                    else sender.addChatMessage(new ChatComponentText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
                 }
                 else if (getAllList().contains(args[1]))
                 {
@@ -148,13 +147,13 @@ public class CommandHoloInventory extends CommandBase
                 }
                 else
                 {
-                    sender.sendChatToPlayer(ChatMessageComponent.createFromText("That thing is not on any banlist I know of...").setColor(EnumChatFormatting.RED));
+                    sender.addChatMessage(new ChatComponentText("That thing is not on any banlist I know of...").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
                 }
             }
             else
             {
-                sender.sendChatToPlayer(ChatMessageComponent.createFromText("You are not opped. Unban stuff in SSP to unblock it client side."));
-                sender.sendChatToPlayer(ChatMessageComponent.createFromText("If you think this ban is stupid, ask a server admin to remove it."));
+                sender.addChatMessage(new ChatComponentText("You are not opped. Unban stuff in SSP to unblock it client side."));
+                sender.addChatMessage(new ChatComponentText("If you think this ban is stupid, ask a server admin to remove it."));
             }
         }
         else

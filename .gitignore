@@ -1,6 +1,6 @@
 .gradle
 build
-minecraft
+jars
 out
 *.iml
 *.ipr
