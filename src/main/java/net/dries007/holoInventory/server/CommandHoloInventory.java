@@ -26,6 +26,7 @@ import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.packet.ResetPacket;
 import net.dries007.holoInventory.util.InventoryData;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
@@ -165,6 +166,6 @@ public class CommandHoloInventory extends CommandBase
     @Override
     public int compareTo(Object par1Obj)
     {
-        return super.compareTo(par1Obj);
+        return super.compareTo((ICommand) par1Obj);
     }
 }
