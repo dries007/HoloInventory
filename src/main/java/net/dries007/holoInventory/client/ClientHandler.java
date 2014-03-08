@@ -21,6 +21,7 @@
 
 package net.dries007.holoInventory.client;
 
+import com.jadarstudios.developercapes.DevCapes;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
@@ -119,6 +120,8 @@ public class ClientHandler
 
             FMLCommonHandler.instance().bus().register(this);
         }
+
+        DevCapes.getInstance().registerConfig(Data.CAPES, Data.MODID);
     }
 
     boolean done = false;
