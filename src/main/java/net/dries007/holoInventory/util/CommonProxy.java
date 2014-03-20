@@ -50,6 +50,8 @@ public class CommonProxy
         serverHandler.init();
     }
 
+    public void postInit() {}
+
     public void serverStarting()
     {
         serverHandler.init();

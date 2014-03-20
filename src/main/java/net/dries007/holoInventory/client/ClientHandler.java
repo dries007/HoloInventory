@@ -70,6 +70,11 @@ public class ClientHandler
         }
     };
 
+    public void postInit()
+    {
+        RENDER_ITEM.setRenderManager(RenderManager.instance);
+    }
+
     public static class VersionCheck implements Runnable
     {
         enum Result
@@ -103,7 +108,7 @@ public class ClientHandler
 
     public ClientHandler()
     {
-        RENDER_ITEM.setRenderManager(RenderManager.instance);
+
     }
 
     public void init()

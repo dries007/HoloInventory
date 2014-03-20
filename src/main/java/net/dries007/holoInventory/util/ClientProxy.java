@@ -43,4 +43,12 @@ public class ClientProxy extends CommonProxy
 
         clientHandler.init();
     }
+
+    @Override
+    public void postInit()
+    {
+        super.postInit();
+
+        clientHandler.postInit();
+    }
 }

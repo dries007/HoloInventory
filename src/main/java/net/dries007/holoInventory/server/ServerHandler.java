@@ -40,7 +40,6 @@ public class ServerHandler
             serverEventHandler = new ServerEventHandler();
             MinecraftForge.EVENT_BUS.register(serverEventHandler);
             FMLCommonHandler.instance().bus().register(serverEventHandler);
-
         }
         else serverEventHandler.clear();
     }
