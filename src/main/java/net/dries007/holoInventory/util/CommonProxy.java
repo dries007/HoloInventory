@@ -22,6 +22,7 @@
 package net.dries007.holoInventory.util;
 
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.server.ServerHandler;
 import org.mcstats.Metrics;
 
@@ -47,10 +48,14 @@ public class CommonProxy
 
     public void init()
     {
+        PacketPipeline.PIPELINE.initialise();
         serverHandler.init();
     }
 
-    public void postInit() {}
+    public void postInit()
+    {
+        PacketPipeline.PIPELINE.postInitialise();
+    }
 
     public void serverStarting()
     {

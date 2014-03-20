@@ -28,7 +28,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.util.CommonProxy;
 
@@ -58,14 +57,13 @@ public class HoloInventory
     @Mod.EventHandler()
     public void fmlEvent(FMLInitializationEvent event)
     {
-        PacketPipeline.PIPELINE.initialise();
         proxy.init();
     }
 
     @Mod.EventHandler()
     public void fmlEvent(FMLPostInitializationEvent event)
     {
-        PacketPipeline.PIPELINE.postInitialise();
+        proxy.postInit();
     }
 
     @Mod.EventHandler()
