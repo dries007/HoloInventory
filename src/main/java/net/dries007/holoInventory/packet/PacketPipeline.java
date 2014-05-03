@@ -70,6 +70,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Abstra
         registerPacket(EntityRequestPacket.class);
         registerPacket(MerchantInventoryPacket.class);
         registerPacket(RemoveInventoryPacket.class);
+        registerPacket(RenamePacket.class);
     }
 
     public boolean registerPacket(Class<? extends AbstractPacket> clazz)

@@ -61,7 +61,7 @@ public class CommandHoloInventory extends CommandBase
     @Override
     public String getCommandUsage(ICommandSender icommandsender)
     {
-        return "Use to reset local cache (<reset>), get tile and entity names (<getNames>).";
+        return "Use to reset local cache (<reset>), (un)ban tiles and override names.";
     }
 
     public List addTabCompletionOptions(ICommandSender sender, String[] args)
@@ -71,8 +71,8 @@ public class CommandHoloInventory extends CommandBase
             default:
                 return null;
             case 1:
-                if (isOp(sender)) return getListOfStringsMatchingLastWord(args, "reset", "ban", "unban");
-                else return getListOfStringsMatchingLastWord(args, "reset");
+                if (isOp(sender)) return getListOfStringsMatchingLastWord(args, "reset", "overrideName", "ban", "unban");
+                else return getListOfStringsMatchingLastWord(args, "reset", "overrideName");
             case 2:
                 if (isOp(sender) && args[0].equalsIgnoreCase("unban")) return getListOfStringsFromIterableMatchingLastWord(args, getAllList());
                 else return null;
@@ -97,6 +97,7 @@ public class CommandHoloInventory extends CommandBase
         sender.addChatMessage(new ChatComponentText("-= HoloInventory By Dries007 =-" +
                 "\nUse one of the following arguments with this command:" +
                 "\n  * <reset>             -> Reset the clients cache" +
+                "\n  * <overrideName> [new name] -> Override a name" +
                 "\n  * <ban>                -> Ban the next inventory you RIGHTclick" +
                 "\n  * <unban> [a name] -> Unban a an inventory" +
                 "\nPro tip: Use tab completion!"));
@@ -117,6 +118,23 @@ public class CommandHoloInventory extends CommandBase
             {
                 //noinspection SuspiciousMethodCalls
                 data.playerSet.remove(sender);
+            }
+        }
+        else if (args[0].equalsIgnoreCase("overrideName"))
+        {
+            if (!(sender instanceof EntityPlayer)) throw new WrongUsageException("You can't use this as the server...");
+            if (args.length == 1)
+            {
+                throw new WrongUsageException("Give a name, can contain spaces.");
+            }
+            else
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 1; i < args.length; i++) stringBuilder.append(args[i]).append(' ');
+                String name = stringBuilder.toString().trim();
+
+                sender.addChatMessage(new ChatComponentText("RIGHTclick a block or entity to override the hologram name on that type to " + name));
+                ServerHandler.serverEventHandler.overrideUsers.put(sender.getCommandSenderName(), name);
             }
         }
         else if (args[0].equalsIgnoreCase("ban"))

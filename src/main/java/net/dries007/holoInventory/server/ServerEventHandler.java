@@ -21,12 +21,14 @@
 
 package net.dries007.holoInventory.server;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.packet.RemoveInventoryPacket;
+import net.dries007.holoInventory.packet.RenamePacket;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.FakeInventory;
 import net.dries007.holoInventory.util.Helper;
@@ -51,6 +53,7 @@ import java.util.List;
 public class ServerEventHandler
 {
     public List<String>                    banUsers = new ArrayList<String>();
+    public HashMap<String, String>         overrideUsers = new HashMap<String, String>();
     public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
 
     @SubscribeEvent()
@@ -74,6 +77,31 @@ public class ServerEventHandler
             }
 
             HoloInventory.getConfig().overrideBannedThings();
+        }
+
+        if (overrideUsers.containsKey(event.entityPlayer.getDisplayName()))
+        {
+            if (FMLCommonHandler.instance().getEffectiveSide().isClient()) return;
+
+            String nameOverride = overrideUsers.get(event.entityPlayer.getDisplayName());
+            overrideUsers.remove(event.entityPlayer.getDisplayName());
+            event.setCanceled(true);
+
+            TileEntity te = event.entity.worldObj.getTileEntity(event.x, event.y, event.z);
+            if (Helper.weWant(te))
+            {
+                String name = null;
+                if (te instanceof  BlockJukebox.TileEntityJukebox) name = "jukebox";
+                else if (te instanceof IInventory) name = ((IInventory) te).getInventoryName();
+                else if (te instanceof TileEntityEnderChest) name = event.entityPlayer.getInventoryEnderChest().getInventoryName();
+
+                PacketPipeline.PIPELINE.sendTo(new RenamePacket(name == null ? "": name, nameOverride), (EntityPlayerMP) event.entityPlayer);
+                event.entityPlayer.addChatComponentMessage(new ChatComponentText(te.getClass().getCanonicalName() + " will now be named " + nameOverride));
+            }
+            else
+            {
+                event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
+            }
         }
     }
 

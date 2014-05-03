@@ -41,11 +41,12 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.text.DecimalFormat;
 import java.util.*;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer
 {
@@ -146,7 +147,7 @@ public class Renderer
         final double distance = distance();
         if (distance < 1) return;
 
-        GL11.glPushMatrix();
+        glPushMatrix();
         moveAndRotate(-0.25);
 
         // Values for later
@@ -173,7 +174,7 @@ public class Renderer
             renderItem(recipe.getItemToSell(), 2, row, recipe.getItemToSell().stackSize);
         }
 
-        GL11.glPopMatrix();
+        glPopMatrix();
     }
 
     /**
@@ -273,7 +274,7 @@ public class Renderer
     private void doRenderHologram(String name, List<ItemStack> itemStacks, double distance)
     {
         // Move to right position and rotate to face the player
-        GL11.glPushMatrix();
+        glPushMatrix();
         moveAndRotate(-1);
 
         // Values for later
@@ -309,7 +310,7 @@ public class Renderer
                 row++;
             }
         }
-        GL11.glPopMatrix();
+        glPopMatrix();
     }
 
     /**
@@ -319,10 +320,10 @@ public class Renderer
      */
     private void moveAndRotate(double depth)
     {
-        GL11.glTranslated(coord.x - RenderManager.renderPosX, coord.y - RenderManager.renderPosY, coord.z - RenderManager.renderPosZ);
-        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
-        GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
-        GL11.glTranslated(0, 0, depth);
+        glTranslated(coord.x - RenderManager.renderPosX, coord.y - RenderManager.renderPosY, coord.z - RenderManager.renderPosZ);
+        glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
+        glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
+        glTranslated(0, 0, depth);
     }
 
     /**
@@ -359,18 +360,18 @@ public class Renderer
     {
         String string = (stackSize < 1000) ? stackSize + "" : DF.format((double) stackSize / 1000) + "K";
 
-        if (string.contains(",")) GL11.glTranslatef(3f, 0f, 0f);
+        if (string.contains(",")) glTranslatef(3f, 0f, 0f);
 
         switch (string.length())
         {
             case 0:
                 return string;
             case 1:
-                GL11.glTranslatef(3f, 0f, 0f);
+                glTranslatef(3f, 0f, 0f);
                 return string;
             default:
-                GL11.glTranslatef(6f, 0f, 0f);
-                GL11.glTranslatef(6f * (1 - string.length()), 0f, 0f);
+                glTranslatef(6f, 0f, 0f);
+                glTranslatef(6f * (1 - string.length()), 0f, 0f);
                 return string;
         }
     }
@@ -385,41 +386,41 @@ public class Renderer
      */
     private void renderItem(ItemStack itemStack, int column, int row, int stackSize)
     {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
-        GL11.glScalef(blockScale, blockScale, blockScale);
-        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) GL11.glRotatef(timeD, 0.0F, 1.0F, 0.0F);
-        else GL11.glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+        glPushMatrix();
+        glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
+        glScalef(blockScale, blockScale, blockScale);
+        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) glRotatef(timeD, 0.0F, 1.0F, 0.0F);
+        else glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
         customitem.setEntityItemStack(itemStack);
         ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);
-        if (itemStack.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glPopMatrix();
+        if (itemStack.hasEffect(0)) glDisable(GL_LIGHTING);
+        glPopMatrix();
         if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1))
         {
-            GL11.glPushMatrix();
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
-            GL11.glScalef(blockScale, blockScale, blockScale);
-            GL11.glScalef(0.03f, 0.03f, 0.03f);
-            GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
-            GL11.glTranslatef(-1f, 1f, 0f);
+            glPushMatrix();
+            glDisable(GL_DEPTH_TEST);
+            glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
+            glScalef(blockScale, blockScale, blockScale);
+            glScalef(0.03f, 0.03f, 0.03f);
+            glRotatef(180, 0.0F, 0.0F, 1.0F);
+            glTranslatef(-1f, 1f, 0f);
             RenderManager.instance.getFontRenderer().drawString(doStackSizeCrap(stackSize), 0, 0, TEXTCOLOR, true);
-            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glPopMatrix();
+            glDisable(GL12.GL_RESCALE_NORMAL);
+            glEnable(GL_DEPTH_TEST);
+            glPopMatrix();
         }
     }
 
     private void renderBG()
     {
-        GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
+        glPushMatrix();
+        glEnable(GL12.GL_RESCALE_NORMAL);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
-        tess.startDrawing(GL11.GL_QUADS);
+        tess.startDrawing(GL_QUADS);
         tess.setColorRGBA(HoloInventory.getConfig().colorR, HoloInventory.getConfig().colorG, HoloInventory.getConfig().colorB, HoloInventory.getConfig().colorAlpha);
         double d = blockScale / 3;
         tess.addVertex(maxWith + d, -d - maxHeight, 0);
@@ -427,34 +428,37 @@ public class Renderer
         tess.addVertex(-maxWith - d, d + maxHeight, 0);
         tess.addVertex(maxWith + d, d + maxHeight, 0);
         tess.draw();
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glPopMatrix();
+        glDisable(GL_BLEND);
+        glDisable(GL12.GL_RESCALE_NORMAL);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
+        glPopMatrix();
     }
 
     private void renderName(String name)
     {
-        name = StatCollector.translateToLocal(name);
-        GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        if (HoloInventory.getConfig().nameOverrides.containsKey(name))
+            name = HoloInventory.getConfig().nameOverrides.get(name);
+        else
+            name = StatCollector.translateToLocal(name);
+        glPushMatrix();
+        glEnable(GL12.GL_RESCALE_NORMAL);
+        glDisable(GL_DEPTH_TEST);
 
-        GL11.glTranslated(0f, maxHeight + blockScale / 1.25, 0f);
+        glTranslated(0f, maxHeight + blockScale / 1.25, 0f);
 
-        GL11.glScaled(blockScale, blockScale, blockScale);
-        GL11.glScalef(1.5f, 1.5f, 1.5f);
-        GL11.glScalef(0.03f, 0.03f, 0.03f);
-        GL11.glTranslated(3f * name.length(), 0f, 0f);
-        GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
-        GL11.glTranslatef(-1f, 1f, 0f);
+        glScaled(blockScale, blockScale, blockScale);
+        glScalef(1.5f, 1.5f, 1.5f);
+        glScalef(0.03f, 0.03f, 0.03f);
+        glTranslated(3f * name.length(), 0f, 0f);
+        glRotatef(180, 0.0F, 0.0F, 1.0F);
+        glTranslatef(-1f, 1f, 0f);
         RenderManager.instance.getFontRenderer().drawString(name, 0, 0, TEXTCOLOR, true);
 
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glPopMatrix();
+        glDisable(GL12.GL_RESCALE_NORMAL);
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_DEPTH_TEST);
+        glPopMatrix();
     }
 
     private double distance()

@@ -21,28 +21,48 @@
 
 package net.dries007.holoInventory.packet;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import net.dries007.holoInventory.HoloInventory;
 import net.minecraft.entity.player.EntityPlayer;
 
-/**
- * AbstractPacket class. Should be the parent of all packets wishing to use the PacketPipeline.
- *
- * @author sirgingalot
- *         http://www.minecraftforge.net/wiki/Netty_Packet_Handling
- */
-public abstract class AbstractPacket
+public class RenamePacket extends AbstractPacket
 {
-    public AbstractPacket()
+    String name, override;
+
+    public RenamePacket() {}
+
+    public RenamePacket(String name, String override)
+    {
+        this.name = name;
+        this.override = override;
+    }
+
+    @Override
+    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
+    {
+        ByteBufUtils.writeUTF8String(buffer, name);
+        ByteBufUtils.writeUTF8String(buffer, override);
+    }
+
+    @Override
+    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
+    {
+        name = ByteBufUtils.readUTF8String(buffer);
+        override = ByteBufUtils.readUTF8String(buffer);
+    }
+
+    @Override
+    public void handleClientSide(EntityPlayer player)
+    {
+        HoloInventory.getConfig().nameOverrides.put(name, override);
+        HoloInventory.getConfig().overrideNameThings();
+    }
+
+    @Override
+    public void handleServerSide(EntityPlayer player)
     {
 
     }
-
-    public abstract void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer);
-
-    public abstract void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer);
-
-    public abstract void handleClientSide(EntityPlayer player);
-
-    public abstract void handleServerSide(EntityPlayer player);
 }

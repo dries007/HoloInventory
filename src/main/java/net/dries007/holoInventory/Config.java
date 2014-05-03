@@ -26,6 +26,8 @@ import net.minecraftforge.common.config.Configuration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
@@ -52,6 +54,7 @@ public class Config
 
     public ArrayList<String> bannedTiles    = new ArrayList<String>();
     public ArrayList<String> bannedEntities = new ArrayList<String>();
+    public HashMap<String, String> nameOverrides = new HashMap<String, String>();
 
     public Config(File file)
     {
@@ -63,7 +66,22 @@ public class Config
     {
         configuration.get(MODID, "bannedTiles", bannedTiles.toArray(new String[bannedTiles.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedTiles.toArray(new String[bannedTiles.size()]));
         configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(bannedEntities.toArray(new String[bannedEntities.size()]));
-        configuration.save();
+        save();
+    }
+
+
+    public void overrideNameThings()
+    {
+        int i = 0;
+        String[] things = new String[nameOverrides.size()];
+        for (Map.Entry<String, String> entry : nameOverrides.entrySet())
+        {
+            things[i] = '"' + entry.getKey() + '#' + entry.getValue() + '"';
+            i++;
+        }
+
+        configuration.get(MODID, "overrideNameThings", things, "Name overrides.\n" + "Use the ingame command '/holoinventory' to change this list easily.").set(things);
+        save();
     }
 
     public void doConfig()
@@ -109,6 +127,17 @@ public class Config
         bannedTiles.addAll(Arrays.asList(configuration.get(MODID, "bannedTiles", bannedTiles.toArray(new String[bannedTiles.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
         bannedEntities.clear();
         bannedEntities.addAll(Arrays.asList(configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
+
+        nameOverrides.clear();
+        String[] things = configuration.get(MODID, "overrideNameThings", new String[0], "Name overrides.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList();
+        for (String thing : things)
+        {
+            // Cut off " at end and begin
+            thing = thing.substring(1, thing.length() - 1);
+            String[] subThings = thing.split("#", 2);
+            if (subThings.length != 2) continue;
+            nameOverrides.put(subThings[0], subThings[1]);
+        }
 
         save();
     }
