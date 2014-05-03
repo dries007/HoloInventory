@@ -48,6 +48,7 @@ public class Config
     public int     cycle          = 0;
     public int     keyMode        = 0;
     public boolean enableEntities = true;
+    public boolean keyState       = false;
 
     public ArrayList<String> bannedTiles    = new ArrayList<String>();
     public ArrayList<String> bannedEntities = new ArrayList<String>();
@@ -80,6 +81,7 @@ public class Config
                 "1: The key toggles the rendering.\n" +
                 "2: Only render hologram while key pressed.\n" +
                 "3: Don't render hologram while key pressed.").getInt();
+        keyState = configuration.get(MODID, "keyState", keyState, "Stores last toggle value. Don't worry about this.").getBoolean(keyState);
 
         renderName = configuration.get(MODID, "renderName", renderName, "Renders the inv name above the hologram").getBoolean(true);
         renderText = configuration.get(MODID, "renderText", renderText, "Render the stacksize as text on top of the items").getBoolean(true);
@@ -108,17 +110,28 @@ public class Config
         bannedEntities.clear();
         bannedEntities.addAll(Arrays.asList(configuration.get(MODID, "bannedEntities", bannedEntities.toArray(new String[bannedEntities.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
 
-        configuration.save();
+        save();
     }
 
     public void setKey(int p_151462_1_)
     {
         configuration.get(MODID, "keyCode", p_151462_1_, "You can set this ingame.").set(p_151462_1_);
-        configuration.save();
+        save();
     }
 
     public int getKey()
     {
         return configuration.get(MODID, "keyCode", 0, "You can set this ingame.").getInt();
+    }
+
+    public void save()
+    {
+        configuration.save();
+    }
+
+    public void setKeyState(boolean keyState)
+    {
+        configuration.get(MODID, "keyState", keyState, "Stores last toggle value. Don't worry about this.").set(keyState);
+        save();
     }
 }

@@ -75,8 +75,8 @@ public class Renderer
     {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
-        if (HoloInventory.getConfig().keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;
-        if (HoloInventory.getConfig().keyMode == 3 && KeyManager.key.getIsKeyPressed()) return;
+        //if (HoloInventory.getConfig().keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;
+        //if (HoloInventory.getConfig().keyMode == 3 && KeyManager.key.getIsKeyPressed()) return;
         if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)

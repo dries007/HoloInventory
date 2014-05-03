@@ -21,10 +21,9 @@
 
 package net.dries007.holoInventory.client;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import net.dries007.holoInventory.HoloInventory;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
@@ -45,7 +44,15 @@ public class KeyManager
     {
         ClientRegistry.registerKeyBinding(key);
         key.setKeyCode(HoloInventory.getConfig().getKey());
-        if (HoloInventory.getConfig().keyMode == 2) Renderer.INSTANCE.enabled = false;
+        switch (HoloInventory.getConfig().keyMode)
+        {
+            case 1:
+                Renderer.INSTANCE.enabled = HoloInventory.getConfig().keyState;
+                break;
+            case 2:
+                Renderer.INSTANCE.enabled = false;
+                break;
+        }
     }
 
     /**
@@ -56,16 +63,31 @@ public class KeyManager
      * 3: Don't render hologram while key pressed. (Handled in Renderer)
      */
 
+    boolean alreadyToggling = false;
     @SubscribeEvent
-    public void input(InputEvent.KeyInputEvent event)
+    public void input(TickEvent.ClientTickEvent event)
     {
-        if (key.getIsKeyPressed())
+        if (event.phase == TickEvent.Phase.END) return;
+        switch (HoloInventory.getConfig().keyMode)
         {
-            switch (HoloInventory.getConfig().keyMode)
-            {
-                case 1:
-                    Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
-            }
+            case 1:
+                if (Keyboard.isKeyDown(key.getKeyCode()))
+                {
+                    if (!alreadyToggling)
+                    {
+                        alreadyToggling = true;
+                        Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
+                        HoloInventory.getConfig().setKeyState(Renderer.INSTANCE.enabled);
+                    }
+                }
+                else alreadyToggling = false;
+                break;
+            case 2:
+                Renderer.INSTANCE.enabled = Keyboard.isKeyDown(key.getKeyCode());
+                break;
+            case 3:
+                Renderer.INSTANCE.enabled = !Keyboard.isKeyDown(key.getKeyCode());
+                break;
         }
     }
 }

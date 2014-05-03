@@ -114,7 +114,10 @@ public class ClientHandler
     public void init()
     {
         MinecraftForge.EVENT_BUS.register(Renderer.INSTANCE);
+        FMLCommonHandler.instance().bus().register(Renderer.INSTANCE);
+
         FMLCommonHandler.instance().bus().register(KEY_MANAGER);
+        MinecraftForge.EVENT_BUS.register(KEY_MANAGER);
 
         if (HoloInventory.getConfig().doVersionCheck)
         {
