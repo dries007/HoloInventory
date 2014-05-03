@@ -24,7 +24,8 @@ Options (see config file):[/center]
 [/spoiler]
 [center]
 
-[u][size=5]News:[/size][/u]
+[u][size=5]News:[/size][/u][/center]
+[center]► v1.8.1: Added inventory name overriding. (See command help.)
 ► v1.8.0: MC 1.7.2 update + added entity disable in config
 ► v1.7.0: Added cycle mode
 ► v1.6.5: Added different modes such as "Sorted" and "most abundant"
@@ -51,11 +52,13 @@ Options (see config file):[/center]
 
 [media]http://www.youtube.com/watch?v=7MhwUOwEUEA[/media]
 
-[u][size=5]Screenshots?[/size][/u]
-[size=4][url="http://www.dries007.net/holoinventory/"]> screenshots <[size][/url]
+[size=6][url="http://www.dries007.net/holoinventory/"]> screenshots <[/url][/size]
 
 [b]Default:[/b]
 [img]http://www.dries007.net/holoinventory/WoolNoBg.png[/img]
+ [/center]
 
-[b]With background (see config file):[/b]
-[img]http://www.dries007.net/holoinventory/wool.png[/img][/center]
+[center]As per MCF rules:[/center]
+[center][url="https://github.com/dries007/HoloInventory/blob/master/src/main/java/net/dries007/holoInventory/util/Data.java"]This mod contains code that does a version check.[/url] (opt out in config)[/center]
+[center][url="https://github.com/dries007/HoloInventory/blob/master/src/main/java/org/mcstats/Metrics.java"]This mod also uses mcstats.org for analytics.[/url] (opt out in the 'PluginMetrics' config)[/center]
+[center][url="https://github.com/dries007/HoloInventory/blob/master/src/main/java/net/dries007/holoInventory/util/Data.java"]This mod adds capes to me and some other people involved with the mod.[/url][/center]
