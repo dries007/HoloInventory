@@ -389,7 +389,7 @@ public class Renderer
         glPushMatrix();
         glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
         glScalef(blockScale, blockScale, blockScale);
-        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) glRotatef(timeD, 0.0F, 1.0F, 0.0F);
+        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) glRotatef(HoloInventory.getConfig().rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
         else glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
         customitem.setEntityItemStack(itemStack);
         ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);

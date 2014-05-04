@@ -24,8 +24,9 @@ Options (see config file):[/center]
 [/spoiler]
 [center]
 
-[u][size=5]News:[/size][/u][/center]
-[center]► v1.8.1: Added inventory name overriding. (See command help.)
+[u][size=5]News:[/size][/u]
+► v1.8.2: Added config option to disable item rotation on fancy graphics.
+► v1.8.1: Added inventory name overriding. (See command help.)
 ► v1.8.0: MC 1.7.2 update + added entity disable in config
 ► v1.7.0: Added cycle mode
 ► v1.6.5: Added different modes such as "Sorted" and "most abundant"

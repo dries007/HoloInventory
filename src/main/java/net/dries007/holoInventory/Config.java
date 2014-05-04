@@ -51,6 +51,7 @@ public class Config
     public int     keyMode        = 0;
     public boolean enableEntities = true;
     public boolean keyState       = false;
+    public boolean rotateItems    = true;
 
     public ArrayList<String> bannedTiles    = new ArrayList<String>();
     public ArrayList<String> bannedEntities = new ArrayList<String>();
@@ -122,6 +123,7 @@ public class Config
                 "6: Same as 1, but with 9 items.").getInt();
 
         cycle = configuration.get(MODID, "cycle", cycle, "Cycle trough all the items one by one. Set to the delay time wanted in ticks. If 0, cycle mode is off. Still takes into a count the mode.").getInt();
+        rotateItems = configuration.get(MODID, "rotateItems", rotateItems, "Rotate the items in the hologram. Only works on fancy rendering.").getBoolean(rotateItems);
 
         bannedTiles.clear();
         bannedTiles.addAll(Arrays.asList(configuration.get(MODID, "bannedTiles", bannedTiles.toArray(new String[bannedTiles.size()]), "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.").getStringList()));
