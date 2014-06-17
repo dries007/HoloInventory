@@ -328,6 +328,7 @@ public class Renderer
 
     /**
      * @param columns amount of columns in the hologram
+     *
      * @return the blockScaleModifier
      */
     private float getBlockScaleModifier(int columns)
@@ -338,6 +339,7 @@ public class Renderer
 
     /**
      * @param size of the inventory
+     *
      * @return columns of the hologram
      */
     private int getMaxColumns(int size)
@@ -354,6 +356,7 @@ public class Renderer
      * Shifts GL & returns the string
      *
      * @param stackSize the stackSize.
+     *
      * @return the string to be rendered
      */
     private String doStackSizeCrap(int stackSize)
@@ -437,10 +440,8 @@ public class Renderer
 
     private void renderName(String name)
     {
-        if (HoloInventory.getConfig().nameOverrides.containsKey(name))
-            name = HoloInventory.getConfig().nameOverrides.get(name);
-        else
-            name = StatCollector.translateToLocal(name);
+        if (HoloInventory.getConfig().nameOverrides.containsKey(name)) name = HoloInventory.getConfig().nameOverrides.get(name);
+        else name = StatCollector.translateToLocal(name);
         glPushMatrix();
         glEnable(GL12.GL_RESCALE_NORMAL);
         glDisable(GL_DEPTH_TEST);

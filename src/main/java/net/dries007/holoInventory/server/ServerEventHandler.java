@@ -52,9 +52,9 @@ import java.util.List;
 
 public class ServerEventHandler
 {
-    public List<String>                    banUsers = new ArrayList<String>();
+    public List<String>                    banUsers      = new ArrayList<String>();
     public HashMap<String, String>         overrideUsers = new HashMap<String, String>();
-    public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
+    public HashMap<Integer, InventoryData> blockMap      = new HashMap<Integer, InventoryData>();
 
     @SubscribeEvent()
     public void event(PlayerInteractEvent event)
@@ -91,11 +91,11 @@ public class ServerEventHandler
             if (Helper.weWant(te))
             {
                 String name = null;
-                if (te instanceof  BlockJukebox.TileEntityJukebox) name = "jukebox";
+                if (te instanceof BlockJukebox.TileEntityJukebox) name = "jukebox";
                 else if (te instanceof IInventory) name = ((IInventory) te).getInventoryName();
                 else if (te instanceof TileEntityEnderChest) name = event.entityPlayer.getInventoryEnderChest().getInventoryName();
 
-                PacketPipeline.PIPELINE.sendTo(new RenamePacket(name == null ? "": name, nameOverride), (EntityPlayerMP) event.entityPlayer);
+                PacketPipeline.PIPELINE.sendTo(new RenamePacket(name == null ? "" : name, nameOverride), (EntityPlayerMP) event.entityPlayer);
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(te.getClass().getCanonicalName() + " will now be named " + nameOverride));
             }
             else

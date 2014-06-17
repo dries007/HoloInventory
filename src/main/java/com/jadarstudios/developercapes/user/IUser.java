@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * This is the interface that you must implement to create your own user type
- * 
+ *
  * @author Jadar
  */
 public interface IUser
@@ -20,7 +20,7 @@ public interface IUser
      * @return The {@link ResourceLocation} that contains the cape file
      */
     public ResourceLocation getResource();
-    
+
     /**
      * @return The {@link ITextureObject} that contains the cape
      */

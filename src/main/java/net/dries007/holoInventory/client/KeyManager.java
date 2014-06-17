@@ -64,6 +64,7 @@ public class KeyManager
      */
 
     boolean alreadyToggling = false;
+
     @SubscribeEvent
     public void input(TickEvent.ClientTickEvent event)
     {

@@ -53,9 +53,9 @@ public class Config
     public boolean keyState       = false;
     public boolean rotateItems    = true;
 
-    public ArrayList<String> bannedTiles    = new ArrayList<String>();
-    public ArrayList<String> bannedEntities = new ArrayList<String>();
-    public HashMap<String, String> nameOverrides = new HashMap<String, String>();
+    public ArrayList<String>       bannedTiles    = new ArrayList<String>();
+    public ArrayList<String>       bannedEntities = new ArrayList<String>();
+    public HashMap<String, String> nameOverrides  = new HashMap<String, String>();
 
     public Config(File file)
     {
