@@ -11,6 +11,9 @@ If you find spelling mistakes, let me know!
 
 (c) Copyright  Dries007.net 2013
 
+### Donate
+If you want to donate to me (dries007), you can [paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M6XDAP29UDX7Q) or [patreon](http://www.patreon.com/dries007) me.
+
 ### Video makers:
 My name is Dutch, that means the "ie" is pronounced like a long i. [Click for an example, thanks Google.](http://translate.google.com/#nl/en/Driees)
 Make sure you use the latest version of the mod (and mention wich one you are using), and that you have a like (to this page or the MCForums) in the video discription.
