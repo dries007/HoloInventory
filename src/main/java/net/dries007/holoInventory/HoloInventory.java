@@ -62,10 +62,11 @@ public class HoloInventory
         snw.registerMessage(BlockInventoryMessage.Handler.class, BlockInventoryMessage.class, id++, Side.CLIENT);
         snw.registerMessage(EntityInventoryMessage.Handler.class, EntityInventoryMessage.class, id++, Side.CLIENT);
         snw.registerMessage(EntityRequestMessage.Handler.class, EntityRequestMessage.class, id++, Side.SERVER);
-        snw.registerMessage(RemoveInventoryMessage.Handler.class, RemoveInventoryMessage.class, id++, Side.CLIENT);
         snw.registerMessage(MerchantInventoryMessage.Handler.class, MerchantInventoryMessage.class, id++, Side.CLIENT);
         snw.registerMessage(ReloadMessage.Handler.class, ReloadMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(RemoveInventoryMessage.Handler.class, RemoveInventoryMessage.class, id++, Side.CLIENT);
         snw.registerMessage(RenameMessage.Handler.class, RenameMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(ResetMessage.Handler.class, ResetMessage.class, id++, Side.CLIENT);
 
         proxy.preInit();
     }
