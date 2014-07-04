@@ -51,7 +51,7 @@ processResources
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'src'
-    appendix = project.minecraft.minecraftVersion
+    appendix = project.minecraft.version
 }
 
 task deobfJar(type: Jar) {
@@ -60,11 +60,11 @@ task deobfJar(type: Jar) {
         include '**/*.java'
     }
 	classifier = 'dev'
-    appendix = project.minecraft.minecraftVersion
+    appendix = project.minecraft.version
 }
 
 jar {
-    appendix = project.minecraft.minecraftVersion
+    appendix = project.minecraft.version
 }
 
 artifacts {
