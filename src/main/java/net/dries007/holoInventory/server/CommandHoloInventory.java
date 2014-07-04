@@ -22,8 +22,7 @@
 package net.dries007.holoInventory.server;
 
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.packet.PacketPipeline;
-import net.dries007.holoInventory.packet.ResetPacket;
+import net.dries007.holoInventory.network.ResetMessage;
 import net.dries007.holoInventory.util.InventoryData;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
@@ -114,7 +113,7 @@ public class CommandHoloInventory extends CommandBase
         else if (args[0].equalsIgnoreCase("reset"))
         {
             if (!(sender instanceof EntityPlayer)) throw new WrongUsageException("You can't use this as the server...");
-            PacketPipeline.PIPELINE.sendTo(new ResetPacket(), (EntityPlayerMP) sender);
+            HoloInventory.getSnw().sendTo(new ResetMessage(), (EntityPlayerMP) sender);
             for (InventoryData data : ServerHandler.serverEventHandler.blockMap.values())
             {
                 //noinspection SuspiciousMethodCalls
@@ -124,7 +123,7 @@ public class CommandHoloInventory extends CommandBase
         else if (args[0].equalsIgnoreCase("reload"))
         {
             if (sender instanceof EntityPlayer)
-                PacketPipeline.PIPELINE.sendTo(new ResetPacket(), (EntityPlayerMP) sender);
+                HoloInventory.getSnw().sendTo(new ResetMessage(), (EntityPlayerMP) sender);
             if (MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(sender.getCommandSenderName()))
                 HoloInventory.getConfig().reload();
 

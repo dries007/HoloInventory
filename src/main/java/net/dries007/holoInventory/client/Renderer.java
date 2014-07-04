@@ -23,8 +23,7 @@ package net.dries007.holoInventory.client;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.packet.EntityRequestPacket;
-import net.dries007.holoInventory.packet.PacketPipeline;
+import net.dries007.holoInventory.network.EntityRequestMessage;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
@@ -120,7 +119,7 @@ public class Renderer
                     // Make & store request
                     if (!requestMap.containsKey(id))
                     {
-                        PacketPipeline.PIPELINE.sendToServer(new EntityRequestPacket(mc.theWorld.provider.dimensionId, id));
+                        HoloInventory.getSnw().sendToServer(new EntityRequestMessage(mc.theWorld.provider.dimensionId, id));
                         requestMap.put(id, mc.theWorld.getTotalWorldTime());
                     }
                     // Remove old request so that we get updated info next render tick

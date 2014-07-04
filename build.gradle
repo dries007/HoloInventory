@@ -17,8 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-ext.env = System.getenv()
-version = file('version.txt').text + env.BUILD_NUMBER
+version = "1.8.3." + System.getenv().BUILD_NUMBER
 
 targetCompatibility = 1.6
 sourceCompatibility = 1.6
@@ -49,12 +48,27 @@ processResources
     }
 }
 
-// because the normal default jar task has been modified to be obfuscated
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'src'
+    appendix = project.minecraft.minecraftVersion
+}
+
 task deobfJar(type: Jar) {
-	from sourceSets.main.output
-	appendix = 'dev'
+    from sourceSets.main.output
+    from (sourceSets.main.allSource.srcDirs) {
+        include '**/*.java'
+    }
+	classifier = 'dev'
+    appendix = project.minecraft.minecraftVersion
+}
+
+jar {
+    appendix = project.minecraft.minecraftVersion
 }
 
 artifacts {
-	archives deobfJar
+	archives jar
+    archives sourcesJar
+    archives deobfJar
 }

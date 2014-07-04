@@ -26,9 +26,8 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.packet.PacketPipeline;
-import net.dries007.holoInventory.packet.RemoveInventoryPacket;
-import net.dries007.holoInventory.packet.RenamePacket;
+import net.dries007.holoInventory.network.RemoveInventoryMessage;
+import net.dries007.holoInventory.network.RenameMessage;
 import net.dries007.holoInventory.util.*;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -92,7 +91,7 @@ public class ServerEventHandler
                 else if (te instanceof IInventory) name = ((IInventory) te).getInventoryName();
                 else if (te instanceof TileEntityEnderChest) name = event.entityPlayer.getInventoryEnderChest().getInventoryName();
 
-                PacketPipeline.PIPELINE.sendTo(new RenamePacket(name == null ? "" : name, nameOverride), (EntityPlayerMP) event.entityPlayer);
+                HoloInventory.getSnw().sendTo(new RenameMessage(name == null ? "" : name, nameOverride), (EntityPlayerMP) event.entityPlayer);
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(te.getClass().getCanonicalName() + " will now be named " + nameOverride));
             }
             else
@@ -196,7 +195,7 @@ public class ServerEventHandler
             NBTTagCompound root = new NBTTagCompound();
             root.setByte("type", (byte) 0);
             root.setInteger("id", coord.hashCode());
-            PacketPipeline.PIPELINE.sendTo(new RemoveInventoryPacket(root), player);
+            HoloInventory.getSnw().sendTo(new RemoveInventoryMessage(root), player);
         }
     }
 

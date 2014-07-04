@@ -28,6 +28,10 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
+import net.dries007.holoInventory.network.*;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.util.CommonProxy;
 
@@ -46,11 +50,23 @@ public class HoloInventory
 
     @SidedProxy(serverSide = "net.dries007.holoInventory.util.CommonProxy", clientSide = "net.dries007.holoInventory.util.ClientProxy")
     public static CommonProxy proxy;
+    private SimpleNetworkWrapper snw;
 
     @Mod.EventHandler()
     public void fmlEvent(FMLPreInitializationEvent event)
     {
         config = new Config(event.getSuggestedConfigurationFile());
+
+        int id = 0;
+        snw = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+        snw.registerMessage(BlockInventoryMessage.Handler.class, BlockInventoryMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(EntityInventoryMessage.Handler.class, EntityInventoryMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(EntityRequestMessage.Handler.class, EntityRequestMessage.class, id++, Side.SERVER);
+        snw.registerMessage(RemoveInventoryMessage.Handler.class, RemoveInventoryMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(MerchantInventoryMessage.Handler.class, MerchantInventoryMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(ReloadMessage.Handler.class, ReloadMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(RenameMessage.Handler.class, RenameMessage.class, id++, Side.CLIENT);
+
         proxy.preInit();
     }
 
@@ -87,5 +103,10 @@ public class HoloInventory
     public static HoloInventory getInstance()
     {
         return instance;
+    }
+
+    public static SimpleNetworkWrapper getSnw()
+    {
+        return instance.snw;
     }
 }

@@ -163,7 +163,8 @@ public class Config
 
     public void save()
     {
-        configuration.save();
+        if (configuration.hasChanged())
+            configuration.save();
     }
 
     public void setKeyState(boolean keyState)

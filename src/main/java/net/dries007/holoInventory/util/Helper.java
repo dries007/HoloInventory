@@ -21,85 +21,21 @@
 
 package net.dries007.holoInventory.util;
 
-import com.google.common.collect.HashMultimap;
-import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.packet.EntityInventoryPacket;
-import net.dries007.holoInventory.packet.MerchantInventoryPacket;
-import net.dries007.holoInventory.packet.PacketPipeline;
-import net.dries007.holoInventory.packet.RemoveInventoryPacket;
 import net.minecraft.block.BlockJukebox;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.DimensionManager;
 
 public class Helper
 {
     public static boolean weWant(Object o)
     {
         return o != null && (o instanceof IInventory || o instanceof IMerchant || o instanceof TileEntityEnderChest || o instanceof BlockJukebox.TileEntityJukebox);
-    }
-
-    public static HashMultimap<Integer, String> map = HashMultimap.create();
-
-    public static void respond(int dim, int entityId, EntityPlayer player)
-    {
-        Entity entity = DimensionManager.getWorld(dim).getEntityByID(entityId);
-
-        if (entity instanceof IInventory || entity instanceof IMerchant)
-        {
-            if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName()))
-            {
-                if (map.containsEntry(entityId, player.getDisplayName()))
-                {
-                    map.remove(entityId, player.getDisplayName());
-                    NBTTagCompound root = new NBTTagCompound();
-                    root.setByte("type", (byte) 1);
-                    root.setInteger("id", entityId);
-                    PacketPipeline.PIPELINE.sendTo(new RemoveInventoryPacket(root), (EntityPlayerMP) player);
-                }
-                return;
-            }
-
-            map.put(entityId, player.getDisplayName());
-
-            if (entity instanceof IInventory)
-            {
-                IInventory inventory = (IInventory) entity;
-                NBTTagCompound root = new NBTTagCompound();
-                root.setInteger("id", entityId);
-                root.setString("name", inventory.getInventoryName());
-                root.setString("class", entity.getClass().getCanonicalName());
-                NBTTagList list = new NBTTagList();
-                for (int i = 0; i < inventory.getSizeInventory(); i++)
-                {
-                    if (inventory.getStackInSlot(i) != null)
-                    {
-                        list.appendTag(inventory.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
-                    }
-                }
-                root.setTag("list", list);
-
-                PacketPipeline.PIPELINE.sendTo(new EntityInventoryPacket(root), (EntityPlayerMP) player);
-            }
-            else
-            {
-                NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
-                tag.setInteger("id", entityId);
-                tag.setString("name", entity.getCommandSenderName());
-                tag.setString("class", entity.getClass().getCanonicalName());
-
-                PacketPipeline.PIPELINE.sendTo(new MerchantInventoryPacket(tag), (EntityPlayerMP) player);
-            }
-        }
     }
 
     public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer)

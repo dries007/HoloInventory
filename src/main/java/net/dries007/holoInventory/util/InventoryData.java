@@ -21,8 +21,8 @@
 
 package net.dries007.holoInventory.util;
 
-import net.dries007.holoInventory.packet.BlockInventoryPacket;
-import net.dries007.holoInventory.packet.PacketPipeline;
+import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.network.BlockInventoryMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -53,7 +53,7 @@ public class InventoryData
         if (!playerSet.containsKey(player) || !playerSet.get(player).equals(data))
         {
             playerSet.put(player, data);
-            PacketPipeline.PIPELINE.sendTo(new BlockInventoryPacket(toNBT()), player);
+            HoloInventory.getSnw().sendTo(new BlockInventoryMessage(toNBT()), player);
         }
     }
 
