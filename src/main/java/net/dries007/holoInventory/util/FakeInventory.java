@@ -69,7 +69,7 @@ public class FakeInventory implements IInventory
     @Override
     public String getInventoryName()
     {
-        return null;
+        return name;
     }
 
     @Override

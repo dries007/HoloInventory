@@ -29,10 +29,7 @@ import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.packet.PacketPipeline;
 import net.dries007.holoInventory.packet.RemoveInventoryPacket;
 import net.dries007.holoInventory.packet.RenamePacket;
-import net.dries007.holoInventory.util.Coord;
-import net.dries007.holoInventory.util.FakeInventory;
-import net.dries007.holoInventory.util.Helper;
-import net.dries007.holoInventory.util.InventoryData;
+import net.dries007.holoInventory.util.*;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -91,7 +88,7 @@ public class ServerEventHandler
             if (Helper.weWant(te))
             {
                 String name = null;
-                if (te instanceof BlockJukebox.TileEntityJukebox) name = "jukebox";
+                if (te instanceof BlockJukebox.TileEntityJukebox) name = Data.JUKEBOX_NAME;
                 else if (te instanceof IInventory) name = ((IInventory) te).getInventoryName();
                 else if (te instanceof TileEntityEnderChest) name = event.entityPlayer.getInventoryEnderChest().getInventoryName();
 
@@ -162,7 +159,7 @@ public class ServerEventHandler
                         else if (te instanceof BlockJukebox.TileEntityJukebox)
                         {
                             BlockJukebox.TileEntityJukebox realTe = ((BlockJukebox.TileEntityJukebox) te);
-                            doStuff(coord.hashCode(), player, "jukebox", realTe.func_145856_a());
+                            doStuff(coord.hashCode(), player, Data.JUKEBOX_NAME, realTe.func_145856_a());
                         }
                         else
                         {

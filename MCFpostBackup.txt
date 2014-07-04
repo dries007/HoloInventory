@@ -24,6 +24,13 @@ Options (see config file):[/center]
 [/spoiler]
 [center]
 
+[b][size=5]Donations always appreciated.[/size][/b][/center]
+[center]
+[b][i][url="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M6XDAP29UDX7Q"]Paypal[/url][/i][/b][/center]
+[center]
+[b][i][url="http://www.patreon.com/dries007"]patreon[/url][/i][/b][/center]
+[center]
+
 [u][size=5]News:[/size][/u]
 ► v1.8.2: Added config option to disable item rotation on fancy graphics.
 ► v1.8.1: Added inventory name overriding. (See command help.)
@@ -49,15 +56,15 @@ Options (see config file):[/center]
 ► [url="http://www.dries007.net/holoinventory/?name=JukeBox.png"]Enderchests?![/url]
 ► [url="http://www.dries007.net/holoinventory/?name=Stacksize.png"]Non stackable items don't render the stacksize.[/url]
 
-[u][size=5]A fan made mod spotlight: (outdated)[/size][/u]
-
-[media]http://www.youtube.com/watch?v=7MhwUOwEUEA[/media]
+[u][size=5]A fan made mod spotlight:[/size][/u][/center]
+[center][u]Now updated[/u][/center]
+[center]
+[media]https://www.youtube.com/watch?v=G2LA7tzSF48[/media]
 
 [size=6][url="http://www.dries007.net/holoinventory/"]> screenshots <[/url][/size]
 
 [b]Default:[/b]
-[img]http://www.dries007.net/holoinventory/WoolNoBg.png[/img]
- [/center]
+[img]http://www.dries007.net/holoinventory/WoolNoBg.png[/img][/center]
 
 [center]As per MCF rules:[/center]
 [center][url="https://github.com/dries007/HoloInventory/blob/master/src/main/java/net/dries007/holoInventory/util/Data.java"]This mod contains code that does a version check.[/url] (opt out in config)[/center]

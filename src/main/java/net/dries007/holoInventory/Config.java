@@ -33,7 +33,8 @@ import static net.dries007.holoInventory.util.Data.MODID;
 
 public class Config
 {
-    final Configuration configuration;
+    private Configuration configuration;
+    private final File file;
 
     public boolean colorEnable    = false;
     public int     colorAlpha     = 200;
@@ -59,8 +60,8 @@ public class Config
 
     public Config(File file)
     {
-        configuration = new Configuration(file);
-        doConfig();
+        this.file = file;
+        reload();
     }
 
     public void overrideBannedThings()
@@ -70,6 +71,11 @@ public class Config
         save();
     }
 
+    public void reload()
+    {
+        configuration = new Configuration(file);
+        doConfig();
+    }
 
     public void overrideNameThings()
     {

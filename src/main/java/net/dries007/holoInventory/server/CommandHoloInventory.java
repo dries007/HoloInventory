@@ -61,7 +61,7 @@ public class CommandHoloInventory extends CommandBase
     @Override
     public String getCommandUsage(ICommandSender icommandsender)
     {
-        return "Use to reset local cache (<reset>), (un)ban tiles and override names.";
+        return "Use to <reset> local cache, <reload> the config, <(un)ban> tiles and override names.";
     }
 
     public List addTabCompletionOptions(ICommandSender sender, String[] args)
@@ -71,7 +71,7 @@ public class CommandHoloInventory extends CommandBase
             default:
                 return null;
             case 1:
-                if (isOp(sender)) return getListOfStringsMatchingLastWord(args, "reset", "overrideName", "ban", "unban");
+                if (isOp(sender)) return getListOfStringsMatchingLastWord(args, "reset", "reload", "overrideName", "ban", "unban");
                 else return getListOfStringsMatchingLastWord(args, "reset", "overrideName");
             case 2:
                 if (isOp(sender) && args[0].equalsIgnoreCase("unban")) return getListOfStringsFromIterableMatchingLastWord(args, getAllList());
@@ -94,13 +94,14 @@ public class CommandHoloInventory extends CommandBase
 
     private void sendHelp(ICommandSender sender)
     {
-        sender.addChatMessage(new ChatComponentText("-= HoloInventory By Dries007 =-" +
-                "\nUse one of the following arguments with this command:" +
-                "\n  * <reset>             -> Reset the clients cache" +
-                "\n  * <overrideName> [new name] -> Override a name" +
-                "\n  * <ban>                -> Ban the next inventory you RIGHTclick" +
-                "\n  * <unban> [a name] -> Unban a an inventory" +
-                "\nPro tip: Use tab completion!"));
+        sender.addChatMessage(new ChatComponentText("-= HoloInventory By Dries007 =-"));
+        sender.addChatMessage(new ChatComponentText("Use one of the following arguments with this command:"));
+        sender.addChatMessage(new ChatComponentText("  * <reset>             -> Reset the clients cache"));
+        sender.addChatMessage(new ChatComponentText("  * <reload>            -> Reload (server) config."));
+        sender.addChatMessage(new ChatComponentText("  * <overrideName> [new name] -> Override a name"));
+        sender.addChatMessage(new ChatComponentText("  * <ban>                -> Ban the next inventory you RIGHTclick"));
+        sender.addChatMessage(new ChatComponentText("  * <unban> [a name] -> Unban a an inventory"));
+        sender.addChatMessage(new ChatComponentText("Pro tip: Use tab completion!"));
     }
 
     @Override
@@ -119,6 +120,15 @@ public class CommandHoloInventory extends CommandBase
                 //noinspection SuspiciousMethodCalls
                 data.playerSet.remove(sender);
             }
+        }
+        else if (args[0].equalsIgnoreCase("reload"))
+        {
+            if (sender instanceof EntityPlayer)
+                PacketPipeline.PIPELINE.sendTo(new ResetPacket(), (EntityPlayerMP) sender);
+            if (MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(sender.getCommandSenderName()))
+                HoloInventory.getConfig().reload();
+
+            sender.addChatMessage(new ChatComponentText("Reload command send."));
         }
         else if (args[0].equalsIgnoreCase("overrideName"))
         {

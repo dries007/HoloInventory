@@ -100,11 +100,13 @@ public class Renderer
                             coord.y += 0.5;
                             coord.z += 0.5;
                             renderHologram(data);
-                            return;
                         }
+                        else
+                            tileMap.remove(coord.hashCode());
                     }
                 }
-                tileMap.remove(coord.hashCode());
+                else
+                    tileMap.remove(coord.hashCode());
                 break;
             case ENTITY:
                 if (!HoloInventory.getConfig().enableEntities) break;

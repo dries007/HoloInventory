@@ -71,26 +71,24 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Abstra
         registerPacket(RemoveInventoryPacket.class);
         registerPacket(RenamePacket.class);
         registerPacket(ResetPacket.class);
+        registerPacket(ReloadPacket.class);
     }
 
     public boolean registerPacket(Class<? extends AbstractPacket> clazz)
     {
         if (this.packets.size() > 256)
         {
-            // You should log here!!
-            return false;
+            throw new RuntimeException("Packet list > 256");
         }
 
         if (this.packets.contains(clazz))
         {
-            // You should log here!!
-            return false;
+            throw new RuntimeException("Double packet registration.");
         }
 
         if (this.isPostInitialised)
         {
-            // You should log here!!
-            return false;
+            throw new RuntimeException("Packet registration after post init.");
         }
 
         this.packets.add(clazz);
