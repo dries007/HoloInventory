@@ -73,6 +73,21 @@ public class Renderer
     @SubscribeEvent
     public void renderEvent(RenderWorldLastEvent event)
     {
+        try
+        {
+            doEvent();
+        }
+        catch (Exception e)
+        {
+            HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
+            HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
+
+            e.printStackTrace();
+        }
+    }
+
+    private void doEvent()
+    {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
         //if (HoloInventory.getConfig().keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;

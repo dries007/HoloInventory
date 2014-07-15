@@ -125,54 +125,64 @@ public class ServerEventHandler
     @SubscribeEvent()
     public void event(TickEvent.PlayerTickEvent event)
     {
-        if (event.phase != TickEvent.Phase.END || event.side != Side.SERVER) return;
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
-        WorldServer world = player.getServerForPlayer();
-        if (world == null) return;
-
-        MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
-
-        if (mo != null)
+        try
         {
-            switch (mo.typeOfHit)
+            if (event.phase != TickEvent.Phase.END || event.side != Side.SERVER) return;
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
+            WorldServer world = player.getServerForPlayer();
+            if (world == null) return;
+
+            MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
+
+            if (mo != null)
             {
-                case BLOCK:
-                    Coord coord = new Coord(world.provider.dimensionId, mo);
-                    TileEntity te = world.getTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
-                    if (Helper.weWant(te))
-                    {
-                        checkForChangedType(coord.hashCode(), te);
-                        if (HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
+                switch (mo.typeOfHit)
+                {
+                    case BLOCK:
+                        Coord coord = new Coord(world.provider.dimensionId, mo);
+                        TileEntity te = world.getTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
+                        if (Helper.weWant(te))
                         {
-                            // BANNED THING
-                            cleanup(coord, player);
+                            checkForChangedType(coord.hashCode(), te);
+                            if (HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
+                            {
+                                // BANNED THING
+                                cleanup(coord, player);
+                            }
+                            else if (te instanceof IInventory)
+                            {
+                                doStuff(coord.hashCode(), player, (IInventory) te);
+                            }
+                            else if (te instanceof TileEntityEnderChest)
+                            {
+                                doStuff(coord.hashCode(), player, player.getInventoryEnderChest());
+                            }
+                            else if (te instanceof BlockJukebox.TileEntityJukebox)
+                            {
+                                BlockJukebox.TileEntityJukebox realTe = ((BlockJukebox.TileEntityJukebox) te);
+                                doStuff(coord.hashCode(), player, Data.JUKEBOX_NAME, realTe.func_145856_a());
+                            }
+                            else
+                            {
+                                cleanup(coord, player);
+                            }
                         }
-                        else if (te instanceof IInventory)
+                        break;
+                    case ENTITY:
+                        if (Helper.weWant(mo.entityHit))
                         {
-                            doStuff(coord.hashCode(), player, (IInventory) te);
+                            doStuff(mo.entityHit.getEntityId(), player, (IInventory) mo.entityHit);
                         }
-                        else if (te instanceof TileEntityEnderChest)
-                        {
-                            doStuff(coord.hashCode(), player, player.getInventoryEnderChest());
-                        }
-                        else if (te instanceof BlockJukebox.TileEntityJukebox)
-                        {
-                            BlockJukebox.TileEntityJukebox realTe = ((BlockJukebox.TileEntityJukebox) te);
-                            doStuff(coord.hashCode(), player, Data.JUKEBOX_NAME, realTe.func_145856_a());
-                        }
-                        else
-                        {
-                            cleanup(coord, player);
-                        }
-                    }
-                    break;
-                case ENTITY:
-                    if (Helper.weWant(mo.entityHit))
-                    {
-                        doStuff(mo.entityHit.getEntityId(), player, (IInventory) mo.entityHit);
-                    }
-                    break;
+                        break;
+                }
             }
+        }
+        catch (Exception e)
+        {
+            HoloInventory.getLogger().warn("Some error while sending over inventory, no hologram for you :(");
+            HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
+
+            e.printStackTrace();
         }
     }
 

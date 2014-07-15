@@ -129,7 +129,16 @@ public class ClientHandler
             FMLCommonHandler.instance().bus().register(this);
         }
 
-        DevCapes.getInstance().registerConfig(Data.CAPES, Data.MODID);
+        try
+        {
+            DevCapes.getInstance().registerConfig(Data.CAPES, Data.MODID);
+        }
+        catch (Exception e)
+        {
+            HoloInventory.getLogger().warn("Some error while loading capes, no capes for you :(");
+            HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
+            e.printStackTrace();
+        }
     }
 
     boolean done = false;

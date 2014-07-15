@@ -34,6 +34,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.dries007.holoInventory.network.*;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.util.CommonProxy;
+import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
@@ -51,10 +52,12 @@ public class HoloInventory
     @SidedProxy(serverSide = "net.dries007.holoInventory.util.CommonProxy", clientSide = "net.dries007.holoInventory.util.ClientProxy")
     public static CommonProxy proxy;
     private SimpleNetworkWrapper snw;
+    private Logger logger;
 
     @Mod.EventHandler()
     public void fmlEvent(FMLPreInitializationEvent event)
     {
+        logger = event.getModLog();
         config = new Config(event.getSuggestedConfigurationFile());
 
         int id = 0;
@@ -109,5 +112,10 @@ public class HoloInventory
     public static SimpleNetworkWrapper getSnw()
     {
         return instance.snw;
+    }
+
+    public static Logger getLogger()
+    {
+        return getInstance().logger;
     }
 }
