@@ -17,7 +17,8 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.8.3." + System.getenv().BUILD_NUMBER
+version = "1.8.3"
+if (System.getenv().BUILD_NUMBER != null) version += "." + System.getenv().BUILD_NUMBER
 
 targetCompatibility = 1.6
 sourceCompatibility = 1.6
@@ -26,7 +27,7 @@ group= "net.dries007"
 archivesBaseName = "HoloInventory"
 
 minecraft {
-    version = "1.7.2-10.12.2.1121"
+    version = "1.7.10-10.13.0.1194"
     assetDir = "jars/assets"
 }
 
@@ -49,12 +50,14 @@ processResources
 }
 
 task sourcesJar(type: Jar) {
+    from "LICENSE.txt"
     from sourceSets.main.allSource
     classifier = 'src'
     appendix = project.minecraft.version
 }
 
 task deobfJar(type: Jar) {
+    from "LICENSE.txt"
     from sourceSets.main.output
     from (sourceSets.main.allSource.srcDirs) {
         include '**/*.java'
@@ -64,6 +67,7 @@ task deobfJar(type: Jar) {
 }
 
 jar {
+    from "LICENSE.txt"
     appendix = project.minecraft.version
 }
 

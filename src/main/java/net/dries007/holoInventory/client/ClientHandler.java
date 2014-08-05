@@ -21,7 +21,6 @@
 
 package net.dries007.holoInventory.client;
 
-import com.jadarstudios.developercapes.DevCapes;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
@@ -127,17 +126,6 @@ public class ClientHandler
             vc.run();
 
             FMLCommonHandler.instance().bus().register(this);
-        }
-
-        try
-        {
-            DevCapes.getInstance().registerConfig(Data.CAPES, Data.MODID);
-        }
-        catch (Exception e)
-        {
-            HoloInventory.getLogger().warn("Some error while loading capes, no capes for you :(");
-            HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
-            e.printStackTrace();
         }
     }
 

@@ -21,6 +21,8 @@
 
 package net.dries007.holoInventory;
 
+import net.dries007.holoInventory.util.DevPerks;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
@@ -53,6 +55,7 @@ public class Config
     public boolean enableEntities = true;
     public boolean keyState       = false;
     public boolean rotateItems    = true;
+    public boolean debug          = false;
 
     public ArrayList<String>       bannedTiles    = new ArrayList<String>();
     public ArrayList<String>       bannedEntities = new ArrayList<String>();
@@ -146,6 +149,9 @@ public class Config
             if (subThings.length != 2) continue;
             nameOverrides.put(subThings[0], subThings[1]);
         }
+
+        debug = configuration.getBoolean("debug", MODID, debug, "Enable debug, use when errors or weird behaviour happens.");
+        if (configuration.getBoolean("sillyness", MODID, true, "Disable sillyness only if you want to piss of the devs XD")) MinecraftForge.EVENT_BUS.register(new DevPerks(debug));
 
         save();
     }

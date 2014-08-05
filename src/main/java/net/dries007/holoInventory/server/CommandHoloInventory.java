@@ -80,7 +80,7 @@ public class CommandHoloInventory extends CommandBase
 
     private boolean isOp(ICommandSender sender)
     {
-        return MinecraftServer.getServer().isSinglePlayer() || MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(sender.getCommandSenderName());
+        return MinecraftServer.getServer().isSinglePlayer() || !(sender instanceof EntityPlayerMP) || MinecraftServer.getServer().getConfigurationManager().func_152596_g(((EntityPlayerMP) sender).getGameProfile());
     }
 
     private List<String> getAllList()
@@ -124,7 +124,7 @@ public class CommandHoloInventory extends CommandBase
         {
             if (sender instanceof EntityPlayer)
                 HoloInventory.getSnw().sendTo(new ResetMessage(), (EntityPlayerMP) sender);
-            if (MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(sender.getCommandSenderName()))
+            if (isOp(sender))
                 HoloInventory.getConfig().reload();
 
             sender.addChatMessage(new ChatComponentText("Reload command send."));

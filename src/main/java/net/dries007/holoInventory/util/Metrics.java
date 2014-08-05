@@ -28,7 +28,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package org.mcstats;
+package net.dries007.holoInventory.util;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;

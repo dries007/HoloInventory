@@ -23,7 +23,6 @@ package net.dries007.holoInventory.util;
 
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
-import org.mcstats.Metrics;
 
 import java.io.IOException;
 
