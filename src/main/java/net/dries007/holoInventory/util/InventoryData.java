@@ -21,11 +21,13 @@
 
 package net.dries007.holoInventory.util;
 
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.BlockInventoryMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
@@ -64,11 +66,32 @@ public class InventoryData
         if (name == null) name = ""; //Really mod authors? Really? Null is not a good name.
         root.setString("name", name);
         NBTTagList list = new NBTTagList();
-        for (int i = 0; i < te.getSizeInventory(); i++)
+
+        if (te instanceof IDrawerGroup) // Drawers compat code
         {
-            if (te.getStackInSlot(i) != null)
+            IDrawerGroup drawerGroup = ((IDrawerGroup) te);
+            for (int i = 0; i < drawerGroup.getDrawerCount(); i++)
             {
-                list.appendTag(te.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
+                ItemStack stack = drawerGroup.getDrawer(i).getStoredItemCopy();
+                if (stack != null)
+                {
+                    NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
+                    tag.setInteger("Count", stack.stackSize);
+                    list.appendTag(tag);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < te.getSizeInventory(); i++)
+            {
+                ItemStack stack = te.getStackInSlot(i);
+                if (stack != null)
+                {
+                    NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
+                    tag.setInteger("Count", stack.stackSize);
+                    list.appendTag(tag);
+                }
             }
         }
         root.setTag("list", list);

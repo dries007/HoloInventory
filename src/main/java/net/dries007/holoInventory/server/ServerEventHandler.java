@@ -71,7 +71,6 @@ public class ServerEventHandler
             {
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
             }
-
             HoloInventory.getConfig().overrideBannedThings();
         }
 
