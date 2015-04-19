@@ -29,12 +29,15 @@ import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.RemoveInventoryMessage;
 import net.dries007.holoInventory.network.RenameMessage;
 import net.dries007.holoInventory.util.*;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MovingObjectPosition;
@@ -147,6 +150,10 @@ public class ServerEventHandler
                             {
                                 // BANNED THING
                                 cleanup(coord, player);
+                            }
+                            else if (te instanceof TileEntityChest)
+                            {
+                                doStuff(coord.hashCode(), player, Blocks.chest.func_149951_m(world, (int) coord.x, (int) coord.y, (int) coord.z));
                             }
                             else if (te instanceof IInventory)
                             {
