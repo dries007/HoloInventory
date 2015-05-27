@@ -28,6 +28,7 @@ import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -277,7 +278,6 @@ public class Renderer
             list = Arrays.asList(list.get(i));
         }
 
-
         doRenderHologram(namedData.name, list, distance);
     }
 
@@ -405,6 +405,7 @@ public class Renderer
      */
     private void renderItem(ItemStack itemStack, int column, int row, int stackSize)
     {
+        RenderHelper.enableStandardItemLighting();
         glPushMatrix();
         glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
         glScalef(blockScale, blockScale, blockScale);
@@ -414,6 +415,7 @@ public class Renderer
         ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);
         if (itemStack.hasEffect(0)) glDisable(GL_LIGHTING);
         glPopMatrix();
+        RenderHelper.disableStandardItemLighting();
         if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1))
         {
             glPushMatrix();
