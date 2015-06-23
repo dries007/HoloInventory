@@ -38,28 +38,28 @@ public class Config
     private Configuration configuration;
     private final File file;
 
-    public boolean colorEnable    = false;
-    public int     colorAlpha     = 200;
-    public int     colorR         = 14;
-    public int     colorG         = 157;
-    public int     colorB         = 196;
+    public boolean colorEnable = false;
+    public int colorAlpha = 200;
+    public int colorR = 14;
+    public int colorG = 157;
+    public int colorB = 196;
     public boolean doVersionCheck = true;
-    public int     syncFreq       = 2;
-    public boolean renderText     = true;
+    public int syncFreq = 2;
+    public boolean renderText = true;
     public boolean renderMultiple = true;
     public boolean enableStacking = true;
-    public boolean renderName     = true;
-    public int     mode           = 0;
-    public int     cycle          = 0;
-    public int     keyMode        = 0;
+    public boolean renderName = true;
+    public int mode = 0;
+    public int cycle = 0;
+    public int keyMode = 0;
     public boolean enableEntities = true;
-    public boolean keyState       = false;
-    public boolean rotateItems    = true;
-    public boolean debug          = false;
+    public boolean keyState = false;
+    public boolean rotateItems = true;
+    public boolean debug = false;
 
-    public ArrayList<String>       bannedTiles    = new ArrayList<String>();
-    public ArrayList<String>       bannedEntities = new ArrayList<String>();
-    public HashMap<String, String> nameOverrides  = new HashMap<String, String>();
+    public ArrayList<String> bannedTiles = new ArrayList<String>();
+    public ArrayList<String> bannedEntities = new ArrayList<String>();
+    public HashMap<String, String> nameOverrides = new HashMap<String, String>();
 
     public Config(File file)
     {

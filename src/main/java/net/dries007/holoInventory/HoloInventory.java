@@ -31,6 +31,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
+import net.dries007.holoInventory.compat.DecoderRegistry;
 import net.dries007.holoInventory.network.*;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.util.CommonProxy;
@@ -72,6 +73,8 @@ public class HoloInventory
         snw.registerMessage(ResetMessage.Handler.class, ResetMessage.class, id++, Side.CLIENT);
 
         proxy.preInit();
+
+        DecoderRegistry.init();
     }
 
     @Mod.EventHandler()

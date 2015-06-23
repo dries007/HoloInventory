@@ -26,7 +26,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class Coord
 {
-    public int    dim;
+    public int dim;
     public double x;
     public double y;
     public double z;

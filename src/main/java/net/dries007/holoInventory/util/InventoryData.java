@@ -23,6 +23,7 @@ package net.dries007.holoInventory.util;
 
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.compat.DecoderRegistry;
 import net.dries007.holoInventory.network.BlockInventoryMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -35,7 +36,7 @@ import java.util.HashMap;
 
 public class InventoryData
 {
-    public int        id;
+    public int id;
     public IInventory te;
     public HashMap<EntityPlayer, NBTTagCompound> playerSet = new HashMap<EntityPlayer, NBTTagCompound>();
     public String name;
@@ -51,11 +52,16 @@ public class InventoryData
 
     public void sendIfOld(EntityPlayerMP player)
     {
-        NBTTagCompound data = toNBT();
+        NBTTagCompound data = new NBTTagCompound();
+        data.setInteger("id", this.id);
+        if (name == null) name = ""; //Really mod authors? Really? Null is not a good name.
+        data.setString("name", name);
+        data.setTag("list", DecoderRegistry.toNBT(te));
+
         if (!playerSet.containsKey(player) || !playerSet.get(player).equals(data))
         {
             playerSet.put(player, data);
-            HoloInventory.getSnw().sendTo(new BlockInventoryMessage(toNBT()), player);
+            HoloInventory.getSnw().sendTo(new BlockInventoryMessage(data), player);
         }
     }
 
@@ -83,16 +89,7 @@ public class InventoryData
         }
         else
         {
-            for (int i = 0; i < te.getSizeInventory(); i++)
-            {
-                ItemStack stack = te.getStackInSlot(i);
-                if (stack != null)
-                {
-                    NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
-                    tag.setInteger("Count", stack.stackSize);
-                    list.appendTag(tag);
-                }
-            }
+
         }
         root.setTag("list", list);
         return root;

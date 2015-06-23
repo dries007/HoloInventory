@@ -11,7 +11,9 @@ public class RenameMessage implements IMessage
 {
     String name, override;
 
-    public RenameMessage() {}
+    public RenameMessage()
+    {
+    }
 
     public RenameMessage(String name, String override)
     {

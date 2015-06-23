@@ -29,7 +29,6 @@ import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.RemoveInventoryMessage;
 import net.dries007.holoInventory.network.RenameMessage;
 import net.dries007.holoInventory.util.*;
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -51,9 +50,9 @@ import java.util.List;
 
 public class ServerEventHandler
 {
-    public List<String>                    banUsers      = new ArrayList<String>();
-    public HashMap<String, String>         overrideUsers = new HashMap<String, String>();
-    public HashMap<Integer, InventoryData> blockMap      = new HashMap<Integer, InventoryData>();
+    public List<String> banUsers = new ArrayList<String>();
+    public HashMap<String, String> overrideUsers = new HashMap<String, String>();
+    public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
 
     @SubscribeEvent()
     public void event(PlayerInteractEvent event)

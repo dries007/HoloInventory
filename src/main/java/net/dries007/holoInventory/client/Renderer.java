@@ -50,12 +50,12 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer
 {
-    private static final DecimalFormat                                   DF          = new DecimalFormat("#.#");
-    private static final int                                             TEXTCOLOR   = 255 + (255 << 8) + (255 << 16) + (170 << 24);
-    public static final  HashMap<Integer, NamedData<ItemStack[]>>        tileMap     = new HashMap<Integer, NamedData<ItemStack[]>>();
-    public static final  HashMap<Integer, NamedData<ItemStack[]>>        entityMap   = new HashMap<Integer, NamedData<ItemStack[]>>();
-    public static final  HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
-    public static final  HashMap<Integer, Long>                          requestMap  = new HashMap<Integer, Long>();
+    private static final DecimalFormat DF = new DecimalFormat("#.#");
+    private static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
+    public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<Integer, NamedData<ItemStack[]>>();
+    public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<Integer, NamedData<ItemStack[]>>();
+    public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
+    public static final HashMap<Integer, Long> requestMap = new HashMap<Integer, Long>();
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
@@ -344,7 +344,6 @@ public class Renderer
 
     /**
      * @param columns amount of columns in the hologram
-     *
      * @return the blockScaleModifier
      */
     private float getBlockScaleModifier(int columns)
@@ -355,7 +354,6 @@ public class Renderer
 
     /**
      * @param size of the inventory
-     *
      * @return columns of the hologram
      */
     private int getMaxColumns(int size)
@@ -372,7 +370,6 @@ public class Renderer
      * Shifts GL & returns the string
      *
      * @param stackSize the stackSize.
-     *
      * @return the string to be rendered
      */
     private String doStackSizeCrap(int stackSize)

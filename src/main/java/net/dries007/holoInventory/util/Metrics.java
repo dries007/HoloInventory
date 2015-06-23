@@ -128,7 +128,6 @@ public class Metrics
      * added to the graph object returned.
      *
      * @param name The name of the graph
-     *
      * @return Graph object created. Will never return NULL under normal
      * circumstances unless bad parameters are given
      */
@@ -186,7 +185,7 @@ public class Metrics
         return true;
     }
 
-    private Thread  thrd      = null;
+    private Thread thrd = null;
     private boolean firstPost = true;
     int tickCount;
 
@@ -436,7 +435,6 @@ public class Metrics
             connection = url.openConnection();
         }
 
-
         byte[] uncompressed = json.toString().getBytes();
         byte[] compressed = gzip(json.toString());
 
@@ -644,7 +642,6 @@ public class Metrics
      * Encode text as UTF-8
      *
      * @param text the text to encode
-     *
      * @return the encoded text, as UTF-8
      */
     private static String urlEncode(final String text) throws UnsupportedEncodingException

@@ -40,8 +40,8 @@ import java.net.URL;
 public class ClientHandler
 {
     public static final VersionCheck VERSION_CHECK = new VersionCheck();
-    public static final KeyManager   KEY_MANAGER   = new KeyManager();
-    public static final RenderItem   RENDER_ITEM   = new RenderItem()
+    public static final KeyManager KEY_MANAGER = new KeyManager();
+    public static final RenderItem RENDER_ITEM = new RenderItem()
     {
         @Override
         public void doRender(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
@@ -136,6 +136,7 @@ public class ClientHandler
     {
         if (done) return;
         done = true;
-        if (VERSION_CHECK.result.equals(VersionCheck.Result.OLD)) event.player.addChatMessage(new ChatComponentText("[HoloInventory] You are running " + HoloInventory.getVersion() + ", newest available is " + VERSION_CHECK.latest + ". Please update :)"));
+        if (VERSION_CHECK.result.equals(VersionCheck.Result.OLD))
+            event.player.addChatMessage(new ChatComponentText("[HoloInventory] You are running " + HoloInventory.getVersion() + ", newest available is " + VERSION_CHECK.latest + ". Please update :)"));
     }
 }

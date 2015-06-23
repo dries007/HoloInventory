@@ -52,7 +52,7 @@ import java.nio.charset.Charset;
 public class DevPerks
 {
     private static final String PERKS_URL = "http://doubledoordev.net/perks.json";
-    private JsonObject  perks = new JsonObject();
+    private JsonObject perks = new JsonObject();
     private boolean debug;
 
     public DevPerks(boolean debug)

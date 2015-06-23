@@ -28,7 +28,7 @@ import net.minecraft.item.ItemStack;
 public class FakeInventory implements IInventory
 {
     private final ItemStack[] itemStacks;
-    private final String      name;
+    private final String name;
 
     public FakeInventory(String name, ItemStack... itemStacks)
     {
