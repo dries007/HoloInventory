@@ -21,16 +21,13 @@
 
 package net.dries007.holoInventory.util;
 
-import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.compat.DecoderRegistry;
 import net.dries007.holoInventory.network.BlockInventoryMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 
 import java.util.HashMap;
 
@@ -63,36 +60,6 @@ public class InventoryData
             playerSet.put(player, data);
             HoloInventory.getSnw().sendTo(new BlockInventoryMessage(data), player);
         }
-    }
-
-    private NBTTagCompound toNBT()
-    {
-        NBTTagCompound root = new NBTTagCompound();
-        root.setInteger("id", this.id);
-        if (name == null) name = ""; //Really mod authors? Really? Null is not a good name.
-        root.setString("name", name);
-        NBTTagList list = new NBTTagList();
-
-        if (te instanceof IDrawerGroup) // Drawers compat code
-        {
-            IDrawerGroup drawerGroup = ((IDrawerGroup) te);
-            for (int i = 0; i < drawerGroup.getDrawerCount(); i++)
-            {
-                ItemStack stack = drawerGroup.getDrawer(i).getStoredItemCopy();
-                if (stack != null)
-                {
-                    NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
-                    tag.setInteger("Count", stack.stackSize);
-                    list.appendTag(tag);
-                }
-            }
-        }
-        else
-        {
-
-        }
-        root.setTag("list", list);
-        return root;
     }
 
     public void update(IInventory inventory)
