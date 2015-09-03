@@ -56,6 +56,7 @@ public class Config
     public boolean keyState = false;
     public boolean rotateItems = true;
     public boolean debug = false;
+    public double renderScaling = 1.0;
 
     public ArrayList<String> bannedTiles = new ArrayList<String>();
     public ArrayList<String> bannedEntities = new ArrayList<String>();
@@ -97,6 +98,8 @@ public class Config
     public void doConfig()
     {
         configuration.addCustomCategoryComment(MODID, "All our settings are in here, as you might expect...");
+
+        renderScaling = configuration.get(MODID, "renderScaling", renderScaling, "Visual scale factor (0.0-1.0)").getDouble(1.0);
 
         colorEnable = configuration.get(MODID, "colorEnable", colorEnable, "Enable a BG color").getBoolean(false);
         colorAlpha = configuration.get(MODID, "colorAlpha", colorAlpha, "The BG transparancy (0-255)").getInt();

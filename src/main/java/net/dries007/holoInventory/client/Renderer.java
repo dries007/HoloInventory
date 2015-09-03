@@ -167,6 +167,10 @@ public class Renderer
         glPushMatrix();
         moveAndRotate(-0.25);
 
+        double uiScaleFactor = HoloInventory.getConfig().renderScaling;
+        if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
+        glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
+
         // Values for later
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
         maxColumns = 3;
@@ -291,7 +295,12 @@ public class Renderer
     {
         // Move to right position and rotate to face the player
         glPushMatrix();
+
         moveAndRotate(-1);
+        
+        double uiScaleFactor = HoloInventory.getConfig().renderScaling;
+        if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
+        glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
 
         // Values for later
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
