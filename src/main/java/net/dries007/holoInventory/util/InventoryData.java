@@ -21,6 +21,7 @@
 
 package net.dries007.holoInventory.util;
 
+import com.google.common.base.Strings;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.compat.DecoderRegistry;
 import net.dries007.holoInventory.network.BlockInventoryMessage;
@@ -43,15 +44,15 @@ public class InventoryData
     {
         this.id = id;
         this.te = te;
-        this.name = te.getInventoryName();
+        this.name = Strings.nullToEmpty(te.getInventoryName());
         this.type = te.getClass().getCanonicalName();
+        if (type == null) type = te.getClass().getName();
     }
 
     public void sendIfOld(EntityPlayerMP player)
     {
         NBTTagCompound data = new NBTTagCompound();
         data.setInteger("id", this.id);
-        if (name == null) name = ""; //Really mod authors? Really? Null is not a good name.
         data.setString("name", name);
         data.setTag("list", DecoderRegistry.toNBT(te));
 

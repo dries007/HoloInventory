@@ -29,10 +29,11 @@ import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.RemoveInventoryMessage;
 import net.dries007.holoInventory.network.RenameMessage;
 import net.dries007.holoInventory.util.*;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -141,7 +142,8 @@ public class ServerEventHandler
                 {
                     case BLOCK:
                         Coord coord = new Coord(world.provider.dimensionId, mo);
-                        TileEntity te = world.getTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
+                        int x = (int) coord.x, y = (int) coord.y, z = (int) coord.z;
+                        TileEntity te = world.getTileEntity(x, y, z);
                         if (Helper.weWant(te))
                         {
                             checkForChangedType(coord.hashCode(), te);
@@ -152,7 +154,16 @@ public class ServerEventHandler
                             }
                             else if (te instanceof TileEntityChest)
                             {
-                                doStuff(coord.hashCode(), player, Blocks.chest.func_149951_m(world, (int) coord.x, (int) coord.y, (int) coord.z));
+                                Block block = world.getBlock(x, y, z);
+                                TileEntityChest teChest = (TileEntityChest) te;
+                                IInventory inventory = teChest;
+
+                                if (world.getBlock(x, y, z + 1) == block) inventory = new InventoryLargeChest("container.chestDouble", teChest, (TileEntityChest) world.getTileEntity(x, y, z + 1));
+                                else if (world.getBlock(x - 1, y, z) == block) inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(x - 1, y, z), teChest);
+                                else if (world.getBlock(x, y, z - 1) == block) inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(x, y, z - 1), teChest);
+                                else if (world.getBlock(x + 1, y, z) == block) inventory = new InventoryLargeChest("container.chestDouble", teChest, (TileEntityChest) world.getTileEntity(x + 1, y, z));
+
+                                doStuff(coord.hashCode(), player, inventory);
                             }
                             else if (te instanceof IInventory)
                             {
