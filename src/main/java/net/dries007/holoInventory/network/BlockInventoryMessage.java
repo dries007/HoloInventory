@@ -42,6 +42,7 @@ public class BlockInventoryMessage implements IMessage
         @Override
         public IMessage onMessage(BlockInventoryMessage message, MessageContext ctx)
         {
+            if (message == null || message.data == null) return null; // hun?
             if (ctx.side.isClient())
             {
                 NBTTagList list = message.data.getTagList("list", 10);
