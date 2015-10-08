@@ -1,5 +1,6 @@
 package net.dries007.holoInventory.network;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -80,7 +81,7 @@ public class EntityRequestMessage implements IMessage
                         IInventory inventory = (IInventory) entity;
                         NBTTagCompound root = new NBTTagCompound();
                         root.setInteger("id", message.entityId);
-                        root.setString("name", inventory.getInventoryName());
+                        root.setString("name", Strings.nullToEmpty(inventory.getInventoryName()));
                         root.setString("class", entity.getClass().getCanonicalName());
                         NBTTagList list = new NBTTagList();
                         for (int i = 0; i < inventory.getSizeInventory(); i++)
