@@ -69,10 +69,12 @@ public class KeyManager
     public void input(TickEvent.ClientTickEvent event)
     {
         if (event.phase == TickEvent.Phase.END) return;
+        int code = key.getKeyCode();
+        if (code < 0 || code > Keyboard.KEYBOARD_SIZE) return;
         switch (HoloInventory.getConfig().keyMode)
         {
             case 1:
-                if (Keyboard.isKeyDown(key.getKeyCode()))
+                if (Keyboard.isKeyDown(code))
                 {
                     if (!alreadyToggling)
                     {
@@ -84,10 +86,10 @@ public class KeyManager
                 else alreadyToggling = false;
                 break;
             case 2:
-                Renderer.INSTANCE.enabled = Keyboard.isKeyDown(key.getKeyCode());
+                Renderer.INSTANCE.enabled = Keyboard.isKeyDown(code);
                 break;
             case 3:
-                Renderer.INSTANCE.enabled = !Keyboard.isKeyDown(key.getKeyCode());
+                Renderer.INSTANCE.enabled = !Keyboard.isKeyDown(code);
                 break;
         }
     }
