@@ -51,7 +51,7 @@ public class BlockInventoryMessage implements IMessage
                 {
                     NBTTagCompound tag = list.getCompoundTagAt(i);
                     itemStacks[i] = ItemStack.loadItemStackFromNBT(tag);
-                    itemStacks[i].stackSize = tag.getInteger("Count");
+                    if (itemStacks[i] != null) itemStacks[i].stackSize = tag.getInteger("Count");
                 }
                 if (message.data.hasKey("class")) Renderer.tileMap.put(message.data.getInteger("id"), new NamedData<ItemStack[]>(message.data.getString("name"), message.data.getString("class"), itemStacks));
                 else Renderer.tileMap.put(message.data.getInteger("id"), new NamedData<ItemStack[]>(message.data.getString("name"), itemStacks));

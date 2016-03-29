@@ -48,7 +48,9 @@ public class EntityInventoryMessage implements IMessage
                 ItemStack[] itemStacks = new ItemStack[list.tagCount()];
                 for (int i = 0; i < list.tagCount(); i++)
                 {
-                    itemStacks[i] = ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i));
+                    NBTTagCompound tag = list.getCompoundTagAt(i);
+                    itemStacks[i] = ItemStack.loadItemStackFromNBT(tag);
+                    if (itemStacks[i] != null) itemStacks[i].stackSize = tag.getInteger("Count");
                 }
                 if (message.data.hasKey("class")) Renderer.entityMap.put(message.data.getInteger("id"), new NamedData<ItemStack[]>(message.data.getString("name"), message.data.getString("class"), itemStacks));
                 else Renderer.entityMap.put(message.data.getInteger("id"), new NamedData<ItemStack[]>(message.data.getString("name"), itemStacks));
