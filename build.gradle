@@ -51,27 +51,22 @@ processResources
     }
 }
 
-task sourcesJar(type: Jar) {
-    from "LICENSE.txt"
-    from sourceSets.main.allSource
-    classifier = 'src'
+task deobfJar(type: Jar, dependsOn: 'jar') {
+    from "build/source/main"
+    classifier "dev"
     appendix = project.minecraft.version
 }
-
-task deobfJar(type: Jar) {
+sourceJar {
     from "LICENSE.txt"
-    from sourceSets.main.output
-	classifier = 'dev'
+    exclude("com/**")
+    classifier "src"
     appendix = project.minecraft.version
 }
-
 jar {
     from "LICENSE.txt"
-	exclude("com/**")
+    exclude("com/**")
     appendix = project.minecraft.version
 }
-
 artifacts {
-    archives sourcesJar
     archives deobfJar
 }
