@@ -1,16 +1,21 @@
-[
 {
-  "modid": "HoloInventory",
-  "name": "HoloInventory",
-  "description": "Holographic inventory screens!",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "https://github.com/dries007/HoloInventory",
-  "updateUrl": "",
-  "authors": ["Dries007"],
-  "credits": "Morton for textures, http://www.reddit.com/r/Minecraft/comments/1prvo4 for idea",
-  "logoFile": "HoloInventory.png",
-  "screenshots": [],
-  "dependencies": []
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "HoloInventory",
+    "name": "HoloInventory",
+    "description": "Holographic inventory screens!",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://dries007.net/holoinventory/",
+    "updateUrl": "https://dries007.net/holoinventory/update.json",
+    "authorList": [ "Dries007" ],
+    "credits": "Code by Dries007, idea by Reddit (http://bit.ly/1UGnbbH)",
+    "logoFile": "",
+    "screenshots": [ "", "" ],
+    "parent": "",
+    "requiredMods": [ "Forge" ],
+    "dependencies": [ ],
+    "dependants": [ ],
+    "useDependencyInformation": true
+  }]
 }
-]

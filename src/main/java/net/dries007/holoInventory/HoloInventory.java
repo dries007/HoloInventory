@@ -21,90 +21,100 @@
 
 package net.dries007.holoInventory;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
-import net.dries007.holoInventory.compat.DecoderRegistry;
-import net.dries007.holoInventory.network.*;
-import net.dries007.holoInventory.server.CommandHoloInventory;
-import net.dries007.holoInventory.util.CommonProxy;
+import net.dries007.holoInventory.client.ClientEventHandler;
+import net.dries007.holoInventory.client.ConfigGuiFactory;
+import net.dries007.holoInventory.network.request.EntityRequest;
+import net.dries007.holoInventory.network.request.TileRequest;
+import net.dries007.holoInventory.network.response.PlainInventory;
+import net.dries007.holoInventory.network.response.ResponseMessage;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.event.FMLModDisabledEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 
-import static net.dries007.holoInventory.util.Data.MODID;
+import static net.dries007.holoInventory.HoloInventory.GUI_FACTORY;
+import static net.dries007.holoInventory.HoloInventory.MODID;
+import static net.dries007.holoInventory.HoloInventory.URL;
 
-@Mod(modid = MODID, name = MODID)
+@Mod(modid = MODID, name = MODID, canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
 public class HoloInventory
 {
+    public static final String MODID = "HoloInventory";
+    public static final String URL = "https://dries007.net/holoinventory/";
+    public static final String GUI_FACTORY = "net.dries007.holoInventory.client.ConfigGuiFactory";
+
     @Mod.Instance(value = MODID)
     private static HoloInventory instance;
-
-    private Config config;
 
     @Mod.Metadata
     private ModMetadata metadata;
 
-    @SidedProxy(serverSide = "net.dries007.holoInventory.util.CommonProxy", clientSide = "net.dries007.holoInventory.util.ClientProxy")
-    public static CommonProxy proxy;
     private SimpleNetworkWrapper snw;
     private Logger logger;
+    private Configuration config;
 
-    @Mod.EventHandler()
+    @Mod.EventHandler
+    public void disableEvent(FMLModDisabledEvent event)
+    {
+        HoloInventory.getLogger().info("Mod disabled via Mods list.");
+    }
+
+    @Mod.EventHandler
     public void fmlEvent(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
-        config = new Config(event.getSuggestedConfigurationFile());
+
+        config = new Configuration(event.getSuggestedConfigurationFile());
+        updateConfig();
 
         int id = 0;
         snw = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-        snw.registerMessage(BlockInventoryMessage.Handler.class, BlockInventoryMessage.class, id++, Side.CLIENT);
-        snw.registerMessage(EntityInventoryMessage.Handler.class, EntityInventoryMessage.class, id++, Side.CLIENT);
-        snw.registerMessage(EntityRequestMessage.Handler.class, EntityRequestMessage.class, id++, Side.SERVER);
-        snw.registerMessage(MerchantInventoryMessage.Handler.class, MerchantInventoryMessage.class, id++, Side.CLIENT);
-        snw.registerMessage(ReloadMessage.Handler.class, ReloadMessage.class, id++, Side.CLIENT);
-        snw.registerMessage(RemoveInventoryMessage.Handler.class, RemoveInventoryMessage.class, id++, Side.CLIENT);
-        snw.registerMessage(RenameMessage.Handler.class, RenameMessage.class, id++, Side.CLIENT);
-        snw.registerMessage(ResetMessage.Handler.class, ResetMessage.class, id++, Side.CLIENT);
 
-        proxy.preInit();
+        // Request packets (client -> server)
+        snw.registerMessage(EntityRequest.Handler.class, EntityRequest.class, id++, Side.SERVER);
+        snw.registerMessage(TileRequest.Handler.class, TileRequest.class, id++, Side.SERVER);
 
-        DecoderRegistry.init();
+        // Response packets (server -> client)
+        snw.registerMessage(PlainInventory.Handler.class, PlainInventory.class, id++, Side.CLIENT);
+
+        if (event.getSide().isClient())
+        {
+            //new VersionCheck(); -- replaced by forge system for now
+            ClientEventHandler.init();
+        }
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @Mod.EventHandler()
-    public void fmlEvent(FMLInitializationEvent event)
+    @SubscribeEvent
+    public void updateConfig(ConfigChangedEvent.OnConfigChangedEvent event)
     {
-        proxy.init();
+        if (event.getModID().equals(MODID)) updateConfig();
     }
 
-    @Mod.EventHandler()
-    public void fmlEvent(FMLPostInitializationEvent event)
+    private void updateConfig()
     {
-        proxy.postInit();
-    }
+        Helper.showOnSneak = config.get(MODID, "showOnSneak", false).setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
+        Helper.showOnSprint = config.get(MODID, "showOnSprint", false).setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
 
-    @Mod.EventHandler()
-    public void fmlEvent(FMLServerStartingEvent event)
-    {
-        event.registerServerCommand(new CommandHoloInventory());
-
-        proxy.serverStarting();
+        if (config.hasChanged()) config.save();
     }
 
     public static String getVersion()
     {
-        return getInstance().metadata.version;
-    }
-
-    public static Config getConfig()
-    {
-        return instance.config;
+        return instance.metadata.version;
     }
 
     public static HoloInventory getInstance()
@@ -119,6 +129,11 @@ public class HoloInventory
 
     public static Logger getLogger()
     {
-        return getInstance().logger;
+        return instance.logger;
+    }
+
+    public static Configuration getConfig()
+    {
+        return instance.config;
     }
 }
