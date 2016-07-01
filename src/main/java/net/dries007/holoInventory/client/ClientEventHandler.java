@@ -9,15 +9,12 @@ import net.dries007.holoInventory.network.request.EntityRequest;
 import net.dries007.holoInventory.network.request.TileRequest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -32,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class ClientEventHandler
 {
     public static final DecimalFormat DF = new DecimalFormat("#.#k");
-    public static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
+    public static final int TEXT_COLOR = 255 + (255 << 8) + (255 << 16) + (255 << 24);
 
     private static final Cache<BlockPos, IRenderer> TILE_CACHE = CacheBuilder.newBuilder().maximumSize(150).expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
     private static final Cache<Integer, IRenderer> ENTITY_CACHE = CacheBuilder.newBuilder().maximumSize(150).expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
@@ -56,8 +53,8 @@ public class ClientEventHandler
         instance = new ClientEventHandler();
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 
-        keyHold = new KeyBinding("key.ho.hold", KeyConflictContext.IN_GAME, Keyboard.KEY_H, HoloInventory.MODID);
-        keyToggle = new KeyBinding("key.ho.toggle", KeyConflictContext.IN_GAME, 0, HoloInventory.MODID);
+        keyHold = new KeyBinding("Hold to show", KeyConflictContext.IN_GAME, Keyboard.KEY_H, HoloInventory.MODID);
+        keyToggle = new KeyBinding("Toggle to show", KeyConflictContext.IN_GAME, 0, HoloInventory.MODID);
         ClientRegistry.registerKeyBinding(keyHold);
         ClientRegistry.registerKeyBinding(keyToggle);
     }
@@ -113,7 +110,7 @@ public class ClientEventHandler
         if (ray.typeOfHit == RayTraceResult.Type.BLOCK)
         {
             final TileEntity tileEntity = world.getTileEntity(ray.getBlockPos());
-            if (tileEntity == null || !Helper.accept(tileEntity)) return;
+            if (tileEntity == null || !Helper.accept(tileEntity) || Helper.banned.contains(tileEntity.getClass().getCanonicalName())) return;
             HoloInventory.getSnw().sendToServer(new TileRequest(world.provider.getDimension(), ray.getBlockPos()));
         }
         else if (ray.typeOfHit == RayTraceResult.Type.ENTITY && Helper.accept(ray.entityHit))

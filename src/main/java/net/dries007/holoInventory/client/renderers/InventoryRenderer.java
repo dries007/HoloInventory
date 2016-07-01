@@ -81,6 +81,7 @@ public class InventoryRenderer implements IRenderer
 
             if (rows > 4) GlStateManager.scale(0.8, 0.8, 0.8);
 
+            // Draw name, with depth disabled
             {
                 GlStateManager.pushMatrix();
                 GlStateManager.pushAttrib();
@@ -89,7 +90,9 @@ public class InventoryRenderer implements IRenderer
                 //GlStateManager.translate(0, -1 - 0.5f * (rows/2.0), 0);
                 GlStateManager.scale(0.03, 0.03, 0.03);
                 int w = mc.fontRendererObj.getStringWidth(name);
+                GlStateManager.disableDepth();
                 mc.fontRendererObj.drawString(name,  -w/2, 0, 0xFFFFFF);
+                GlStateManager.enableDepth();
                 GlStateManager.popAttrib();
                 GlStateManager.popMatrix();
             }
@@ -109,8 +112,12 @@ public class InventoryRenderer implements IRenderer
                     c = 0;
                 }
                 GlStateManager.pushMatrix();
+
                 GlStateManager.rotate((float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL), 0, 1, 0);
+
+
                 ri.renderItem(stack, ItemCameraTransforms.TransformType.GROUND);
+
                 if (stack.hasEffect())
                 {
                     GlStateManager.disableAlpha();
@@ -118,25 +125,38 @@ public class InventoryRenderer implements IRenderer
                     GlStateManager.disableLighting();
                 }
                 GlStateManager.popMatrix();
-                {
-                    GlStateManager.pushMatrix();
-                    GlStateManager.pushAttrib();
-                    GlStateManager.rotate(180, 0, 0, 1);
-                    GlStateManager.translate(0.2, 0, -0.1);
-                    GlStateManager.scale(0.01, 0.01, 0.01);
-
-                    String size = stack.stackSize < 1000 ? String.valueOf(stack.stackSize) : ClientEventHandler.DF.format(stack.stackSize / 1000.0);
-                    int w = mc.fontRendererObj.getStringWidth(size);
-                    mc.fontRendererObj.drawStringWithShadow(size, -w, 0, ClientEventHandler.TEXTCOLOR);
-                    GlStateManager.popAttrib();
-                    GlStateManager.popMatrix();
-                }
 
                 //RenderHelper.disableStandardItemLighting();
                 GlStateManager.popAttrib();
                 GlStateManager.popMatrix();
             }
+            // Draw stack sizes later, to draw over the items (disableDepth)
+            r = 0;
+            c = 0;
+            GlStateManager.disableDepth();
+            for (final ItemStack stack : stacks)
+            {
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(0.4f * (cols / 2.0 - c) - 0.2f, 0.4f * (rows / 2.0 - r) - 0.2f, 0);
+                if (++c == cols)
+                {
+                    r++;
+                    c = 0;
+                }
+                GlStateManager.pushAttrib();
+                GlStateManager.rotate(180, 0, 0, 1);
+                GlStateManager.translate(0.2, 0, -0.1);
+                GlStateManager.scale(0.01, 0.01, 0.01);
 
+                String size = stack.stackSize < 1000 ? String.valueOf(stack.stackSize) : ClientEventHandler.DF.format(stack.stackSize / 1000.0);
+                int w = mc.fontRendererObj.getStringWidth(size);
+
+                mc.fontRendererObj.drawStringWithShadow(size, -w, 0, ClientEventHandler.TEXT_COLOR);
+
+                GlStateManager.popAttrib();
+                GlStateManager.popMatrix();
+            }
+            GlStateManager.enableDepth();
         }
         finally
         {

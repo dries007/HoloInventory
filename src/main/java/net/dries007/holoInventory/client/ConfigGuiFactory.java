@@ -3,7 +3,6 @@ package net.dries007.holoInventory.client;
 import net.dries007.holoInventory.HoloInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.IModGuiFactory;
@@ -20,13 +19,23 @@ public class ConfigGuiFactory implements IModGuiFactory
     {
         public ConfigGuiScreen(GuiScreen parentScreen)
         {
-            super(parentScreen, getConfigElements(), HoloInventory.MODID, false, false, I18n.format("d007.hi.config.title"));
+            super(parentScreen, getConfigElements(), HoloInventory.MODID, false, false, HoloInventory.MODID);
         }
 
         private static List<IConfigElement> getConfigElements()
         {
-            List<IConfigElement> list = new ArrayList<>();
             Configuration c = HoloInventory.getConfig();
+            if (c.getCategoryNames().size() == 1)
+            {
+                //noinspection LoopStatementThatDoesntLoop
+                for (String k : c.getCategoryNames())
+                {
+                    // Let forge do the work, for loop abused to avoid other strange constructs
+                    return new ConfigElement(c.getCategory(k)).getChildElements();
+                }
+            }
+
+            List<IConfigElement> list = new ArrayList<>();
             for (String k : c.getCategoryNames())
             {
                 list.add(new ConfigElement(c.getCategory(k)));

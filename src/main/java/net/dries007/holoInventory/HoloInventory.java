@@ -21,32 +21,27 @@
 
 package net.dries007.holoInventory;
 
+import com.google.common.collect.Sets;
 import net.dries007.holoInventory.client.ClientEventHandler;
-import net.dries007.holoInventory.client.ConfigGuiFactory;
 import net.dries007.holoInventory.network.request.EntityRequest;
 import net.dries007.holoInventory.network.request.TileRequest;
 import net.dries007.holoInventory.network.response.PlainInventory;
-import net.dries007.holoInventory.network.response.ResponseMessage;
-import net.minecraft.client.Minecraft;
+import net.dries007.holoInventory.server.ServerEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLModDisabledEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 
-import static net.dries007.holoInventory.HoloInventory.GUI_FACTORY;
-import static net.dries007.holoInventory.HoloInventory.MODID;
-import static net.dries007.holoInventory.HoloInventory.URL;
+import static net.dries007.holoInventory.HoloInventory.*;
 
 @Mod(modid = MODID, name = MODID, canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
 public class HoloInventory
@@ -72,7 +67,7 @@ public class HoloInventory
     }
 
     @Mod.EventHandler
-    public void fmlEvent(FMLPreInitializationEvent event)
+    public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
 
@@ -91,11 +86,17 @@ public class HoloInventory
 
         if (event.getSide().isClient())
         {
-            //new VersionCheck(); -- replaced by forge system for now
             ClientEventHandler.init();
         }
 
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(ServerEventHandler.I);
+    }
+
+    @Mod.EventHandler
+    public void serverStart(FMLServerStartingEvent event)
+    {
+        event.registerServerCommand(new HICommand());
     }
 
     @SubscribeEvent
@@ -104,10 +105,20 @@ public class HoloInventory
         if (event.getModID().equals(MODID)) updateConfig();
     }
 
+    public void saveBanned()
+    {
+        config.get(MODID, "banned", new String[0]).set(Helper.banned.toArray(new String[Helper.banned.size()]));
+
+        if (config.hasChanged()) config.save();
+    }
+
     private void updateConfig()
     {
-        Helper.showOnSneak = config.get(MODID, "showOnSneak", false).setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
-        Helper.showOnSprint = config.get(MODID, "showOnSprint", false).setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
+        logger.info("Update config");
+
+        Helper.showOnSneak = config.get(MODID, "showOnSneak", false, "Show on sneak, bypasses other keyboard settings.").setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
+        Helper.showOnSprint = config.get(MODID, "showOnSprint", false, "Show on sprint, bypasses other keyboard settings.").setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
+        Helper.banned = Sets.newHashSet(config.get(MODID, "banned", new String[0]).setRequiresWorldRestart(false).setRequiresMcRestart(false).getStringList());
 
         if (config.hasChanged()) config.save();
     }

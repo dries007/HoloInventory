@@ -7,10 +7,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+import java.util.HashSet;
+
 public class Helper
 {
     public static boolean showOnSneak;
     public static boolean showOnSprint;
+    public static HashSet<String> banned;
 
     private Helper()
     {

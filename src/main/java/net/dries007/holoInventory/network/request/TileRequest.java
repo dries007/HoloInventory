@@ -1,16 +1,14 @@
 package net.dries007.holoInventory.network.request;
 
 import io.netty.buffer.ByteBuf;
-import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.Helper;
 import net.dries007.holoInventory.network.response.PlainInventory;
 import net.dries007.holoInventory.network.response.ResponseMessage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockJukebox;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
@@ -62,6 +60,8 @@ public class TileRequest extends RequestMessage
             if (world == null) return null;
             TileEntity te = world.getTileEntity(message.pos);
             if (te == null) return null;
+
+            if (Helper.banned.contains(te.getClass().getCanonicalName())) return null;
 
             if (te instanceof TileEntityEnderChest)
             {
