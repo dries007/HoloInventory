@@ -116,8 +116,8 @@ public class HoloInventory
     {
         logger.info("Update config");
 
-        Helper.showOnSneak = config.get(MODID, "showOnSneak", false, "Show on sneak, bypasses other keyboard settings.").setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
-        Helper.showOnSprint = config.get(MODID, "showOnSprint", false, "Show on sprint, bypasses other keyboard settings.").setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
+        Helper.showOnSneak = config.get(MODID, "showOnSneak", true, "Show on sneak, bypasses other keyboard settings.").setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
+        Helper.showOnSprint = config.get(MODID, "showOnSprint", true, "Show on sprint, bypasses other keyboard settings.").setRequiresWorldRestart(false).setRequiresMcRestart(false).getBoolean();
         Helper.banned = Sets.newHashSet(config.get(MODID, "banned", new String[0]).setRequiresWorldRestart(false).setRequiresMcRestart(false).getStringList());
 
         if (config.hasChanged()) config.save();
