@@ -71,7 +71,7 @@ public class TileRequest extends RequestMessage
             {
                 InventoryBasic ib = new InventoryBasic("minecraft:jukebox", false, 1);
                 ib.setInventorySlotContents(0, ((BlockJukebox.TileEntityJukebox) te).getRecord());
-                return new PlainInventory(message.pos, ib);
+                return new PlainInventory(message.pos, ib).setName("tile.jukebox.name");
             }
             else if (te instanceof TileEntityChest)
             {

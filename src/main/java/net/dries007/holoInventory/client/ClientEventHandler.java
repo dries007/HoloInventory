@@ -149,6 +149,7 @@ public class ClientEventHandler
             if (renderer == null) return;
             try
             {
+//                renderer.render(worldRef.get(), ray, ray.entityHit.getPositionVector().add(new Vec3d(0, ray.entityHit.height, 0)));
                 renderer.render(worldRef.get(), ray, ray.hitVec);
             }
             catch (Exception e)

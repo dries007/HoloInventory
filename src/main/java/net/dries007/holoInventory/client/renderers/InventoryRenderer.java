@@ -114,7 +114,7 @@ public class InventoryRenderer implements IRenderer
                 GlStateManager.pushMatrix();
 
                 GlStateManager.rotate((float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL), 0, 1, 0);
-
+                GlStateManager.scale(0.9, 0.9, 0.9);
 
                 ri.renderItem(stack, ItemCameraTransforms.TransformType.GROUND);
 

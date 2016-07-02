@@ -88,6 +88,12 @@ public class PlainInventory extends ResponseMessage
         for (ItemStack stack : stacks) ByteBufUtils.writeItemStack(buf, stack);
     }
 
+    public PlainInventory setName(String name)
+    {
+        this.name = name;
+        return this;
+    }
+
     public static class Handler implements IMessageHandler<PlainInventory, IMessage>
     {
         @Override
