@@ -1,3 +1,4 @@
+import groovy.json.*
 
 // For those who want the bleeding edge
 buildscript {
@@ -48,6 +49,28 @@ processResources
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+
+    doLast {
+        def updateFile = new File('update.json')
+        if (updateFile.exists())
+        {
+            def outStream = new ByteArrayOutputStream()
+            def result = exec {
+                executable = 'git'
+                args = [ 'log', '-n', '1', "--format='%B'"]
+                standardOutput = outStream
+            }
+            def fullLog = outStream.toString().replaceAll("^\\s*'\\s*|\\s*'\\s*\$", "")
+
+            def json = new JsonSlurper().parseText(updateFile.getText())
+            json['promos'][project.minecraft.version + '-latest'] = project.version
+            json['promos'][project.minecraft.version + '-recomended'] = project.version
+            if (!json.containsKey(project.minecraft.version)) json.put(project.minecraft.version, new HashMap<>())
+            def version = json[project.minecraft.version]
+            version.put(project.version, fullLog)
+            updateFile.write JsonOutput.prettyPrint(JsonOutput.toJson(json))
+        }
     }
 }
 
