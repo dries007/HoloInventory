@@ -34,8 +34,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
-//todo: write script to make update.json file
-
 processResources
 {
     // replace stuff in mcmod.info, nothing else
@@ -75,7 +73,7 @@ processResources
 }
 
 task deobfJar(type: Jar, dependsOn: 'jar') {
-    from "build/source/main"
+    from sourceSets.main.output
     classifier "dev"
     appendix = project.minecraft.version
 }

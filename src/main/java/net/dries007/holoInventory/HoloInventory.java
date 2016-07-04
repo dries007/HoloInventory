@@ -48,6 +48,7 @@ public class HoloInventory
 {
     public static final String MODID = "HoloInventory";
     public static final String URL = "https://dries007.net/holoinventory/";
+    /** @see net.dries007.holoInventory.client.ConfigGuiFactory */
     public static final String GUI_FACTORY = "net.dries007.holoInventory.client.ConfigGuiFactory";
 
     @Mod.Instance(value = MODID)

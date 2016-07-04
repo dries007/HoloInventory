@@ -15,6 +15,7 @@ import java.util.Set;
 
 public class ConfigGuiFactory implements IModGuiFactory
 {
+    @SuppressWarnings("WeakerAccess")
     public static class ConfigGuiScreen extends GuiConfig
     {
         public ConfigGuiScreen(GuiScreen parentScreen)
