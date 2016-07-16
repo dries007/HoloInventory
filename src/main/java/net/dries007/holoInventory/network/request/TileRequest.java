@@ -80,6 +80,7 @@ public class TileRequest extends RequestMessage
                 {
                     IInventory i = ((BlockChest) b).getLockableContainer(world, message.pos);
                     if (i != null) return new PlainInventory(message.pos, i);
+                    return null;
                 }
                 return new PlainInventory(message.pos, ((TileEntityChest) te));
             }
