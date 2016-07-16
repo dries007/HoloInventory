@@ -15,7 +15,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.0.0"
+version = "2.0.1"
 if (System.getenv().BUILD_NUMBER != null) version += "." + System.getenv().BUILD_NUMBER
 
 targetCompatibility = 1.7
@@ -73,6 +73,7 @@ processResources
 }
 
 task deobfJar(type: Jar, dependsOn: 'jar') {
+    from "LICENSE.txt"
     from sourceSets.main.output
     classifier "dev"
     appendix = project.minecraft.version

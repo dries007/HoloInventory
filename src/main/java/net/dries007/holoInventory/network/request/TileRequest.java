@@ -76,7 +76,12 @@ public class TileRequest extends RequestMessage
             else if (te instanceof TileEntityChest)
             {
                 Block b = world.getBlockState(message.pos).getBlock();
-                if (b instanceof BlockChest) return new PlainInventory(message.pos, ((BlockChest) b).getLockableContainer(world, message.pos));
+                if (b instanceof BlockChest)
+                {
+                    IInventory i = ((BlockChest) b).getLockableContainer(world, message.pos);
+                    if (i != null) return new PlainInventory(message.pos, i);
+                }
+                return new PlainInventory(message.pos, ((TileEntityChest) te));
             }
             else if (te instanceof IInventory)
             {
