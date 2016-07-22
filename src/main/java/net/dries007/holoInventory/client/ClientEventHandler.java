@@ -4,7 +4,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.dries007.holoInventory.Helper;
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.client.renderers.FakeRenderer;
 import net.dries007.holoInventory.client.renderers.IRenderer;
+import net.dries007.holoInventory.client.renderers.RenderHelper;
 import net.dries007.holoInventory.network.request.EntityRequest;
 import net.dries007.holoInventory.network.request.TileRequest;
 import net.minecraft.client.Minecraft;
@@ -30,6 +32,7 @@ public class ClientEventHandler
 {
     public static final DecimalFormat DF = new DecimalFormat("#.#k");
     public static final int TEXT_COLOR = 255 + (255 << 8) + (255 << 16) + (255 << 24);
+    public static final int TEXT_COLOR_LIGHT = 255 + (255 << 8) + (255 << 16) + (255 << 24);
 
     private static final Cache<BlockPos, IRenderer> TILE_CACHE = CacheBuilder.newBuilder().maximumSize(150).expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
     private static final Cache<Integer, IRenderer> ENTITY_CACHE = CacheBuilder.newBuilder().maximumSize(150).expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
@@ -130,9 +133,11 @@ public class ClientEventHandler
         if (ray.typeOfHit == RayTraceResult.Type.BLOCK)
         {
             final IRenderer renderer = TILE_CACHE.getIfPresent(ray.getBlockPos());
-            if (renderer == null) return;
+            if (renderer == null || !renderer.shouldRender()) return;
             try
             {
+                RenderHelper.start();
+
                 renderer.render(worldRef.get(), ray, ray.hitVec);
             }
             catch (Exception e)
@@ -141,15 +146,22 @@ public class ClientEventHandler
                 HoloInventory.getLogger().warn("INFO: Block @ {}", ray.getBlockPos());
                 HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
                 HoloInventory.getLogger().catching(e);
+
+                TILE_CACHE.put(ray.getBlockPos(), new FakeRenderer()); // This should cut back on console spam
+            }
+            finally
+            {
+                RenderHelper.end();
             }
         }
         else if (ray.typeOfHit == RayTraceResult.Type.ENTITY)
         {
             final IRenderer renderer = ENTITY_CACHE.getIfPresent(ray.entityHit.getEntityId());
-            if (renderer == null) return;
+            if (renderer == null || !renderer.shouldRender()) return;
             try
             {
-//                renderer.render(worldRef.get(), ray, ray.entityHit.getPositionVector().add(new Vec3d(0, ray.entityHit.height, 0)));
+                RenderHelper.start();
+
                 renderer.render(worldRef.get(), ray, ray.hitVec);
             }
             catch (Exception e)
@@ -158,6 +170,12 @@ public class ClientEventHandler
                 HoloInventory.getLogger().warn("INFO: Entity: {}", ray.entityHit);
                 HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
                 HoloInventory.getLogger().catching(e);
+
+                ENTITY_CACHE.put(ray.entityHit.getEntityId(), new FakeRenderer()); // This should cut back on console spam
+            }
+            finally
+            {
+                RenderHelper.end();
             }
         }
     }

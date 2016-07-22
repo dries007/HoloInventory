@@ -2,8 +2,6 @@ package net.dries007.holoInventory.network.response;
 
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
-import net.dries007.holoInventory.client.ClientEventHandler;
-import net.dries007.holoInventory.client.renderers.IRenderer;
 import net.dries007.holoInventory.client.renderers.InventoryRenderer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -99,12 +97,7 @@ public class PlainInventory extends ResponseMessage
         @Override
         public IMessage onMessage(PlainInventory message, MessageContext ctx)
         {
-            IRenderer renderer = new InventoryRenderer(message.name, message.stacks);
-            switch (message.getType())
-            {
-                case TILE: ClientEventHandler.cache(message.getPos(), renderer); break;
-                case ENTITY: ClientEventHandler.cache(message.getId(), renderer); break;
-            }
+            ResponseMessage.handle(message, new InventoryRenderer(message.name, message.stacks));
             return null;
         }
     }

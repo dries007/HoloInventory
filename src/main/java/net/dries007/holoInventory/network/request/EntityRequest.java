@@ -1,9 +1,11 @@
 package net.dries007.holoInventory.network.request;
 
 import io.netty.buffer.ByteBuf;
+import net.dries007.holoInventory.network.response.MerchantRecipes;
 import net.dries007.holoInventory.network.response.PlainInventory;
 import net.dries007.holoInventory.network.response.ResponseMessage;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.IMerchant;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -52,6 +54,7 @@ public class EntityRequest extends RequestMessage
             if (entity == null) return null;
 
             if (entity instanceof IInventory) return new PlainInventory(message.id, (IInventory) entity);
+            else if (entity instanceof IMerchant) return new MerchantRecipes(message.id, (IMerchant) entity, ctx.getServerHandler().playerEntity);
             else if (entity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
             {
                 return new PlainInventory(message.id, entity.getName(), entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));

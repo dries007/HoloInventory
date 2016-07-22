@@ -6,5 +6,7 @@ import net.minecraft.util.math.Vec3d;
 
 public interface IRenderer
 {
-    void render(WorldClient worldClient, RayTraceResult ray, Vec3d vec3d);
+    void render(final WorldClient world, final RayTraceResult hit, final Vec3d pos);
+
+    boolean shouldRender();
 }

@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import net.dries007.holoInventory.client.ClientEventHandler;
 import net.dries007.holoInventory.network.request.EntityRequest;
 import net.dries007.holoInventory.network.request.TileRequest;
+import net.dries007.holoInventory.network.response.MerchantRecipes;
 import net.dries007.holoInventory.network.response.PlainInventory;
 import net.dries007.holoInventory.server.ServerEventHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -84,6 +85,7 @@ public class HoloInventory
 
         // Response packets (server -> client)
         snw.registerMessage(PlainInventory.Handler.class, PlainInventory.class, id++, Side.CLIENT);
+        snw.registerMessage(MerchantRecipes.Handler.class, MerchantRecipes.class, id++, Side.CLIENT);
 
         if (event.getSide().isClient())
         {

@@ -8,34 +8,22 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraft.village.MerchantRecipeList;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class InventoryRenderer implements IRenderer
+public class MerchantRenderer implements IRenderer
 {
     private final String name;
-    private final List<ItemStack> stacks;
+    private final List<MerchantRecipe> recipes;
 
-    public InventoryRenderer(String name, ItemStack[] input)
+    public MerchantRenderer(String name, MerchantRecipeList input)
     {
         this.name = I18n.format(name);
-
-        this.stacks = new ArrayList<>(input.length);
-        for (ItemStack stack : input)
-        outer: {
-            if (stack == null) continue;
-            for (ItemStack stack2 : stacks)
-            {
-                if (!ItemStack.areItemStackTagsEqual(stack, stack2) || !ItemStack.areItemsEqual(stack, stack2)) continue;
-                stack2.stackSize += stack.stackSize;
-                break outer;
-            }
-            this.stacks.add(stack);
-        }
+        this.recipes = input;
     }
 
     @Override
@@ -56,23 +44,12 @@ public class InventoryRenderer implements IRenderer
         if (d < 1.75) return;
         GlStateManager.scale(d * 0.2, d * 0.2, d * 0.2);
 
-        int cols;
-        if (stacks.size() <= 9) cols = stacks.size();
-        else if (stacks.size() <= 27) cols = 9;
-        else if (stacks.size() <= 54) cols = 11;
-        else if (stacks.size() <= 90) cols = 14;
-        else if (stacks.size() <= 109) cols = 18;
-        else cols = 21;
-        int rows = 1 + ((stacks.size() % cols == 0) ? (stacks.size() / cols) - 1 : stacks.size() / cols);
-
-        if (rows > 4) GlStateManager.scale(0.8, 0.8, 0.8);
-
         // Draw name, with depth disabled
         {
             GlStateManager.pushMatrix();
             GlStateManager.pushAttrib();
             GlStateManager.rotate(180, 0, 0, 1);
-            GlStateManager.translate(0, -0.6f -0.4f * (rows/2.0), 0);
+            GlStateManager.translate(0, -0.6f -0.4f * (recipes.size()/2.0), 0);
             //GlStateManager.translate(0, -1 - 0.5f * (rows/2.0), 0);
             GlStateManager.scale(0.03, 0.03, 0.03);
             int w = mc.fontRendererObj.getStringWidth(name);
@@ -83,29 +60,39 @@ public class InventoryRenderer implements IRenderer
             GlStateManager.popMatrix();
         }
 
-        int r = 0;
-        int c = 0;
-        for (final ItemStack stack : stacks)
+        for (int row = 0; row < recipes.size(); row ++)
         {
-            RenderHelper.renderStack(ri, stack, cols, c, rows, r);
-            if (++c == cols)
-            {
-                r++;
-                c = 0;
-            }
+            final MerchantRecipe recipe = recipes.get(row);
+
+            GlStateManager.pushMatrix();
+            GlStateManager.pushAttrib();
+
+            RenderHelper.renderStack(ri, recipe.getItemToBuy(), 4, 0, recipes.size(), row);
+            if (recipe.hasSecondItemToBuy())
+                RenderHelper.renderStack(ri, recipe.getSecondItemToBuy(), 4, 1, recipes.size(), row);
+            RenderHelper.renderStack(ri, recipe.getItemToSell(), 4, 3, recipes.size(), row);
+
+            GlStateManager.popAttrib();
+            GlStateManager.popMatrix();
         }
         // Draw stack sizes later, to draw over the items (disableDepth)
-        r = 0;
-        c = 0;
         GlStateManager.disableDepth();
-        for (final ItemStack stack : stacks)
+        for (int row = 0; row < recipes.size(); row ++)
         {
-            RenderHelper.renderName(mc.fontRendererObj, stack, cols, c, rows, r, ClientEventHandler.TEXT_COLOR);
-            if (++c == cols)
-            {
-                r++;
-                c = 0;
-            }
+            final MerchantRecipe recipe = recipes.get(row);
+
+            GlStateManager.pushMatrix();
+            GlStateManager.pushAttrib();
+
+            int color = recipe.isRecipeDisabled() ? ClientEventHandler.TEXT_COLOR_LIGHT : ClientEventHandler.TEXT_COLOR;
+
+            RenderHelper.renderName(mc.fontRendererObj, recipe.getItemToBuy(), 4, 0, recipes.size(), row, color);
+            if (recipe.hasSecondItemToBuy())
+                RenderHelper.renderName(mc.fontRendererObj, recipe.getSecondItemToBuy(), 4, 1, recipes.size(), row, color);
+            RenderHelper.renderName(mc.fontRendererObj, recipe.getItemToSell(), 4, 3, recipes.size(), row, color);
+
+            GlStateManager.popAttrib();
+            GlStateManager.popMatrix();
         }
         GlStateManager.enableDepth();
     }
@@ -113,6 +100,7 @@ public class InventoryRenderer implements IRenderer
     @Override
     public boolean shouldRender()
     {
-        return stacks.size() != 0;
+        return recipes.size() != 0;
     }
+
 }

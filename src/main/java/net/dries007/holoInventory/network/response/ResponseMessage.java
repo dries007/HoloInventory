@@ -2,6 +2,8 @@ package net.dries007.holoInventory.network.response;
 
 import io.netty.buffer.ByteBuf;
 import net.dries007.holoInventory.Helper;
+import net.dries007.holoInventory.client.ClientEventHandler;
+import net.dries007.holoInventory.client.renderers.IRenderer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -69,5 +71,14 @@ public abstract class ResponseMessage implements IMessage
     public final int getId()
     {
         return id;
+    }
+
+    public static void handle(ResponseMessage message, IRenderer renderer)
+    {
+        switch (message.getType())
+        {
+            case TILE: ClientEventHandler.cache(message.getPos(), renderer); break;
+            case ENTITY: ClientEventHandler.cache(message.getId(), renderer); break;
+        }
     }
 }
