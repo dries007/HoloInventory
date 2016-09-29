@@ -4,13 +4,13 @@ import net.dries007.holoInventory.client.ClientEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class InventoryRenderer implements IRenderer
     }
 
     @Override
-    public void render(WorldClient world, RayTraceResult hit, Vec3d pos)
+    public void render(WorldClient world, MovingObjectPosition hit, Vec3 pos)
     {
         Minecraft mc = Minecraft.getMinecraft();
         RenderManager rm = mc.getRenderManager();
@@ -51,7 +51,7 @@ public class InventoryRenderer implements IRenderer
         GlStateManager.rotate(rm.playerViewX, 0.5F, 0.0F, 0.0F);
         GlStateManager.translate(0, 0, -0.5);
 
-        double d = pos.distanceTo(new Vec3d(TileEntityRendererDispatcher.staticPlayerX, TileEntityRendererDispatcher.staticPlayerY, TileEntityRendererDispatcher.staticPlayerZ));
+        double d = pos.distanceTo(new Vec3(TileEntityRendererDispatcher.staticPlayerX, TileEntityRendererDispatcher.staticPlayerY, TileEntityRendererDispatcher.staticPlayerZ));
 
         if (d < 1.75) return;
         GlStateManager.scale(d * 0.2, d * 0.2, d * 0.2);
