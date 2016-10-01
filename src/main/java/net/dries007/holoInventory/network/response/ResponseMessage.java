@@ -1,10 +1,11 @@
 package net.dries007.holoInventory.network.response;
 
+import net.minecraft.util.BlockPos;
+
 import io.netty.buffer.ByteBuf;
 import net.dries007.holoInventory.Helper;
 import net.dries007.holoInventory.client.ClientEventHandler;
 import net.dries007.holoInventory.client.renderers.IRenderer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public abstract class ResponseMessage implements IMessage

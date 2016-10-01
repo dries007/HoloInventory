@@ -3,8 +3,8 @@ package net.dries007.holoInventory.client.renderers;
 import net.dries007.holoInventory.client.ClientEventHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 
 public class RenderHelper
@@ -18,7 +18,7 @@ public class RenderHelper
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.blendFunc(770, 771);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
@@ -57,6 +57,7 @@ public class RenderHelper
         GlStateManager.pushMatrix();
         GlStateManager.rotate((float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL), 0, 1, 0);
         GlStateManager.scale(0.45, 0.45, 0.45);
+
 
         ri.renderItem(stack, ItemCameraTransforms.TransformType.FIXED);
 

@@ -13,10 +13,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -56,8 +55,8 @@ public class ClientEventHandler
         instance = new ClientEventHandler();
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 
-        keyHold = new KeyBinding("Hold to show", KeyConflictContext.IN_GAME, Keyboard.KEY_H, HoloInventory.MODID);
-        keyToggle = new KeyBinding("Toggle to show", KeyConflictContext.IN_GAME, 0, HoloInventory.MODID);
+        keyHold = new KeyBinding("Hold to show", Keyboard.KEY_H, HoloInventory.MODID);
+        keyToggle = new KeyBinding("Toggle to show", 0, HoloInventory.MODID);
         ClientRegistry.registerKeyBinding(keyHold);
         ClientRegistry.registerKeyBinding(keyToggle);
     }
@@ -107,18 +106,18 @@ public class ClientEventHandler
         TILE_CACHE.cleanUp();
         ENTITY_CACHE.cleanUp();
 
-        RayTraceResult ray = mc.objectMouseOver;
+        MovingObjectPosition ray = mc.objectMouseOver;
         if (ray == null) return;
 
-        if (ray.typeOfHit == RayTraceResult.Type.BLOCK)
+        if (ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
         {
             final TileEntity tileEntity = world.getTileEntity(ray.getBlockPos());
             if (tileEntity == null || !Helper.accept(tileEntity) || Helper.banned.contains(tileEntity.getClass().getCanonicalName())) return;
-            HoloInventory.getSnw().sendToServer(new TileRequest(world.provider.getDimension(), ray.getBlockPos()));
+            HoloInventory.getSnw().sendToServer(new TileRequest(world.provider.getDimensionId(), ray.getBlockPos()));
         }
-        else if (ray.typeOfHit == RayTraceResult.Type.ENTITY && Helper.accept(ray.entityHit))
+        else if (ray.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && Helper.accept(ray.entityHit))
         {
-            HoloInventory.getSnw().sendToServer(new EntityRequest(world.provider.getDimension(), ray.entityHit.getEntityId()));
+            HoloInventory.getSnw().sendToServer(new EntityRequest(world.provider.getDimensionId(), ray.entityHit.getEntityId()));
         }
     }
 
@@ -127,10 +126,10 @@ public class ClientEventHandler
     {
         if (worldRef.get() == null || !enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
-        RayTraceResult ray = mc.objectMouseOver;
+        MovingObjectPosition ray = mc.objectMouseOver;
         if (ray == null) return;
 
-        if (ray.typeOfHit == RayTraceResult.Type.BLOCK)
+        if (ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
         {
             final IRenderer renderer = TILE_CACHE.getIfPresent(ray.getBlockPos());
             if (renderer == null || !renderer.shouldRender()) return;
@@ -154,7 +153,7 @@ public class ClientEventHandler
                 RenderHelper.end();
             }
         }
-        else if (ray.typeOfHit == RayTraceResult.Type.ENTITY)
+        else if (ray.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY)
         {
             final IRenderer renderer = ENTITY_CACHE.getIfPresent(ray.entityHit.getEntityId());
             if (renderer == null || !renderer.shouldRender()) return;

@@ -1,13 +1,13 @@
 package net.dries007.holoInventory.client.renderers;
 
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 
 public class FakeRenderer implements IRenderer
 {
     @Override
-    public void render(WorldClient world, RayTraceResult hit, Vec3d pos)
+    public void render(WorldClient world, MovingObjectPosition hit, Vec3 pos)
     {
 
     }

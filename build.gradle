@@ -10,12 +10,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.0.2"
+version = "2.1.0"
 if (System.getenv().BUILD_NUMBER != null) version += "." + System.getenv().BUILD_NUMBER
 
 targetCompatibility = 1.7
@@ -25,9 +25,9 @@ group= "net.dries007.holoinventory"
 archivesBaseName = "HoloInventory"
 
 minecraft {
-    version = "1.9.4-12.17.0.1976"
-    runDir = "jars"
-    mappings = "stable_26"
+    version = "1.8.9-11.15.1.1902-1.8.9"
+    runDir = "run"
+    mappings = "stable_20"
 }
 
 dependencies {

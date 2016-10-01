@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.HoloInventory.*;
 
-@Mod(modid = MODID, name = MODID, canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
+@Mod(modid = MODID, name = MODID, acceptableRemoteVersions = "*", acceptedMinecraftVersions = "[1.8.9]", canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
 public class HoloInventory
 {
     public static final String MODID = "HoloInventory";
@@ -105,7 +105,7 @@ public class HoloInventory
     @SubscribeEvent
     public void updateConfig(ConfigChangedEvent.OnConfigChangedEvent event)
     {
-        if (event.getModID().equals(MODID)) updateConfig();
+        if (event.modID.equals(MODID)) updateConfig();
     }
 
     public void saveBanned()
