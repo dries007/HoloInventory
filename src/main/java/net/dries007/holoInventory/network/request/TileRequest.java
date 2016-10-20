@@ -13,6 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -62,6 +63,7 @@ public class TileRequest extends RequestMessage
             if (te == null) return null;
 
             if (Helper.banned.contains(te.getClass().getCanonicalName())) return null;
+            if (te instanceof ILockableContainer && !ctx.getServerHandler().playerEntity.canOpen(((ILockableContainer) te).getLockCode())) return null;
 
             if (te instanceof TileEntityEnderChest)
             {
