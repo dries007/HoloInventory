@@ -50,23 +50,31 @@ public class PlainInventory extends ResponseMessage
         this.name = name;
     }
 
+    private void add(ItemStack s, int i)
+    {
+        if (s == null) return;
+        try
+        {
+            stacks[i] = s.copy();
+        }
+        catch (Throwable e)
+        {
+            // WHY??
+            e.printStackTrace();
+        }
+    }
+
     private void scan(IItemHandler ii)
     {
         stacks = new ItemStack[ii.getSlots()];
-        for (int i = 0; i < stacks.length; i++)
-        {
-            stacks[i] = ii.getStackInSlot(i);
-        }
+        for (int i = 0; i < stacks.length; i++) add(ii.getStackInSlot(i), i);
     }
 
     private void scan(IInventory ii)
     {
         name = ii.getName();
         stacks = new ItemStack[ii.getSizeInventory()];
-        for (int i = 0; i < stacks.length; i++)
-        {
-            stacks[i] = ii.getStackInSlot(i);
-        }
+        for (int i = 0; i < stacks.length; i++) add(ii.getStackInSlot(i), i);
     }
 
     @Override
