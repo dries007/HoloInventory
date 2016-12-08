@@ -2,6 +2,7 @@ package net.dries007.holoInventory.network.request;
 
 import io.netty.buffer.ByteBuf;
 import net.dries007.holoInventory.Helper;
+import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.response.PlainInventory;
 import net.dries007.holoInventory.network.response.ResponseMessage;
 import net.minecraft.block.Block;
@@ -19,6 +20,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class TileRequest extends RequestMessage
 {
@@ -92,7 +94,14 @@ public class TileRequest extends RequestMessage
             }
             else if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
             {
-                return new PlainInventory(message.pos, te.getBlockType().getUnlocalizedName(), te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
+                IItemHandler iih = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                //noinspection ConstantConditions
+                if (iih == null)
+                {
+                    HoloInventory.getLogger().warn("Error: Block at {} (Class: {} Te: {} Block: {}) returned null after indicating the capability is available.", message.pos, te.getClass().getName(), te, te.getBlockType());
+                    return null;
+                }
+                return new PlainInventory(message.pos, te.getBlockType().getUnlocalizedName(), iih);
             }
 
             return null;
