@@ -43,9 +43,18 @@ public class InventoryRenderer implements IRenderer
     private final String name;
     private final List<ItemStack> stacks;
 
-    public InventoryRenderer(String name, List<ItemStack> input)
+    public InventoryRenderer(final String name, List<ItemStack> input)
     {
-        this.name = I18n.format(name);
+        // Minecraft & Localization. One giant clusterfuck.
+        String tmp = I18n.format(name);
+        if (!tmp.equals(name)) this.name = tmp;
+        else
+        {
+            String name2 = name + ".name";
+            tmp = I18n.format(name2);
+            if (!tmp.equals(name2)) this.name = tmp;
+            else this.name = name;
+        }
 
         this.stacks = new ArrayList<>(input.size());
         for (ItemStack stack : input)
