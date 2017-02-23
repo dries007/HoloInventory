@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2017 Dries K. Aka Dries007
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package net.dries007.holoInventory.client.renderers;
 
 import net.dries007.holoInventory.client.ClientEventHandler;
@@ -41,7 +64,11 @@ public class RenderHelper
         GlStateManager.translate(0.2, 0, -0.1);
         GlStateManager.scale(0.01, 0.01, 0.01);
 
-        String size = stack.stackSize < 1000 ? String.valueOf(stack.stackSize) : ClientEventHandler.DF.format(stack.stackSize / 1000.0);
+        String size;
+        if (stack.getCount() < 1000) size = String.valueOf(stack.getCount());
+        else if (stack.getCount() > 1000) size = ClientEventHandler.DF.format(stack.getCount() / 1000.0) + "k";
+        else size = ClientEventHandler.DF.format(stack.getCount() / (1000.0 * 1000.0)) + "M";
+
         int w = fr.getStringWidth(size);
         fr.drawStringWithShadow(size, -w, 0, color);
 

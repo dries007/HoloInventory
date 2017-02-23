@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2017 Dries K. Aka Dries007
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package net.dries007.holoInventory.client.renderers;
 
 import net.dries007.holoInventory.client.ClientEventHandler;
@@ -52,9 +75,9 @@ public class MerchantRenderer implements IRenderer
             GlStateManager.translate(0, -0.6f -0.4f * (recipes.size()/2.0), 0);
             //GlStateManager.translate(0, -1 - 0.5f * (rows/2.0), 0);
             GlStateManager.scale(0.03, 0.03, 0.03);
-            int w = mc.fontRendererObj.getStringWidth(name);
+            int w = mc.fontRenderer.getStringWidth(name);
             GlStateManager.disableDepth();
-            mc.fontRendererObj.drawString(name,  -w/2, 0, 0xFFFFFF);
+            mc.fontRenderer.drawString(name,  -w/2, 0, 0xFFFFFF);
             GlStateManager.enableDepth();
             GlStateManager.popAttrib();
             GlStateManager.popMatrix();
@@ -86,10 +109,10 @@ public class MerchantRenderer implements IRenderer
 
             int color = recipe.isRecipeDisabled() ? ClientEventHandler.TEXT_COLOR_LIGHT : ClientEventHandler.TEXT_COLOR;
 
-            RenderHelper.renderName(mc.fontRendererObj, recipe.getItemToBuy(), 4, 0, recipes.size(), row, color);
+            RenderHelper.renderName(mc.fontRenderer, recipe.getItemToBuy(), 4, 0, recipes.size(), row, color);
             if (recipe.hasSecondItemToBuy())
-                RenderHelper.renderName(mc.fontRendererObj, recipe.getSecondItemToBuy(), 4, 1, recipes.size(), row, color);
-            RenderHelper.renderName(mc.fontRendererObj, recipe.getItemToSell(), 4, 3, recipes.size(), row, color);
+                RenderHelper.renderName(mc.fontRenderer, recipe.getSecondItemToBuy(), 4, 1, recipes.size(), row, color);
+            RenderHelper.renderName(mc.fontRenderer, recipe.getItemToSell(), 4, 3, recipes.size(), row, color);
 
             GlStateManager.popAttrib();
             GlStateManager.popMatrix();

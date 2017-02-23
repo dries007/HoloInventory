@@ -1,6 +1,6 @@
 .gradle
 build
-jars
+run/
 out
 *.iml
 *.ipr

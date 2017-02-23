@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2014. Dries K. Aka Dries007
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2017 Dries K. Aka Dries007
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -44,10 +46,11 @@ import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.HoloInventory.*;
 
-@Mod(modid = MODID, name = MODID, acceptableRemoteVersions = "*", canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
+@Mod(modid = MODID, name = MODNAME, acceptableRemoteVersions = "*", canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
 public class HoloInventory
 {
-    public static final String MODID = "HoloInventory";
+    public static final String MODID = "holoinventory";
+    public static final String MODNAME = "HoloInventory";
     public static final String URL = "https://dries007.net/holoinventory/";
     /** @see net.dries007.holoInventory.client.ConfigGuiFactory */
     public static final String GUI_FACTORY = "net.dries007.holoInventory.client.ConfigGuiFactory";

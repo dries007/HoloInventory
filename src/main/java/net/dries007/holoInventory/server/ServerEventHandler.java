@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2017 Dries K. Aka Dries007
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package net.dries007.holoInventory.server;
 
 import net.dries007.holoInventory.Helper;
@@ -39,24 +62,24 @@ public class ServerEventHandler
 
         if (te == null)
         {
-            event.getEntityPlayer().addChatComponentMessage(new TextComponentString("That block does not have a TileEntity.").setStyle(new Style().setColor(TextFormatting.RED)));
+            event.getEntityPlayer().sendMessage(new TextComponentString("That block does not have a TileEntity.").setStyle(new Style().setColor(TextFormatting.RED)));
             return;
         }
 
         if (ban)
         {
             if (Helper.banned.add(te.getClass().getCanonicalName()))
-                event.getEntityPlayer().addChatComponentMessage(new TextComponentString("Banned " + te.getClass().getCanonicalName()).setStyle(new Style().setColor(TextFormatting.GREEN)));
+                event.getEntityPlayer().sendMessage(new TextComponentString("Banned " + te.getClass().getCanonicalName()).setStyle(new Style().setColor(TextFormatting.GREEN)));
             else
-                event.getEntityPlayer().addChatComponentMessage(new TextComponentString(te.getClass().getCanonicalName() + " is already banned.").setStyle(new Style().setColor(TextFormatting.RED)));
+                event.getEntityPlayer().sendMessage(new TextComponentString(te.getClass().getCanonicalName() + " is already banned.").setStyle(new Style().setColor(TextFormatting.RED)));
         }
         else
         {
             boolean wasBanned = Helper.banned.remove(te.getClass().getCanonicalName());
             if (wasBanned)
-                event.getEntityPlayer().addChatComponentMessage(new TextComponentString("Unbanned " + te.getClass().getCanonicalName()).setStyle(new Style().setColor(TextFormatting.GREEN)));
+                event.getEntityPlayer().sendMessage(new TextComponentString("Unbanned " + te.getClass().getCanonicalName()).setStyle(new Style().setColor(TextFormatting.GREEN)));
             else
-                event.getEntityPlayer().addChatComponentMessage(new TextComponentString(te.getClass().getCanonicalName() + " is not banned. Perhaps it is banned on the " + (FMLCommonHandler.instance().getSide().isClient() ? "server" : "client") + "?").setStyle(new Style().setColor(TextFormatting.RED)));
+                event.getEntityPlayer().sendMessage(new TextComponentString(te.getClass().getCanonicalName() + " is not banned. Perhaps it is banned on the " + (FMLCommonHandler.instance().getSide().isClient() ? "server" : "client") + "?").setStyle(new Style().setColor(TextFormatting.RED)));
         }
 
         HoloInventory.getInstance().saveBanned();

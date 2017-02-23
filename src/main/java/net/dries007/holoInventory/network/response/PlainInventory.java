@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2017 Dries K. Aka Dries007
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package net.dries007.holoInventory.network.response;
 
 import com.google.common.base.Strings;
@@ -6,17 +29,19 @@ import net.dries007.holoInventory.client.renderers.InventoryRenderer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILockableContainer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.items.IItemHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlainInventory extends ResponseMessage
 {
     private String name;
-    private ItemStack[] stacks;
+    private List<ItemStack> stacks;
 
     @SuppressWarnings("unused") // netty needs it
     public PlainInventory()
@@ -50,31 +75,25 @@ public class PlainInventory extends ResponseMessage
         this.name = name;
     }
 
-    private void add(ItemStack s, int i)
+    private void add(ItemStack s)
     {
-        if (s == null) return;
-        try
-        {
-            stacks[i] = s.copy();
-        }
-        catch (Throwable e)
-        {
-            // WHY??
-            e.printStackTrace();
-        }
+        if (s.isEmpty()) return;
+        stacks.add(s);
     }
 
     private void scan(IItemHandler ii)
     {
-        stacks = new ItemStack[ii.getSlots()];
-        for (int i = 0; i < stacks.length; i++) add(ii.getStackInSlot(i), i);
+        int size = ii.getSlots();
+        stacks = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) add(ii.getStackInSlot(i));
     }
 
     private void scan(IInventory ii)
     {
         name = ii.getName();
-        stacks = new ItemStack[ii.getSizeInventory()];
-        for (int i = 0; i < stacks.length; i++) add(ii.getStackInSlot(i), i);
+        int size = ii.getSizeInventory();
+        stacks = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) add(ii.getStackInSlot(i));
     }
 
     @Override
@@ -82,8 +101,9 @@ public class PlainInventory extends ResponseMessage
     {
         super.fromBytes(buf);
         name = ByteBufUtils.readUTF8String(buf);
-        stacks = new ItemStack[buf.readInt()];
-        for (int i = 0; i < stacks.length; i++) stacks[i] = ByteBufUtils.readItemStack(buf);
+        int size = buf.readInt();
+        stacks = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) add(ByteBufUtils.readItemStack(buf));
     }
 
     @Override
@@ -91,7 +111,7 @@ public class PlainInventory extends ResponseMessage
     {
         super.toBytes(buf);
         ByteBufUtils.writeUTF8String(buf, Strings.nullToEmpty(name));
-        buf.writeInt(stacks.length);
+        buf.writeInt(stacks.size());
         for (ItemStack stack : stacks) ByteBufUtils.writeItemStack(buf, stack);
     }
 

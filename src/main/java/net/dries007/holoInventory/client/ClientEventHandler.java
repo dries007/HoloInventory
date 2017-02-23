@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - 2017 Dries K. Aka Dries007
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package net.dries007.holoInventory.client;
 
 import com.google.common.cache.Cache;
@@ -30,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ClientEventHandler
 {
-    public static final DecimalFormat DF = new DecimalFormat("#.#k");
+    public static final DecimalFormat DF = new DecimalFormat("#.#");
     public static final int TEXT_COLOR = 255 + (255 << 8) + (255 << 16) + (255 << 24);
     public static final int TEXT_COLOR_LIGHT = 255 + (255 << 8) + (255 << 16) + (255 << 24);
 
@@ -84,8 +107,8 @@ public class ClientEventHandler
     {
         if (event.phase == TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc == null || mc.isGamePaused()) return;
-        WorldClient mcWorld = Minecraft.getMinecraft().theWorld;
+        if (mc.isGamePaused()) return;
+        WorldClient mcWorld = Minecraft.getMinecraft().world;
         if (mcWorld == null) return;
 
         WorldClient world = worldRef.get();
