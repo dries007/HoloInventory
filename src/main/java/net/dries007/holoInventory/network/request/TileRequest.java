@@ -8,6 +8,7 @@ import net.dries007.holoInventory.network.response.ResponseMessage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockJukebox;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.tileentity.TileEntity;
@@ -75,7 +76,7 @@ public class TileRequest extends RequestMessage
             {
                 InventoryBasic ib = new InventoryBasic("minecraft:jukebox", false, 1);
                 ib.setInventorySlotContents(0, ((BlockJukebox.TileEntityJukebox) te).getRecord());
-                return new PlainInventory(message.pos, ib).setName("tile.jukebox.name");
+                return new PlainInventory(message.pos, ib).setName(Blocks.JUKEBOX.getUnlocalizedName());
             }
             else if (te instanceof TileEntityChest)
             {
