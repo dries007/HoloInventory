@@ -34,10 +34,13 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public class InventoryRenderer implements IRenderer
 {
     private final String name;
@@ -77,7 +80,7 @@ public class InventoryRenderer implements IRenderer
         RenderManager rm = mc.getRenderManager();
         RenderItem ri = mc.getRenderItem();
 
-        GlStateManager.translate(pos.xCoord - TileEntityRendererDispatcher.staticPlayerX, pos.yCoord - TileEntityRendererDispatcher.staticPlayerY, pos.zCoord - TileEntityRendererDispatcher.staticPlayerZ);
+        GlStateManager.translate(pos.x - TileEntityRendererDispatcher.staticPlayerX, pos.y - TileEntityRendererDispatcher.staticPlayerY, pos.z - TileEntityRendererDispatcher.staticPlayerZ);
 
         GlStateManager.rotate(-rm.playerViewY, 0.0F, 0.5F, 0.0F);
         GlStateManager.rotate(rm.playerViewX, 0.5F, 0.0F, 0.0F);

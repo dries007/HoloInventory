@@ -46,12 +46,11 @@ import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.HoloInventory.*;
 
-@Mod(modid = MODID, name = MODNAME, acceptableRemoteVersions = "*", canBeDeactivated = true, updateJSON = URL + "update.json", guiFactory = GUI_FACTORY)
+@Mod(modid = MODID, name = MODNAME, acceptableRemoteVersions = "*", canBeDeactivated = true, guiFactory = GUI_FACTORY)
 public class HoloInventory
 {
     public static final String MODID = "holoinventory";
     public static final String MODNAME = "HoloInventory";
-    public static final String URL = "https://dries007.net/holoinventory/";
     /** @see net.dries007.holoInventory.client.ConfigGuiFactory */
     public static final String GUI_FACTORY = "net.dries007.holoInventory.client.ConfigGuiFactory";
 
@@ -68,7 +67,7 @@ public class HoloInventory
     @Mod.EventHandler
     public void disableEvent(FMLModDisabledEvent event)
     {
-        HoloInventory.getLogger().info("Mod disabled via Mods list.");
+        logger.info("Mod disabled via Mods list.");
     }
 
     @Mod.EventHandler
@@ -92,6 +91,7 @@ public class HoloInventory
 
         if (event.getSide().isClient())
         {
+            //noinspection MethodCallSideOnly
             ClientEventHandler.init();
         }
 

@@ -45,17 +45,20 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
+@SideOnly(Side.CLIENT)
 public class ClientEventHandler
 {
     public static final DecimalFormat DF = new DecimalFormat("#.#");
-    public static final int TEXT_COLOR = 255 + (255 << 8) + (255 << 16) + (255 << 24);
-    public static final int TEXT_COLOR_LIGHT = 255 + (255 << 8) + (255 << 16) + (255 << 24);
+    public static final int TEXT_COLOR = 0xFFFFFFFF; //255 + (255 << 8) + (255 << 16) + (255 << 24);
+    public static final int TEXT_COLOR_LIGHT = 0xFFFFFFFF; //255 + (255 << 8) + (255 << 16) + (255 << 24);
 
     private static final Cache<BlockPos, IRenderer> TILE_CACHE = CacheBuilder.newBuilder().maximumSize(150).expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
     private static final Cache<Integer, IRenderer> ENTITY_CACHE = CacheBuilder.newBuilder().maximumSize(150).expireAfterWrite(500, TimeUnit.MILLISECONDS).build();
