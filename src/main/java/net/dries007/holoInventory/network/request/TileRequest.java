@@ -26,6 +26,7 @@ package net.dries007.holoInventory.network.request;
 import io.netty.buffer.ByteBuf;
 import net.dries007.holoInventory.Helper;
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.api.INamedItemHandler;
 import net.dries007.holoInventory.network.response.PlainInventory;
 import net.dries007.holoInventory.network.response.ResponseMessage;
 import net.minecraft.block.Block;
@@ -123,6 +124,10 @@ public class TileRequest extends RequestMessage
                 {
                     HoloInventory.getLogger().warn("Error: Block at {} (Class: {} Te: {} Block: {}) returned null after indicating the capability is available.", message.pos, te.getClass().getName(), te, te.getBlockType());
                     return null;
+                }
+                if (te instanceof INamedItemHandler) {
+                	INamedItemHandler namedHandler = (INamedItemHandler) te;
+                	return new PlainInventory(message.pos, namedHandler.getItemHandlerName(), iih);
                 }
                 return new PlainInventory(message.pos, te.getBlockType().getUnlocalizedName(), iih);
             }
