@@ -126,7 +126,8 @@ public class ClientEventHandler
         enabled = (Helper.showOnSneak && mc.gameSettings.keyBindSneak.isKeyDown()) ||
                 (Helper.showOnSprint && mc.gameSettings.keyBindSprint.isKeyDown()) ||
                 (keyHold.getKeyCode() != 0 && keyHold.isKeyDown()) ||
-                (keyToggle.getKeyCode() != 0 && toggleState);
+                (keyToggle.getKeyCode() != 0 && toggleState) ||
+                (!Helper.showOnSneak && !Helper.showOnSprint && keyHold.getKeyCode() == 0 && keyToggle.getKeyCode() == 0);
 
         if (!enabled) return;
 
