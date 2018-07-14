@@ -119,8 +119,6 @@ public class Config
         renderMultiple = configuration.get(MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
         enableEntities = configuration.get(MODID, "enableEntities", enableEntities, "Set to false to prevent all entities from rendering the hologram.").getBoolean(true);
 
-        doVersionCheck = configuration.get(MODID, "doVersionCheck", doVersionCheck).getBoolean(true);
-
         syncFreq = configuration.get(MODID, "syncFreq", syncFreq, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
         enableStacking = configuration.get(MODID, "enableStacking", enableStacking, "Stack items, even above 64.").getBoolean(enableStacking);

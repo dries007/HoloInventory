@@ -21,34 +21,21 @@
 
 package net.dries007.holoInventory.client;
 
-import com.google.common.base.Joiner;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
-import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.util.Data;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.event.ClickEvent;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.MinecraftForge;
-import org.apache.commons.io.IOUtils;
 
-import java.net.URL;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static net.dries007.holoInventory.client.ClientHandler.VersionCheck.Result.*;
-import static net.minecraft.event.ClickEvent.Action.OPEN_URL;
-import static net.minecraft.util.EnumChatFormatting.*;
+import static net.minecraft.util.EnumChatFormatting.AQUA;
 
 public class ClientHandler
 {
-    public static final VersionCheck VERSION_CHECK = new VersionCheck();
     public static final KeyManager KEY_MANAGER = new KeyManager();
     public static final RenderItem RENDER_ITEM = new RenderItem()
     {
@@ -83,50 +70,6 @@ public class ClientHandler
         RENDER_ITEM.setRenderManager(RenderManager.instance);
     }
 
-    public static class VersionCheck implements Runnable
-    {
-        public static final Pattern VERSIONS = Pattern.compile("(?:\\d+\\.)+.*");
-
-        enum Result
-        {
-            UNKNOWN, OK, OLD, ERROR
-        }
-
-        public Result result = UNKNOWN;
-        public String latest = "";
-
-        @Override
-        public void run()
-        {
-            try
-            {
-                Minecraft.getMinecraft();
-                URL url = new URL(Data.VERSION.replace("MCVERSION", MinecraftForge.MC_VERSION));
-                List<String> lines = IOUtils.readLines(url.openStream());
-                for (String line : lines)
-                {
-                    if (VERSIONS.matcher(line).matches())
-                    {
-                        if (result != UNKNOWN)
-                        {
-                            HoloInventory.getLogger().warn("The version checker got more then 1 viable version line back. Here is the entire log:");
-                            HoloInventory.getLogger().warn(Joiner.on("\r\n").join(lines));
-                            result = ERROR;
-                            return;
-                        }
-                        latest = line;
-                        result = HoloInventory.getVersion().equals(latest) ? OK : OLD;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                result = ERROR;
-            }
-        }
-    }
-
     public ClientHandler()
     {
 
@@ -140,15 +83,6 @@ public class ClientHandler
         FMLCommonHandler.instance().bus().register(KEY_MANAGER);
         MinecraftForge.EVENT_BUS.register(KEY_MANAGER);
 
-        if (HoloInventory.getConfig().doVersionCheck)
-        {
-            Thread vc = new Thread(VERSION_CHECK);
-            vc.setDaemon(true);
-            vc.setName(Data.MODID + "VersionCheckThread");
-            vc.run();
-
-            FMLCommonHandler.instance().bus().register(this);
-        }
     }
 
     boolean done = false;
@@ -158,18 +92,6 @@ public class ClientHandler
     {
         if (done) return;
         IChatComponent root = new ChatComponentText("[HoloInventory] ").setChatStyle(new ChatStyle().setColor(AQUA));
-        switch (VERSION_CHECK.result)
-        {
-            case ERROR:
-                root.appendSibling(new ChatComponentText("Something went wrong version checking, please check the log file.").setChatStyle(new ChatStyle().setColor(RED)));
-                break;
-            case OLD:
-                root.appendSibling(new ChatComponentText("You are running " + HoloInventory.getVersion() + ", the newest available is " + VERSION_CHECK.latest + ". ").setChatStyle(new ChatStyle().setColor(WHITE)));
-                root.appendSibling(new ChatComponentText("Click here!").setChatStyle(new ChatStyle().setColor(GOLD).setChatClickEvent(new ClickEvent(OPEN_URL, "https://www.dries007.net/holoinventory/"))));
-                break;
-            default:
-                return;
-        }
         done = true;
         event.player.addChatMessage(root);
     }

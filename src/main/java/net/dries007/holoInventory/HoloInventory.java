@@ -39,7 +39,7 @@ import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-@Mod(modid = MODID, name = MODID)
+@Mod(modid = MODID, name = MODID, canBeDeactivated = true, acceptableRemoteVersions = "*")
 public class HoloInventory
 {
     @Mod.Instance(value = MODID)

@@ -17,11 +17,13 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.9.1"
+version = "1.9.2-GTNH"
 if (System.getenv().BUILD_NUMBER != null) version += "." + System.getenv().BUILD_NUMBER
 
-targetCompatibility = 1.6
-sourceCompatibility = 1.6
+targetCompatibility = sourceCompatibility = 1.8
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
 
 group= "net.dries007"
 archivesBaseName = "HoloInventory"

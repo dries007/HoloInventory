@@ -33,15 +33,6 @@ public class CommonProxy
     public void preInit()
     {
         serverHandler = new ServerHandler();
-
-        try
-        {
-            new Metrics(Data.MODID, HoloInventory.getVersion()).start();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     public void init()
