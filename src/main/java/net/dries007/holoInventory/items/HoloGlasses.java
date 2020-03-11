@@ -35,7 +35,7 @@ public class HoloGlasses  extends Item implements IBauble
     @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IIconRegister ir) {
-        icon = ir.registerIcon(Data.MODID + ":hologlasses");
+        icon = ir.registerIcon("holoinventory:hologlasses");
     }
     @SideOnly(Side.CLIENT)
     @Override

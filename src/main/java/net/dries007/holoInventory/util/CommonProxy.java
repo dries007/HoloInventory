@@ -21,10 +21,13 @@
 
 package net.dries007.holoInventory.util;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
-
-import java.io.IOException;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class CommonProxy
 {
@@ -38,6 +41,7 @@ public class CommonProxy
     public void init()
     {
         serverHandler.init();
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(HoloInventory.holoGlasses), "I I", "I#I", "AAA", '#', Blocks.glass_pane, 'I', Items.iron_ingot, 'A', Blocks.coal_block));
     }
 
     public void postInit()

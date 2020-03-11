@@ -79,3 +79,5 @@ artifacts {
     archives sourcesJar
     archives deobfJar
 }
+
+idea { module { inheritOutputDirs = true } }
