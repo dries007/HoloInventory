@@ -30,11 +30,14 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.dries007.holoInventory.compat.DecoderRegistry;
+import net.dries007.holoInventory.items.HoloGlasses;
 import net.dries007.holoInventory.network.*;
 import net.dries007.holoInventory.server.CommandHoloInventory;
 import net.dries007.holoInventory.util.CommonProxy;
+import net.minecraft.item.Item;
 import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.util.Data.MODID;
@@ -44,7 +47,7 @@ public class HoloInventory
 {
     @Mod.Instance(value = MODID)
     private static HoloInventory instance;
-
+    public static Item holoGlasses;
     private Config config;
 
     @Mod.Metadata
@@ -60,6 +63,9 @@ public class HoloInventory
     {
         logger = event.getModLog();
         config = new Config(event.getSuggestedConfigurationFile());
+
+        holoGlasses =(new HoloGlasses()).setUnlocalizedName("Hologlasses");
+        GameRegistry.registerItem(holoGlasses, "Hologlasses", MODID);
 
         int id = 0;
         snw = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
