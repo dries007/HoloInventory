@@ -26,7 +26,7 @@ compileJava {
 }
 
 group= "net.dries007"
-archivesBaseName = "HoloInventory"
+archivesBaseName = "holoinventory"
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
@@ -41,6 +41,10 @@ file('version.' + project.minecraft.version + '.txt').write version
 
 processResources
 {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+  
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
