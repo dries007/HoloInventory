@@ -41,7 +41,6 @@ public class CommonProxy
     public void init()
     {
         serverHandler.init();
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(HoloInventory.holoGlasses), "I I", "I#I", "AAA", '#', Blocks.glass_pane, 'I', Items.iron_ingot, 'A', Blocks.coal_block));
     }
 
     public void postInit()
