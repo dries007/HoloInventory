@@ -36,7 +36,6 @@ import static net.minecraft.util.EnumChatFormatting.AQUA;
 
 public class ClientHandler
 {
-    public static final KeyManager KEY_MANAGER = new KeyManager();
     public static final RenderItem RENDER_ITEM = new RenderItem()
     {
         @Override
@@ -79,10 +78,6 @@ public class ClientHandler
     {
         MinecraftForge.EVENT_BUS.register(Renderer.INSTANCE);
         FMLCommonHandler.instance().bus().register(Renderer.INSTANCE);
-
-        FMLCommonHandler.instance().bus().register(KEY_MANAGER);
-        MinecraftForge.EVENT_BUS.register(KEY_MANAGER);
-
     }
 
     boolean done = false;
