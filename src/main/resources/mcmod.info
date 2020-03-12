@@ -1,7 +1,7 @@
 [
 {
   "modid": "holoinventory",
-  "name": "holoinventory",
+  "name": "Holo Inventory",
   "description": "Holographic inventory screens!",
   "version": "${version}",
   "mcversion": "${mcversion}",
