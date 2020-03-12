@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.9.2-GTNH"
+version = "2.0.0-beta2-GTNH"
 if (System.getenv().BUILD_NUMBER != null) version += "." + System.getenv().BUILD_NUMBER
 
 targetCompatibility = sourceCompatibility = 1.8
@@ -26,7 +26,7 @@ compileJava {
 }
 
 group= "net.dries007"
-archivesBaseName = "HoloInventory"
+archivesBaseName = "holoinventory"
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
@@ -41,6 +41,10 @@ file('version.' + project.minecraft.version + '.txt').write version
 
 processResources
 {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+  
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
@@ -79,3 +83,5 @@ artifacts {
     archives sourcesJar
     archives deobfJar
 }
+
+idea { module { inheritOutputDirs = true } }

@@ -7,3 +7,4 @@ out
 *.iws
 .idea
 version.*.txt
+eclipse/**

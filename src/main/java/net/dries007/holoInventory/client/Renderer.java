@@ -56,6 +56,7 @@ public class Renderer
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<Integer, NamedData<ItemStack[]>>();
     public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
     public static final HashMap<Integer, Long> requestMap = new HashMap<Integer, Long>();
+    public static boolean enable = false;
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
@@ -74,16 +75,18 @@ public class Renderer
     @SubscribeEvent
     public void renderEvent(RenderWorldLastEvent event)
     {
-        try
-        {
-            doEvent();
-        }
-        catch (Exception e)
-        {
-            HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
-            HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
+        if(enable){
+            try
+            {
+                doEvent();
+            }
+            catch (Exception e)
+            {
+                HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
+                HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
 
-            e.printStackTrace();
+                e.printStackTrace();
+            }
         }
     }
 

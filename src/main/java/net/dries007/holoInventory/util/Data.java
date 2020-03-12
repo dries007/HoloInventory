@@ -23,7 +23,7 @@ package net.dries007.holoInventory.util;
 
 public class Data
 {
-    public static final String MODID = "HoloInventory";
+    public static final String MODID = "holoinventory";
     public static final String VERSION = "https://vps2.dries007.net/holoinventory/version.MCVERSION.txt";
 
     public static final String JUKEBOX_NAME = "Jukebox";

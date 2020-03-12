@@ -106,14 +106,14 @@ public class Config
         colorR = configuration.get(MODID, "colorRed", colorR, "0-255").getInt();
         colorG = configuration.get(MODID, "colorGreen", colorG, "0-255").getInt();
         colorB = configuration.get(MODID, "colorBlue", colorB, "0-255").getInt();
-
+        /**
         keyMode = configuration.get(MODID, "keyMode", keyMode, "Valid modes:\n" +
                 "0: Always display hologram.\n" +
                 "1: The key toggles the rendering.\n" +
                 "2: Only render hologram while key pressed.\n" +
                 "3: Don't render hologram while key pressed.").getInt();
         keyState = configuration.get(MODID, "keyState", keyState, "Stores last toggle value. Don't worry about this.").getBoolean(keyState);
-
+		**/
         renderName = configuration.get(MODID, "renderName", renderName, "Renders the inv name above the hologram").getBoolean(true);
         renderText = configuration.get(MODID, "renderText", renderText, "Render the stacksize as text on top of the items").getBoolean(true);
         renderMultiple = configuration.get(MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
