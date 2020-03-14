@@ -34,6 +34,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -42,6 +43,7 @@ import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL12;
+import tconstruct.armor.player.ArmorExtended;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -56,7 +58,7 @@ public class Renderer
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<Integer, NamedData<ItemStack[]>>();
     public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
     public static final HashMap<Integer, Long> requestMap = new HashMap<Integer, Long>();
-    public static boolean enable = false;
+    private static final ArmorExtended inventory = new ArmorExtended();
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
@@ -75,7 +77,7 @@ public class Renderer
     @SubscribeEvent
     public void renderEvent(RenderWorldLastEvent event)
     {
-        if(enable){
+        if(inventory.func_70301_a(0) != null){
             try
             {
                 doEvent();
