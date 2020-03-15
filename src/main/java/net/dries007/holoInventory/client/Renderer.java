@@ -21,7 +21,33 @@
 
 package net.dries007.holoInventory.client;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScaled;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+
+import org.lwjgl.opengl.GL12;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.api.IHoloGlasses;
 import net.dries007.holoInventory.items.HoloGlasses;
@@ -45,15 +71,6 @@ import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import org.lwjgl.opengl.GL12;
-
-import baubles.api.BaublesApi;
-import tconstruct.armor.player.ArmorExtended;
-
-import java.text.DecimalFormat;
-import java.util.*;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer
 {
@@ -85,10 +102,13 @@ public class Renderer
 
        ItemStack glasses = HoloGlasses.getHoloGlasses(world,player);
 
-        if(glasses!=null && ((IHoloGlasses)glasses.getItem()).shouldRender(glasses)){
-
             try{
-                doEvent();
+				if(Config.requireGlasses && glasses!=null && ((IHoloGlasses)glasses.getItem()).shouldRender(glasses))
+                	doEvent();
+				else {
+					if(!Config.requireGlasses)
+						doEvent();
+				}
             }
 
             catch (Exception e){
@@ -97,15 +117,14 @@ public class Renderer
 
                 e.printStackTrace();
             }
-        }
     }
 
     private void doEvent()
     {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
-        //if (HoloInventory.getConfig().keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;
-        //if (HoloInventory.getConfig().keyMode == 3 && KeyManager.key.getIsKeyPressed()) return;
+        //if (Config.keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;
+        //if (Config.keyMode == 3 && KeyManager.key.getIsKeyPressed()) return;
         if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)
@@ -117,7 +136,7 @@ public class Renderer
                 {
                     String clazz = te.getClass().getCanonicalName();
                     // Check for local ban
-                    if (HoloInventory.getConfig().bannedTiles.contains(clazz)) return;
+                    if (Config.bannedTiles.contains(clazz)) return;
                     NamedData<ItemStack[]> data = tileMap.get(coord.hashCode());
                     if (data != null)
                     {
@@ -137,12 +156,12 @@ public class Renderer
                     tileMap.remove(coord.hashCode());
                 break;
             case ENTITY:
-                if (!HoloInventory.getConfig().enableEntities) break;
+                if (!Config.enableEntities) break;
                 Entity entity = mc.objectMouseOver.entityHit;
                 if (Helper.weWant(entity))
                 {
                     // Check for local ban
-                    if (HoloInventory.getConfig().bannedEntities.contains(entity.getClass().getCanonicalName())) return;
+                    if (Config.bannedEntities.contains(entity.getClass().getCanonicalName())) return;
 
                     int id = entity.getEntityId();
                     // Make & store request
@@ -152,7 +171,7 @@ public class Renderer
                         requestMap.put(id, mc.theWorld.getTotalWorldTime());
                     }
                     // Remove old request so that we get updated info next render tick
-                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(id) + 20 * HoloInventory.getConfig().syncFreq)
+                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(id) + 20 * Config.syncFreq)
                     {
                         requestMap.remove(id);
                     }
@@ -180,7 +199,7 @@ public class Renderer
         glPushMatrix();
         moveAndRotate(-0.25);
 
-        double uiScaleFactor = HoloInventory.getConfig().renderScaling;
+        double uiScaleFactor = Config.renderScaling;
         if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
         glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
 
@@ -194,10 +213,10 @@ public class Renderer
         renderText = true;
 
         // Render the BG
-        if (HoloInventory.getConfig().colorEnable) renderBG();
+        if (Config.colorEnable) renderBG();
 
         // Render the inv name
-        if (HoloInventory.getConfig().renderName) renderName(namedData.name);
+        if (Config.renderName) renderName(namedData.name);
 
         for (int row = 0; row < namedData.data.size(); row++)
         {
@@ -225,7 +244,7 @@ public class Renderer
 
         List<ItemStack> list;
 
-        if (HoloInventory.getConfig().enableStacking)
+        if (Config.enableStacking)
         {
             list = new ArrayList<ItemStack>();
             // Stack same items together
@@ -252,7 +271,7 @@ public class Renderer
 
         int wantedSize = list.size();
 
-        switch (HoloInventory.getConfig().mode)
+        switch (Config.mode)
         {
             // Most abundant, 1 item
             case 2:
@@ -276,7 +295,7 @@ public class Renderer
                 break;
         }
 
-        if (HoloInventory.getConfig().mode != 0)
+        if (Config.mode != 0)
         {
             Collections.sort(list, new Comparator<ItemStack>()
             {
@@ -289,9 +308,9 @@ public class Renderer
             if (list.size() > wantedSize) list = list.subList(0, wantedSize);
         }
 
-        if (HoloInventory.getConfig().cycle != 0)
+        if (Config.cycle != 0)
         {
-            int i = (int) ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() / HoloInventory.getConfig().cycle) % list.size());
+            int i = (int) ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() / Config.cycle) % list.size());
             list = Arrays.asList(list.get(i));
         }
 
@@ -311,7 +330,7 @@ public class Renderer
 
         moveAndRotate(-1);
 
-        double uiScaleFactor = HoloInventory.getConfig().renderScaling;
+        double uiScaleFactor = Config.renderScaling;
         if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
         glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
 
@@ -322,20 +341,20 @@ public class Renderer
         blockScale = getBlockScaleModifier(maxColumns) + (float) (0.05f * distance);
         maxWith = maxColumns * blockScale * 0.7f * 0.4f;
         maxHeight = maxRows * blockScale * 0.7f * 0.4f;
-        renderText = HoloInventory.getConfig().renderText;
+        renderText = Config.renderText;
 
         // Render the BG
-        if (HoloInventory.getConfig().colorEnable) renderBG();
+        if (Config.colorEnable) renderBG();
 
         // Render the inv name
-        if (HoloInventory.getConfig().renderName) renderName(name);
+        if (Config.renderName) renderName(name);
 
         // Render items
         int column = 0, row = 0;
         for (ItemStack item : itemStacks)
         {
             int stackSize = item.stackSize;
-            if (!HoloInventory.getConfig().renderMultiple)
+            if (!Config.renderMultiple)
             {
                 item = item.copy();
                 item.stackSize = 1;
@@ -428,7 +447,7 @@ public class Renderer
         glPushMatrix();
         glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
         glScalef(blockScale, blockScale, blockScale);
-        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) glRotatef(HoloInventory.getConfig().rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
+        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) glRotatef(Config.rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
         else glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
         customitem.setEntityItemStack(itemStack);
         ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);
@@ -461,7 +480,7 @@ public class Renderer
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL_QUADS);
-        tess.setColorRGBA(HoloInventory.getConfig().colorR, HoloInventory.getConfig().colorG, HoloInventory.getConfig().colorB, HoloInventory.getConfig().colorAlpha);
+		tess.setColorRGBA(Config.colorR, Config.colorG, Config.colorB, Config.colorAlpha);
         double d = blockScale / 3;
         tess.addVertex(maxWith + d, -d - maxHeight, 0);
         tess.addVertex(-maxWith - d, -d - maxHeight, 0);
@@ -477,7 +496,7 @@ public class Renderer
 
     private void renderName(String name)
     {
-        if (HoloInventory.getConfig().nameOverrides.containsKey(name)) name = HoloInventory.getConfig().nameOverrides.get(name);
+        if (Config.nameOverrides.containsKey(name)) name = Config.nameOverrides.get(name);
         else name = StatCollector.translateToLocal(name);
         glPushMatrix();
         glEnable(GL12.GL_RESCALE_NORMAL);

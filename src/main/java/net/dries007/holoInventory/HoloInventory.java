@@ -41,10 +41,11 @@ import net.dries007.holoInventory.util.CommonProxy;
 import net.minecraft.item.Item;
 import org.apache.logging.log4j.Logger;
 
-import static net.dries007.holoInventory.util.Data.MODID;
-
-@Mod(modid = MODID, name = MODID, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
+@Mod(modid = HoloInventory.MODID, name = HoloInventory.MODID, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
 public class HoloInventory {
+
+    public static final String MODID = "holoinventory";
+    public static final String VERSION = "https://vps2.dries007.net/holoinventory/version.MCVERSION.txt";
 
 	@Mod.Instance(value = MODID)
     private static HoloInventory instance;

@@ -25,6 +25,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
+import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.RemoveInventoryMessage;
 import net.dries007.holoInventory.network.RenameMessage;
@@ -49,31 +50,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ServerEventHandler
-{
-    public List<String> banUsers = new ArrayList<String>();
+public class ServerEventHandler {
+	public List<String> banUsers = new ArrayList<String>();
     public HashMap<String, String> overrideUsers = new HashMap<String, String>();
     public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
 
+    private static final String JUKEBOX_NAME = "Jukebox";
+
     @SubscribeEvent()
-    public void event(PlayerInteractEvent event)
-    {
+    public void event(PlayerInteractEvent event) {
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
-        if (banUsers.contains(event.entityPlayer.getDisplayName()))
-        {
+        if (banUsers.contains(event.entityPlayer.getDisplayName())) {
             banUsers.remove(event.entityPlayer.getDisplayName());
             event.setCanceled(true);
 
             TileEntity te = event.entity.worldObj.getTileEntity(event.x, event.y, event.z);
-            if (Helper.weWant(te))
-            {
-                HoloInventory.getConfig().bannedTiles.add(te.getClass().getCanonicalName());
+            if (Helper.weWant(te)) {
+				Config.bannedTiles.add(te.getClass().getCanonicalName());
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(te.getClass().getCanonicalName() + " will no longer display a hologram."));
             }
-            else
-            {
-                event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
-            }
+            else event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
+
             HoloInventory.getConfig().overrideBannedThings();
         }
 
@@ -86,20 +83,17 @@ public class ServerEventHandler
             event.setCanceled(true);
 
             TileEntity te = event.entity.worldObj.getTileEntity(event.x, event.y, event.z);
-            if (Helper.weWant(te))
-            {
+            if (Helper.weWant(te)) {
                 String name = null;
-                if (te instanceof BlockJukebox.TileEntityJukebox) name = Data.JUKEBOX_NAME;
+                if (te instanceof BlockJukebox.TileEntityJukebox) name = JUKEBOX_NAME;
                 else if (te instanceof IInventory) name = ((IInventory) te).getInventoryName();
                 else if (te instanceof TileEntityEnderChest) name = event.entityPlayer.getInventoryEnderChest().getInventoryName();
 
                 HoloInventory.getSnw().sendTo(new RenameMessage(name == null ? "" : name, nameOverride), (EntityPlayerMP) event.entityPlayer);
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(te.getClass().getCanonicalName() + " will now be named " + nameOverride));
             }
-            else
-            {
-                event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
-            }
+            else event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
+
         }
     }
 
@@ -113,7 +107,7 @@ public class ServerEventHandler
 
             if (Helper.weWant(event.target))
             {
-                HoloInventory.getConfig().bannedEntities.add(event.target.getClass().getCanonicalName());
+				Config.bannedEntities.add(event.target.getClass().getCanonicalName());
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(event.target.getClass().getCanonicalName() + " will no longer display a hologram."));
             }
             else
@@ -147,7 +141,8 @@ public class ServerEventHandler
                         if (Helper.weWant(te))
                         {
                             checkForChangedType(coord.hashCode(), te);
-                            if (HoloInventory.getConfig().bannedTiles.contains(te.getClass().getCanonicalName()))
+                            HoloInventory.getConfig();
+							if (Config.bannedTiles.contains(te.getClass().getCanonicalName()))
                             {
                                 // BANNED THING
                                 cleanup(coord, player);
@@ -176,7 +171,7 @@ public class ServerEventHandler
                             else if (te instanceof BlockJukebox.TileEntityJukebox)
                             {
                                 BlockJukebox.TileEntityJukebox realTe = ((BlockJukebox.TileEntityJukebox) te);
-                                doStuff(coord.hashCode(), player, Data.JUKEBOX_NAME, realTe.func_145856_a());
+                                doStuff(coord.hashCode(), player, JUKEBOX_NAME, realTe.func_145856_a());
                             }
                             else
                             {
