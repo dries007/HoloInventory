@@ -18,8 +18,8 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
-import tconstruct.api.TConstructAPI;
 import tconstruct.armor.ArmorProxyClient;
+import tconstruct.armor.player.ArmorExtended;
 import tconstruct.armor.player.TPlayerStats;
 import tconstruct.library.accessory.IAccessory;
 
@@ -46,9 +46,34 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
     	return "holoinventory:textures/models/armor/glasses.png";
     }
 
+	@Override
+	public ItemStack onItemRightClick (ItemStack stack, World world, EntityPlayer player)
+	{
+		if (!world.isRemote)
+		{
+			TPlayerStats stats = TPlayerStats.get(player);
+			if (stats != null && stats.armor != null)
+			{
+				ArmorExtended armor = stats.armor;
+				ItemStack slotStack = armor.getStackInSlot(0);
+				if (slotStack == null)
+				{
+					armor.setInventorySlotContents(0, new ItemStack(this, 1, 2));
+					stack.stackSize--;
+				}
+				else if (slotStack.getItem() == this && slotStack.stackSize < this.maxStackSize)
+				{
+					slotStack.stackSize++;
+					stack.stackSize--;
+				}
+			}
+		}
+		return stack;
+	}
+
     public static ItemStack getHoloGlasses(World world, EntityPlayer player){
-    	if(player.inventory.getStackInSlot(39) != null && player.inventory.getStackInSlot(39).getItem() instanceof IHoloGlasses)
-    		return player.inventory.getStackInSlot(39);
+    	//if(player.inventory.getStackInSlot(39) != null && player.inventory.getStackInSlot(39).getItem() instanceof IHoloGlasses)
+    		//return player.inventory.getStackInSlot(39);
 
     	if(HoloInventory.isBaublesLoaded){
     		IInventory inventory =  BaublesApi.getBaubles(player);
