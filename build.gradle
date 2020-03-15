@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "2.1.1-beta-GTNH"
+version = "2.1.2-beta-GTNH"
 if (System.getenv().BUILD_NUMBER != null) version += "." + System.getenv().BUILD_NUMBER
 
 targetCompatibility = sourceCompatibility = 1.8
