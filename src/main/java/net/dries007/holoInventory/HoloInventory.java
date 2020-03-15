@@ -21,6 +21,7 @@
 
 package net.dries007.holoInventory;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.SidedProxy;
@@ -42,10 +43,10 @@ import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-@Mod(modid = MODID, name = MODID, canBeDeactivated = true, acceptableRemoteVersions = "*")
-public class HoloInventory
-{
-    @Mod.Instance(value = MODID)
+@Mod(modid = MODID, name = MODID, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
+public class HoloInventory {
+
+	@Mod.Instance(value = MODID)
     private static HoloInventory instance;
     public static Item holoGlasses;
     private Config config;
@@ -58,13 +59,18 @@ public class HoloInventory
     private SimpleNetworkWrapper snw;
     private Logger logger;
 
+    public static boolean isBaublesLoaded, isTinkersLoaded = false;
+
     @Mod.EventHandler()
-    public void fmlEvent(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
+
+    	isBaublesLoaded = Loader.isModLoaded("Baubles");
+    	isTinkersLoaded = Loader.isModLoaded("TConstruct");
+
         logger = event.getModLog();
         config = new Config(event.getSuggestedConfigurationFile());
 
-        holoGlasses =(new HoloGlasses()).setUnlocalizedName("Hologlasses");
+        holoGlasses = new HoloGlasses("Hologlasses");
         GameRegistry.registerItem(holoGlasses, "Hologlasses", MODID);
 
         int id = 0;
@@ -84,47 +90,39 @@ public class HoloInventory
     }
 
     @Mod.EventHandler()
-    public void fmlEvent(FMLInitializationEvent event)
-    {
+    public void init(FMLInitializationEvent event) {
         proxy.init();
     }
 
     @Mod.EventHandler()
-    public void fmlEvent(FMLPostInitializationEvent event)
-    {
+    public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit();
     }
 
     @Mod.EventHandler()
-    public void fmlEvent(FMLServerStartingEvent event)
-    {
+    public void fmlEvent(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandHoloInventory());
 
         proxy.serverStarting();
     }
 
-    public static String getVersion()
-    {
+    public static String getVersion() {
         return getInstance().metadata.version;
     }
 
-    public static Config getConfig()
-    {
+    public static Config getConfig() {
         return instance.config;
     }
 
-    public static HoloInventory getInstance()
-    {
+    public static HoloInventory getInstance() {
         return instance;
     }
 
-    public static SimpleNetworkWrapper getSnw()
-    {
+    public static SimpleNetworkWrapper getSnw() {
         return instance.snw;
     }
 
-    public static Logger getLogger()
-    {
+    public static Logger getLogger() {
         return getInstance().logger;
     }
 }
