@@ -63,7 +63,6 @@ public class Renderer
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<Integer, NamedData<ItemStack[]>>();
     public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
     public static final HashMap<Integer, Long> requestMap = new HashMap<Integer, Long>();
-    private static final ArmorExtended inventory = new ArmorExtended();
 
     private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;

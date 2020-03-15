@@ -10,6 +10,7 @@ import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.api.IHoloGlasses;
 import net.dries007.holoInventory.util.Data;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -28,7 +29,7 @@ import tconstruct.library.accessory.IAccessory;
 
 	})
 
-public class HoloGlasses  extends ItemArmor implements IHoloGlasses, IBauble, IAccessory {
+public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAccessory {
 
 	public static final ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("holoGlasses", 0, new int[] { 0,0,0,0}, 0);
 
@@ -38,6 +39,11 @@ public class HoloGlasses  extends ItemArmor implements IHoloGlasses, IBauble, IA
         this.setTextureName(Data.MODID+":"+name);
         this.setUnlocalizedName(name);
         setCreativeTab(CreativeTabs.tabTools);
+    }
+    
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
+    	return "holoinventory:textures/models/armor/glasses.png";
     }
 
     public static ItemStack getHoloGlasses(World world, EntityPlayer player){

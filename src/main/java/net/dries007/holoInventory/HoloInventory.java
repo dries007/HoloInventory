@@ -43,7 +43,7 @@ import org.apache.logging.log4j.Logger;
 
 import static net.dries007.holoInventory.util.Data.MODID;
 
-@Mod(modid = MODID, name = MODID, canBeDeactivated = true, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
+@Mod(modid = MODID, name = MODID, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
 public class HoloInventory {
 
 	@Mod.Instance(value = MODID)
@@ -70,8 +70,8 @@ public class HoloInventory {
         logger = event.getModLog();
         config = new Config(event.getSuggestedConfigurationFile());
 
-        holoGlasses = new HoloGlasses("holoGlasses");
-        GameRegistry.registerItem(holoGlasses, "holoGlasses", MODID);
+        holoGlasses = new HoloGlasses("Hologlasses");
+        GameRegistry.registerItem(holoGlasses, "Hologlasses", MODID);
 
         int id = 0;
         snw = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
