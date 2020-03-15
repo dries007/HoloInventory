@@ -36,55 +36,50 @@ import static net.minecraft.util.EnumChatFormatting.AQUA;
 
 public class ClientHandler
 {
-    public static final RenderItem RENDER_ITEM = new RenderItem()
-    {
+    public static final KeyManager KEY_MANAGER = new KeyManager();
+    public static final RenderItem RENDER_ITEM = new RenderItem() {
         @Override
-        public void doRender(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
-        {
-            try
-            {
+        public void doRender(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9) {
+            try {
                 super.doRender(par1EntityItem, par2, par4, par6, par8, par9);
             }
-            catch (Exception e)
-            {
+
+            catch (Exception e) {
                 //e.printStackTrace();
             }
         }
 
         @Override
-        public boolean shouldBob()
-        {
+        public boolean shouldBob() {
             return false;
         }
 
         @Override
-        public boolean shouldSpreadItems()
-        {
+        public boolean shouldSpreadItems() {
             return false;
         }
     };
 
-    public void postInit()
-    {
+    public void postInit() {
         RENDER_ITEM.setRenderManager(RenderManager.instance);
     }
 
-    public ClientHandler()
-    {
+    public ClientHandler() {
 
     }
 
-    public void init()
-    {
+    public void init() {
         MinecraftForge.EVENT_BUS.register(Renderer.INSTANCE);
         FMLCommonHandler.instance().bus().register(Renderer.INSTANCE);
+
+        MinecraftForge.EVENT_BUS.register(KEY_MANAGER);
+        FMLCommonHandler.instance().bus().register(KEY_MANAGER);
     }
 
     boolean done = false;
 
     @SubscribeEvent
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
-    {
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (done) return;
         IChatComponent root = new ChatComponentText("[HoloInventory] ").setChatStyle(new ChatStyle().setColor(AQUA));
         done = true;

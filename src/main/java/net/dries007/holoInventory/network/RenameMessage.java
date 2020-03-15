@@ -5,6 +5,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
+import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 
 public class RenameMessage implements IMessage
@@ -42,7 +43,7 @@ public class RenameMessage implements IMessage
         {
             if (ctx.side.isClient())
             {
-                HoloInventory.getConfig().nameOverrides.put(message.name, message.override);
+                Config.nameOverrides.put(message.name, message.override);
                 HoloInventory.getConfig().overrideNameThings();
             }
             return null;

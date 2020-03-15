@@ -21,13 +21,7 @@
 
 package net.dries007.holoInventory.util;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.server.ServerHandler;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class CommonProxy
 {

@@ -21,6 +21,7 @@
 
 package net.dries007.holoInventory.server;
 
+import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.ResetMessage;
 import net.dries007.holoInventory.util.InventoryData;
@@ -86,8 +87,8 @@ public class CommandHoloInventory extends CommandBase
     private List<String> getAllList()
     {
         ArrayList<String> temp = new ArrayList<String>();
-        temp.addAll(HoloInventory.getConfig().bannedEntities);
-        temp.addAll(HoloInventory.getConfig().bannedTiles);
+		temp.addAll(Config.bannedEntities);
+		temp.addAll(Config.bannedTiles);
         return temp;
     }
 
@@ -169,8 +170,8 @@ public class CommandHoloInventory extends CommandBase
                 }
                 else if (getAllList().contains(args[1]))
                 {
-                    HoloInventory.getConfig().bannedEntities.remove(args[1]);
-                    HoloInventory.getConfig().bannedTiles.remove(args[1]);
+					Config.bannedEntities.remove(args[1]);
+					Config.bannedTiles.remove(args[1]);
                     HoloInventory.getConfig().overrideBannedThings();
                 }
                 else
