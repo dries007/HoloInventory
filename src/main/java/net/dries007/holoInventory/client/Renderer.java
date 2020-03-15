@@ -23,6 +23,8 @@ package net.dries007.holoInventory.client;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.dries007.holoInventory.HoloInventory;
+import net.dries007.holoInventory.api.IHoloGlasses;
+import net.dries007.holoInventory.items.HoloGlasses;
 import net.dries007.holoInventory.network.EntityRequestMessage;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
@@ -41,8 +43,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL12;
+
+import baubles.api.BaublesApi;
 import tconstruct.armor.player.ArmorExtended;
 
 import java.text.DecimalFormat;
@@ -75,15 +80,19 @@ public class Renderer
     }
 
     @SubscribeEvent
-    public void renderEvent(RenderWorldLastEvent event)
-    {
-        if(inventory.func_70301_a(0) != null){
-            try
-            {
+    public void renderEvent(RenderWorldLastEvent event){
+       EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+       World world = Minecraft.getMinecraft().theWorld;
+
+       ItemStack glasses = HoloGlasses.getHoloGlasses(world,player);
+
+        if(glasses!=null && ((IHoloGlasses)glasses.getItem()).shouldRender(glasses)){
+
+            try{
                 doEvent();
             }
-            catch (Exception e)
-            {
+
+            catch (Exception e){
                 HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
                 HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
 
@@ -302,7 +311,7 @@ public class Renderer
         glPushMatrix();
 
         moveAndRotate(-1);
-        
+
         double uiScaleFactor = HoloInventory.getConfig().renderScaling;
         if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
         glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
