@@ -93,7 +93,7 @@ public class Config {
 
         renderScaling = configuration.get(HoloInventory.MODID, "renderScaling", renderScaling, "Visual scale factor (0.0-1.0)").getDouble(1.0);
 
-        requireGlasses = configuration.get(HoloInventory.MODID, "requireGlasses", requireGlasses,"Makes HoloInventory require HoloGlasses").getBoolean(true);
+    //    requireGlasses = configuration.get(HoloInventory.MODID, "requireGlasses", requireGlasses,"Makes HoloInventory require HoloGlasses").getBoolean(true);
         colorEnable = configuration.get(HoloInventory.MODID, "colorEnable", colorEnable, "Enable a BG color").getBoolean(false);
         colorAlpha = configuration.get(HoloInventory.MODID, "colorAlpha", colorAlpha, "The BG transparancy (0-255)").getInt();
         colorR = configuration.get(HoloInventory.MODID, "colorRed", colorR, "0-255").getInt();
