@@ -21,6 +21,8 @@ import tconstruct.armor.ArmorProxyClient;
 import tconstruct.armor.player.TPlayerStats;
 import tconstruct.library.accessory.IAccessory;
 
+import java.util.List;
+
 @InterfaceList({
     @Interface(iface = "baubles.api.IBauble", modid = "Baubles"),
     @Interface(iface = "tconstruct.library.accessory.IAccessory", modid = "TConstruct")
@@ -43,6 +45,12 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
     public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
     	return "holoinventory:textures/models/armor/glasses.png";
     }
+
+	@Override
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4)
+	{
+		list.add("You can put it in the Tinkers mask slot");
+	}
 
     public static ItemStack getHoloGlasses(World world, EntityPlayer player){
     	if(player.inventory.getStackInSlot(39) != null && player.inventory.getStackInSlot(39).getItem() instanceof IHoloGlasses)
@@ -72,12 +80,10 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
     	return null;
     }
 
-
 	@Override
 	public boolean shouldRender(ItemStack stack) {
 		return true;
 	}
-
 
     //TConstruct
 
@@ -110,18 +116,16 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
 	@Override
 	@Method(modid = "Baubles")
 	public void onEquipped(ItemStack arg0, EntityLivingBase arg1) {
-
 	}
 
 	@Override
 	@Method(modid = "Baubles")
 	public void onUnequipped(ItemStack arg0, EntityLivingBase arg1) {
-
 	}
 
 	@Override
 	@Method(modid = "Baubles")
 	public void onWornTick(ItemStack arg0, EntityLivingBase arg1) {
-
 	}
+
 }

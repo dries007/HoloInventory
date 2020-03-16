@@ -41,7 +41,6 @@ public class Config {
     public static int colorR = 14;
     public static int colorG = 157;
     public static int colorB = 196;
-    public static boolean doVersionCheck = true;
     public static int syncFreq = 2;
     public static boolean renderText = true;
     public static boolean renderMultiple = true;
@@ -49,9 +48,9 @@ public class Config {
     public static boolean renderName = true;
     public static int mode = 0;
     public static int cycle = 0;
-    public static int keyMode = 0;
+    public static int keyMode = 1;
     public static boolean enableEntities = true;
-    public static boolean keyState = false;
+    public static boolean keyState = true;
     public static boolean rotateItems = true;
     public static boolean debug = false;
     public static double renderScaling = 1.0;
@@ -100,7 +99,6 @@ public class Config {
         colorG = configuration.get(HoloInventory.MODID, "colorGreen", colorG, "0-255").getInt();
         colorB = configuration.get(HoloInventory.MODID, "colorBlue", colorB, "0-255").getInt();
         keyMode = configuration.get(HoloInventory.MODID, "keyMode", keyMode, "Valid modes:\n" +
-                "0: Always display hologram.\n" +
                 "1: The key toggles the rendering.\n" +
                 "2: Only render hologram while key pressed.\n" +
                 "3: Don't render hologram while key pressed.").getInt();
