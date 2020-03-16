@@ -99,6 +99,7 @@ public class Config {
         colorG = configuration.get(HoloInventory.MODID, "colorGreen", colorG, "0-255").getInt();
         colorB = configuration.get(HoloInventory.MODID, "colorBlue", colorB, "0-255").getInt();
         keyMode = configuration.get(HoloInventory.MODID, "keyMode", keyMode, "Valid modes:\n" +
+                "0: Always display hologram.\n" +
                 "1: The key toggles the rendering.\n" +
                 "2: Only render hologram while key pressed.\n" +
                 "3: Don't render hologram while key pressed.").getInt();
