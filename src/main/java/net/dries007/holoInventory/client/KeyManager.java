@@ -21,6 +21,7 @@
 
 package net.dries007.holoInventory.client;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -69,7 +70,7 @@ public class KeyManager {
         if (code < 0 || code > Keyboard.KEYBOARD_SIZE) return;
         switch (Config.keyMode) {
             case 1:
-                if (Keyboard.isKeyDown(code)) {
+                if (Keyboard.isKeyDown(code) && FMLClientHandler.instance().getClient().inGameHasFocus) {
                     if (!alreadyToggling) {
                         alreadyToggling = true;
                         Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
