@@ -21,6 +21,12 @@
 
 package net.dries007.holoInventory.server;
 
+import appeng.api.implementations.ICraftingPatternItem;
+import appeng.api.parts.IPartHost;
+import appeng.api.parts.SelectedPart;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.parts.misc.PartInterface;
+import appeng.tile.misc.TileInterface;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -42,6 +48,8 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -160,6 +168,20 @@ public class ServerEventHandler {
 
                                 doStuff(coord.hashCode(), player, inventory);
                             }
+                            else if (te instanceof TileInterface)
+                            {
+                                doStuff(coord.hashCode(), player, convertToOutputItems(
+                                    ((TileInterface)te).getCustomName(), ((TileInterface)te).getInventoryByName("patterns"), world));
+                            }
+                            else if( te instanceof IPartHost)
+                            {
+                                final Vec3 position = mo.hitVec.addVector( -mo.blockX, -mo.blockY, -mo.blockZ );
+                                final IPartHost host = (IPartHost) te;
+                                final SelectedPart sp = host.selectPart( position );
+                                if (sp != null && sp.part instanceof PartInterface)
+                                    doStuff(coord.hashCode(), player, convertToOutputItems(
+                                        ((PartInterface)sp.part).getCustomName(), ((PartInterface)sp.part).getInventoryByName("patterns"), world));
+                            }
                             else if (te instanceof IInventory)
                             {
                                 doStuff(coord.hashCode(), player, (IInventory) te);
@@ -218,6 +240,24 @@ public class ServerEventHandler {
             root.setInteger("id", coord.hashCode());
             HoloInventory.getSnw().sendTo(new RemoveInventoryMessage(root), player);
         }
+    }
+
+    private IInventory convertToOutputItems(String name, IInventory patterns, World w)
+    {
+        int N = patterns.getSizeInventory();
+        ItemStack[] outputs = new ItemStack[N];
+        for (int i = 0; i < N; ++i)
+        {
+            ItemStack stack = patterns.getStackInSlot(i);
+            outputs[i] = null;
+            if (stack != null && stack.getItem() instanceof ICraftingPatternItem)
+            {
+                IAEItemStack[] outs = ((ICraftingPatternItem)stack.getItem()).getPatternForItem(stack, w).getCondensedOutputs();
+                if(outs.length > 0)
+                    outputs[i] = outs[0].getItemStack();
+            }
+        }
+        return new FakeInventory(name, outputs);
     }
 
     private void doStuff(int id, EntityPlayerMP player, String name, ItemStack... itemStacks)
