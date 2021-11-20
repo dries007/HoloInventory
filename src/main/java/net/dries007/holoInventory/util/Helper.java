@@ -31,11 +31,16 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
+import appeng.api.parts.IPartHost;
+import appeng.tile.misc.TileInterface;
+
 public class Helper
 {
     public static boolean weWant(Object o)
     {
-        return o != null && (o instanceof IInventory || o instanceof IMerchant || o instanceof TileEntityEnderChest || o instanceof BlockJukebox.TileEntityJukebox);
+        return o != null && (o instanceof IInventory || o instanceof IMerchant
+            || o instanceof TileEntityEnderChest || o instanceof BlockJukebox.TileEntityJukebox
+            || o instanceof TileInterface || o instanceof IPartHost);
     }
 
     public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer)
