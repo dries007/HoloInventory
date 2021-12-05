@@ -16,5 +16,3 @@ If you find spelling mistakes, let me know!
 ### Donate
 If you want to donate to me (dries007), you can [paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M6XDAP29UDX7Q) or [patreon](http://www.patreon.com/dries007) me.
 
-### Modpacks:
-All modpacks can distribute this mod on one condition: You use the official versions (provided by the download link above).
