@@ -54,15 +54,13 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ServerEventHandler {
 	public List<String> banUsers = new ArrayList<String>();
     public HashMap<String, String> overrideUsers = new HashMap<String, String>();
     public HashMap<Integer, InventoryData> blockMap = new HashMap<Integer, InventoryData>();
-
+    Map<IInventory, IInventory> wrappedInventoryCache = new WeakHashMap<>();
     private static final String JUKEBOX_NAME = "Jukebox";
 
     @SubscribeEvent()
@@ -170,17 +168,23 @@ public class ServerEventHandler {
                             }
                             else if (te instanceof TileInterface)
                             {
-                                doStuff(coord.hashCode(), player, convertToOutputItems(
-                                    ((TileInterface)te).getCustomName(), ((TileInterface)te).getInventoryByName("patterns"), world));
+                                IInventory patterns = ((TileInterface)te).getInventoryByName("patterns");
+                                IInventory wrapped = wrappedInventoryCache.computeIfAbsent(patterns,
+                                    key -> convertToOutputItems(((TileInterface)te).getCustomName(), key, world));
+                                doStuff(coord.hashCode(), player, wrapped);
                             }
                             else if( te instanceof IPartHost)
                             {
                                 final Vec3 position = mo.hitVec.addVector( -mo.blockX, -mo.blockY, -mo.blockZ );
                                 final IPartHost host = (IPartHost) te;
-                                final SelectedPart sp = host.selectPart( position );
+                                final SelectedPart sp = host.selectPart(position);
                                 if (sp != null && sp.part instanceof PartInterface)
-                                    doStuff(coord.hashCode(), player, convertToOutputItems(
-                                        ((PartInterface)sp.part).getCustomName(), ((PartInterface)sp.part).getInventoryByName("patterns"), world));
+                                {
+                                    IInventory patterns = ((PartInterface) sp.part).getInventoryByName("patterns");
+                                    IInventory wrapped = wrappedInventoryCache.computeIfAbsent(patterns,
+                                        key -> convertToOutputItems(((PartInterface) sp.part).getCustomName(), key, world));
+                                    doStuff(coord.hashCode(), player, wrapped);
+                                }
                             }
                             else if (te instanceof IInventory)
                             {
