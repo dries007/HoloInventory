@@ -15,8 +15,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
+import org.lwjgl.input.Keyboard;
 import tconstruct.armor.ArmorProxyClient;
 import tconstruct.armor.player.TPlayerStats;
 import tconstruct.library.accessory.IAccessory;
@@ -50,6 +52,10 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4)
 	{
 		list.add("You can put it in the Tinkers mask slot");
+		list.add("<Hold Shift>");
+		if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))){
+			list.add(EnumChatFormatting.RED+"Adds Holographic inventory screen for all blocks with an inventory");
+		}
 	}
 
     public static ItemStack getHoloGlasses(World world, EntityPlayer player){
