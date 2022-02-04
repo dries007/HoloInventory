@@ -44,8 +44,8 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = HoloInventory.MODID, name = HoloInventory.MODID, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
 public class HoloInventory {
 
-    public static final String MODID = "holoinventory";
-    public static final String VERSION = "https://vps2.dries007.net/holoinventory/version.MCVERSION.txt";
+    public static final String MODID = "GRADLETOKEN_MODID";
+    public static final String VERSION = "GRADLETOKEN_VERSION";
 
 	@Mod.Instance(value = MODID)
     private static HoloInventory instance;
