@@ -74,7 +74,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 public class Renderer
 {
-    private static final DecimalFormat DF = new DecimalFormat("#.#");
+    private static final String[] suffix = {"", "K", "M", "B"};
     private static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
     public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<Integer, NamedData<ItemStack[]>>();
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<Integer, NamedData<ItemStack[]>>();
@@ -242,32 +242,7 @@ public class Renderer
         final double distance = distance();
         if (distance < 1.5) return;
 
-        List<ItemStack> list;
-
-        if (Config.enableStacking)
-        {
-            list = new ArrayList<ItemStack>();
-            // Stack same items together
-            for (ItemStack stackToAdd : Arrays.asList(namedData.data))
-            {
-                boolean f = false;
-                for (ItemStack stackInList : list)
-                {
-                    if (stackInList == null) continue;
-                    if (stackToAdd.isItemEqual(stackInList) && ItemStack.areItemStackTagsEqual(stackToAdd, stackInList))
-                    {
-                        stackInList.stackSize += stackToAdd.stackSize;
-                        f = true;
-                        break;
-                    }
-                }
-                if (!f) list.add(stackToAdd.copy());
-            }
-        }
-        else
-        {
-            list = Arrays.asList(namedData.data);
-        }
+        List<ItemStack> list = Arrays.asList(namedData.data);
 
         int wantedSize = list.size();
 
@@ -297,21 +272,14 @@ public class Renderer
 
         if (Config.mode != 0)
         {
-            Collections.sort(list, new Comparator<ItemStack>()
-            {
-                @Override
-                public int compare(ItemStack o1, ItemStack o2)
-                {
-                    return o2.stackSize - o1.stackSize;
-                }
-            });
+            list.sort(Comparator.<ItemStack>comparingInt(s -> s.stackSize).reversed());
             if (list.size() > wantedSize) list = list.subList(0, wantedSize);
         }
 
         if (Config.cycle != 0)
         {
             int i = (int) ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() / Config.cycle) % list.size());
-            list = Arrays.asList(list.get(i));
+            list = Collections.singletonList(list.get(i));
         }
 
         doRenderHologram(namedData.name, list, distance);
@@ -415,7 +383,7 @@ public class Renderer
      */
     private String doStackSizeCrap(int stackSize)
     {
-        String string = (stackSize < 1000) ? stackSize + "" : DF.format((double) stackSize / 1000) + "K";
+        String string = formatStackSize(stackSize);
 
         if (string.contains(",")) glTranslatef(3f, 0f, 0f);
 
@@ -431,6 +399,24 @@ public class Renderer
                 glTranslatef(6f * (1 - string.length()), 0f, 0f);
                 return string;
         }
+    }
+
+    private static String formatStackSize(long i) {
+        int level = 0;
+        while (i > 1000 && level < suffix.length - 1) {
+            level++;
+            if (i >= 100_000) {
+                // still more level to go, or 0 fraction digit
+                i /= 1000;
+            } else if (i >= 10_000) {
+                // 1 fraction digit
+                return "" + (i / 1000) + '.' + (((i % 1000) / 100)) + suffix[level];
+            } else {
+                // 2 fraction digit
+                return "" + (i / 1000) + '.' + (((i % 1000) / 10)) + suffix[level];
+            }
+        }
+        return i + suffix[level];
     }
 
     /**
