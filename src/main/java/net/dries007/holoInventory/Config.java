@@ -43,6 +43,7 @@ public class Config {
     public static int colorB = 196;
     public static int syncFreq = 2;
     public static boolean renderText = true;
+    public static boolean renderSuffixDarkened = true;
     public static boolean renderMultiple = true;
     public static boolean enableStacking = true;
     public static boolean renderName = true;
@@ -106,6 +107,7 @@ public class Config {
         keyState = configuration.get(HoloInventory.MODID, "keyState", keyState, "Stores last toggle value. Don't worry about this.").getBoolean(keyState);
         renderName = configuration.get(HoloInventory.MODID, "renderName", renderName, "Renders the inv name above the hologram").getBoolean(true);
         renderText = configuration.get(HoloInventory.MODID, "renderText", renderText, "Render the stacksize as text on top of the items").getBoolean(true);
+        renderSuffixDarkened = configuration.get(HoloInventory.MODID, "renderSuffixDarkened", renderSuffixDarkened, "Render the stacksize suffix darkened").getBoolean(true);
         renderMultiple = configuration.get(HoloInventory.MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
         enableEntities = configuration.get(HoloInventory.MODID, "enableEntities", enableEntities, "Set to false to prevent all entities from rendering the hologram.").getBoolean(true);
 

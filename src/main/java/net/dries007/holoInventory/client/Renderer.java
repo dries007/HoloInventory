@@ -21,31 +21,6 @@
 
 package net.dries007.holoInventory.client;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-
-import org.lwjgl.opengl.GL12;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
@@ -56,6 +31,7 @@ import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -66,22 +42,34 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import org.lwjgl.opengl.GL12;
+
+import java.text.DecimalFormat;
+import java.util.*;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer
 {
-    private static final String[] suffix = {"", "K", "M", "B"};
+    private static final DecimalFormat DF_ONE_FRACTION_DIGIT = new DecimalFormat("##.0");
+    private static final DecimalFormat DF_TWO_FRACTION_DIGIT = new DecimalFormat("#.00");
+    // changed with an attached debugger..
+    static int stackSizeDebugOverride = 0;
+    private static final String[] suffixNormal = {"", "K", "M", "B"};
+    private static final String[] suffixDarkened = {"", EnumChatFormatting.GRAY + "K", EnumChatFormatting.GRAY + "M", EnumChatFormatting.GRAY + "B"};
     private static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
-    public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<Integer, NamedData<ItemStack[]>>();
-    public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<Integer, NamedData<ItemStack[]>>();
-    public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<Integer, NamedData<MerchantRecipeList>>();
-    public static final HashMap<Integer, Long> requestMap = new HashMap<Integer, Long>();
+    public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<>();
+    public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<>();
+    public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<>();
+    public static final HashMap<Integer, Long> requestMap = new HashMap<>();
 
-    private EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
+    private final EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
     public boolean enabled = true;
 
@@ -123,8 +111,6 @@ public class Renderer
     {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
-        //if (Config.keyMode == 2 && !KeyManager.key.getIsKeyPressed()) return;
-        //if (Config.keyMode == 3 && KeyManager.key.getIsKeyPressed()) return;
         if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         switch (mc.objectMouseOver.typeOfHit)
@@ -171,7 +157,7 @@ public class Renderer
                         requestMap.put(id, mc.theWorld.getTotalWorldTime());
                     }
                     // Remove old request so that we get updated info next render tick
-                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(id) + 20 * Config.syncFreq)
+                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(id) + 20L * Config.syncFreq)
                     {
                         requestMap.remove(id);
                     }
@@ -218,13 +204,16 @@ public class Renderer
         // Render the inv name
         if (Config.renderName) renderName(namedData.name);
 
+        // merchant cannot sell more than 127 items. no need to increase spacing whatsoever
+        float stackSpacing = 0.6f;
         for (int row = 0; row < namedData.data.size(); row++)
         {
             MerchantRecipe recipe = (MerchantRecipe) namedData.data.get(row);
 
-            renderItem(recipe.getItemToBuy(), 0, row, recipe.getItemToBuy().stackSize);
-            if (recipe.hasSecondItemToBuy()) renderItem(recipe.getSecondItemToBuy(), 1, row, recipe.getSecondItemToBuy().stackSize);
-            renderItem(recipe.getItemToSell(), 2, row, recipe.getItemToSell().stackSize);
+            renderItem(recipe.getItemToBuy(), 0, row, recipe.getItemToBuy().stackSize, stackSpacing);
+            if (recipe.hasSecondItemToBuy())
+                renderItem(recipe.getSecondItemToBuy(), 1, row, recipe.getSecondItemToBuy().stackSize, stackSpacing);
+            renderItem(recipe.getItemToSell(), 2, row, recipe.getItemToSell().stackSize, stackSpacing);
         }
 
         glPopMatrix();
@@ -302,13 +291,27 @@ public class Renderer
         if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
         glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
 
+        // See if we need to increase spacing
+        float stackSpacing = 0.6f;
+        if (Config.renderText)
+        {
+            for (ItemStack stack : itemStacks)
+            {
+                if (stack.stackSize >= 1000 || stackSizeDebugOverride >= 1000)
+                {
+                    stackSpacing = 0.8f;
+                    break;
+                }
+            }
+        }
+
         // Values for later
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
         maxColumns = getMaxColumns(itemStacks.size());
         maxRows = (itemStacks.size() % maxColumns == 0) ? (itemStacks.size() / maxColumns) - 1 : itemStacks.size() / maxColumns;
         blockScale = getBlockScaleModifier(maxColumns) + (float) (0.05f * distance);
-        maxWith = maxColumns * blockScale * 0.7f * 0.4f;
-        maxHeight = maxRows * blockScale * 0.7f * 0.4f;
+        maxWith = maxColumns * blockScale * (stackSpacing + 0.1f) * 0.4f;
+        maxHeight = maxRows * blockScale * (stackSpacing + 0.1f) * 0.4f;
         renderText = Config.renderText;
 
         // Render the BG
@@ -327,7 +330,7 @@ public class Renderer
                 item = item.copy();
                 item.stackSize = 1;
             }
-            renderItem(item, column, row, stackSize);
+            renderItem(item, column, row, stackSize, stackSpacing);
             column++;
             if (column >= maxColumns)
             {
@@ -383,57 +386,55 @@ public class Renderer
      */
     private String doStackSizeCrap(int stackSize)
     {
+        if (stackSizeDebugOverride != 0)
+            stackSize = stackSizeDebugOverride;
         String string = formatStackSize(stackSize);
 
-        if (string.contains(",")) glTranslatef(3f, 0f, 0f);
-
-        switch (string.length())
-        {
-            case 0:
-                return string;
-            case 1:
-                glTranslatef(3f, 0f, 0f);
-                return string;
-            default:
-                glTranslatef(6f, 0f, 0f);
-                glTranslatef(6f * (1 - string.length()), 0f, 0f);
-                return string;
-        }
+        glTranslatef(-RenderManager.instance.getFontRenderer().getStringWidth(string) / 2.f, 0f, 0f);
+        return string;
     }
 
-    private static String formatStackSize(long i) {
+    private static String formatStackSize(long i)
+    {
+        String[] suffixSelected = Config.renderSuffixDarkened ? suffixDarkened : suffixNormal;
         int level = 0;
-        while (i > 1000 && level < suffix.length - 1) {
+        while (i > 1000 && level < suffixSelected.length - 1)
+        {
             level++;
-            if (i >= 100_000) {
+            if (i >= 100_000)
+            {
                 // still more level to go, or 0 fraction digit
                 i /= 1000;
-            } else if (i >= 10_000) {
+            } else if (i >= 10_000)
+            {
                 // 1 fraction digit
-                return "" + (i / 1000) + '.' + (((i % 1000) / 100)) + suffix[level];
-            } else {
+                return DF_ONE_FRACTION_DIGIT.format(i / 1000.0d) + suffixSelected[level];
+            } else
+            {
                 // 2 fraction digit
-                return "" + (i / 1000) + '.' + (((i % 1000) / 10)) + suffix[level];
+                return DF_TWO_FRACTION_DIGIT.format(i / 1000.0d) + suffixSelected[level];
             }
         }
-        return i + suffix[level];
+        return i + suffixSelected[level];
     }
 
     /**
      * Renders 1 item
      *
-     * @param itemStack itemStack to render
-     * @param column    the column the item needs to be rendered at
-     * @param row       the row the item needs to be rendered at
-     * @param stackSize the stackSize to use for text
+     * @param itemStack    itemStack to render
+     * @param column       the column the item needs to be rendered at
+     * @param row          the row the item needs to be rendered at
+     * @param stackSize    the stackSize to use for text
+     * @param stackSpacing spacing multiplier
      */
-    private void renderItem(ItemStack itemStack, int column, int row, int stackSize)
+    private void renderItem(ItemStack itemStack, int column, int row, int stackSize, float stackSpacing)
     {
         RenderHelper.enableStandardItemLighting();
         glPushMatrix();
-        glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
+        glTranslatef(maxWith - ((column + 0.2f) * blockScale * stackSpacing), maxHeight - ((row + 0.05f) * blockScale * stackSpacing), 0f);
         glScalef(blockScale, blockScale, blockScale);
-        if (Minecraft.getMinecraft().gameSettings.fancyGraphics) glRotatef(Config.rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
+        if (Minecraft.getMinecraft().gameSettings.fancyGraphics)
+            glRotatef(Config.rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
         else glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
         customitem.setEntityItemStack(itemStack);
         ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);
@@ -444,7 +445,7 @@ public class Renderer
         {
             glPushMatrix();
             glDisable(GL_DEPTH_TEST);
-            glTranslatef(maxWith - ((column + 0.2f) * blockScale * 0.6f), maxHeight - ((row + 0.05f) * blockScale * 0.6f), 0f);
+            glTranslatef(maxWith - ((column + 0.2f) * blockScale * stackSpacing), maxHeight - ((row + 0.05f) * blockScale * stackSpacing), 0f);
             glScalef(blockScale, blockScale, blockScale);
             glScalef(0.03f, 0.03f, 0.03f);
             glRotatef(180, 0.0F, 0.0F, 1.0F);
@@ -482,6 +483,7 @@ public class Renderer
 
     private void renderName(String name)
     {
+        FontRenderer fontRenderer = RenderManager.instance.getFontRenderer();
         if (Config.nameOverrides.containsKey(name)) name = Config.nameOverrides.get(name);
         else name = StatCollector.translateToLocal(name);
         glPushMatrix();
@@ -493,10 +495,9 @@ public class Renderer
         glScaled(blockScale, blockScale, blockScale);
         glScalef(1.5f, 1.5f, 1.5f);
         glScalef(0.03f, 0.03f, 0.03f);
-        glTranslated(3f * name.length(), 0f, 0f);
+        glTranslated(fontRenderer.getStringWidth(name) / 2f, 0f, 0f);
         glRotatef(180, 0.0F, 0.0F, 1.0F);
-        glTranslatef(-1f, 1f, 0f);
-        RenderManager.instance.getFontRenderer().drawString(name, 0, 0, TEXTCOLOR, true);
+        fontRenderer.drawString(name, 0, 0, TEXTCOLOR, true);
 
         glDisable(GL12.GL_RESCALE_NORMAL);
         glEnable(GL_TEXTURE_2D);
