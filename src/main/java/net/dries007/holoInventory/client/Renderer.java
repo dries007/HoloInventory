@@ -21,6 +21,11 @@
 
 package net.dries007.holoInventory.client;
 
+import codechicken.nei.ItemList;
+import codechicken.nei.NEIClientConfig;
+import codechicken.nei.SearchField;
+import codechicken.nei.api.ItemFilter;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
@@ -30,6 +35,7 @@ import net.dries007.holoInventory.network.EntityRequestMessage;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -52,6 +58,7 @@ import org.lwjgl.opengl.GL12;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -77,6 +84,9 @@ public class Renderer
     private float timeD, blockScale, maxWith, maxHeight;
     private int maxColumns, maxRows;
     private boolean renderText;
+
+    ItemFilter cachedFilter = null;
+    String cachedSearch = "";
 
     private Renderer()
     {
@@ -220,6 +230,42 @@ public class Renderer
     }
 
     /**
+     * Recreate the item filter from updated NEI search string
+     *
+     * @param s_filter new search string
+     */
+    private ItemFilter getFilter(String s_filter)
+    {
+        cachedSearch = s_filter;
+        List<ItemFilter> primary = new LinkedList<>();
+        List<ItemFilter> secondary = new LinkedList<>();
+        for (SearchField.ISearchProvider p : SearchField.searchProviders) {
+            ItemFilter filter = p.getFilter(s_filter);
+            if (filter != null)
+                (p.isPrimary() ? primary : secondary).add(filter);
+        }
+        if (!primary.isEmpty()) return new ItemList.AnyMultiItemFilter(primary);
+        if (!secondary.isEmpty()) return new ItemList.AnyMultiItemFilter(secondary);
+        return new ItemList.EverythingItemFilter();
+    }
+
+    /**
+     * Filter items by NEI search string
+     *
+     * @param items Array of items in the inventory
+     */
+    private List<ItemStack> filterByNEI(ItemStack[] items)
+    {
+        if (Config.hideItemsNotSelected && Loader.isModLoaded("NotEnoughItems") && SearchField.searchInventories()) {
+            final String searchString = NEIClientConfig.getSearchExpression().toLowerCase();
+            if (!cachedSearch.equals(searchString) || cachedFilter == null)
+                cachedFilter = getFilter(searchString);
+            return Arrays.stream(items).filter(s -> cachedFilter.matches(s)).collect(Collectors.toList());
+        }
+        return Arrays.asList(items);
+    }
+
+    /**
      * Render a regular hologram
      * Does stacking first if user wants it
      *
@@ -231,7 +277,7 @@ public class Renderer
         final double distance = distance();
         if (distance < 1.5) return;
 
-        List<ItemStack> list = Arrays.asList(namedData.data);
+        List<ItemStack> list = filterByNEI(namedData.data);
 
         int wantedSize = list.size();
 

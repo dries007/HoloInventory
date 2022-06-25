@@ -47,6 +47,7 @@ public class Config {
     public static boolean renderMultiple = true;
     public static boolean enableStacking = true;
     public static boolean renderName = true;
+    public static boolean hideItemsNotSelected = true;
     public static int mode = 0;
     public static int cycle = 0;
     public static int keyMode = 1;
@@ -110,7 +111,7 @@ public class Config {
         renderSuffixDarkened = configuration.get(HoloInventory.MODID, "renderSuffixDarkened", renderSuffixDarkened, "Render the stacksize suffix darkened").getBoolean(true);
         renderMultiple = configuration.get(HoloInventory.MODID, "renderMultiple", renderMultiple, "Render multiple items depending on stacksize").getBoolean(true);
         enableEntities = configuration.get(HoloInventory.MODID, "enableEntities", enableEntities, "Set to false to prevent all entities from rendering the hologram.").getBoolean(true);
-
+        hideItemsNotSelected = configuration.get(HoloInventory.MODID, "filterItemsByNEI", hideItemsNotSelected, "Filter items to render by the NEI search string (when focused)").getBoolean(true);
         syncFreq = configuration.get(HoloInventory.MODID, "syncFreq", syncFreq, "Amout of seconds pass before sending a new update to the client looking at the chest.").getInt();
 
         enableStacking = configuration.get(HoloInventory.MODID, "enableStacking", enableStacking, "Stack items, even above 64.").getBoolean(enableStacking);

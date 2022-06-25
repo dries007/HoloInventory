@@ -7,6 +7,8 @@ dependencies {
     compile('com.github.GTNewHorizons:Baubles:1.0.1.14:dev') {
         transitive = false
     }
+    compile("com.github.GTNewHorizons:NotEnoughItems:2.2.6-GTNH:dev")
+    compile("com.github.GTNewHorizons:CodeChickenLib:1.1.5.3:dev")
     compileOnly("com.github.GTNewHorizons:TinkersConstruct:1.9.0.12-GTNH:dev")
     compileOnly("com.github.GTNewHorizons:Galacticraft:3.0.37-GTNH:dev")
     compileOnly("com.github.GTNewHorizons:StorageDrawers:1.11.11-GTNH:dev")
