@@ -6,27 +6,17 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.dries007.holoInventory.client.Renderer;
 
-public class ResetMessage implements IMessage
-{
+public class ResetMessage implements IMessage {
     @Override
-    public void fromBytes(ByteBuf buf)
-    {
-
-    }
+    public void fromBytes(ByteBuf buf) {}
 
     @Override
-    public void toBytes(ByteBuf buf)
-    {
+    public void toBytes(ByteBuf buf) {}
 
-    }
-
-    public static class Handler implements IMessageHandler<ResetMessage, IMessage>
-    {
+    public static class Handler implements IMessageHandler<ResetMessage, IMessage> {
         @Override
-        public IMessage onMessage(ResetMessage message, MessageContext ctx)
-        {
-            if (ctx.side.isClient())
-            {
+        public IMessage onMessage(ResetMessage message, MessageContext ctx) {
+            if (ctx.side.isClient()) {
                 Renderer.entityMap.clear();
                 Renderer.requestMap.clear();
                 Renderer.tileMap.clear();

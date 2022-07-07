@@ -2,34 +2,28 @@ package net.dries007.holoInventory.compat;
 
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 import cpw.mods.fml.common.Loader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Dries007
  */
-public class DecoderRegistry
-{
+public class DecoderRegistry {
     private static final Map<Class, InventoryDecoder> CACHE_MAP = new HashMap<Class, InventoryDecoder>();
     private static final List<InventoryDecoder> REGISTERED_INVENTORY_DECODERS = new ArrayList<InventoryDecoder>();
-    private static final InventoryDecoder VANILLA = new InventoryDecoder(IInventory.class)
-    {
+    private static final InventoryDecoder VANILLA = new InventoryDecoder(IInventory.class) {
         @Override
-        public NBTTagList toNBT(IInventory te)
-        {
+        public NBTTagList toNBT(IInventory te) {
             NBTTagList list = new NBTTagList();
-            for (int i = 0; i < te.getSizeInventory(); i++)
-            {
+            for (int i = 0; i < te.getSizeInventory(); i++) {
                 ItemStack stack = te.getStackInSlot(i);
-                if (stack != null)
-                {
+                if (stack != null) {
                     NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
                     tag.setInteger("Count", stack.stackSize);
                     list.appendTag(tag);
@@ -39,27 +33,18 @@ public class DecoderRegistry
         }
     };
 
-    private DecoderRegistry()
-    {
+    private DecoderRegistry() {}
 
-    }
-
-    public static void init()
-    {
-        if (Loader.isModLoaded("StorageDrawers"))
-        {
-            REGISTERED_INVENTORY_DECODERS.add(new InventoryDecoder(IDrawerGroup.class)
-            {
+    public static void init() {
+        if (Loader.isModLoaded("StorageDrawers")) {
+            REGISTERED_INVENTORY_DECODERS.add(new InventoryDecoder(IDrawerGroup.class) {
                 @Override
-                public NBTTagList toNBT(IInventory te)
-                {
+                public NBTTagList toNBT(IInventory te) {
                     IDrawerGroup drawerGroup = ((IDrawerGroup) te);
                     NBTTagList list = new NBTTagList();
-                    for (int i = 0; i < drawerGroup.getDrawerCount(); i++)
-                    {
+                    for (int i = 0; i < drawerGroup.getDrawerCount(); i++) {
                         ItemStack stack = drawerGroup.getDrawer(i).getStoredItemCopy();
-                        if (stack != null)
-                        {
+                        if (stack != null) {
                             NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
                             tag.setInteger("Count", stack.stackSize);
                             list.appendTag(tag);
@@ -71,17 +56,13 @@ public class DecoderRegistry
         }
     }
 
-    public static NBTTagList toNBT(IInventory te)
-    {
+    public static NBTTagList toNBT(IInventory te) {
         Class<? extends IInventory> teClass = te.getClass();
         InventoryDecoder decoder = CACHE_MAP.get(teClass);
 
-        if (decoder == null)
-        {
-            for (InventoryDecoder possibleDecoder : REGISTERED_INVENTORY_DECODERS)
-            {
-                if (possibleDecoder.targetClass.isAssignableFrom(teClass))
-                {
+        if (decoder == null) {
+            for (InventoryDecoder possibleDecoder : REGISTERED_INVENTORY_DECODERS) {
+                if (possibleDecoder.targetClass.isAssignableFrom(teClass)) {
                     decoder = possibleDecoder;
                     break;
                 }

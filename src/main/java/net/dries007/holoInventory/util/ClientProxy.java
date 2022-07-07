@@ -23,30 +23,26 @@ package net.dries007.holoInventory.util;
 
 import net.dries007.holoInventory.client.ClientHandler;
 
-public class ClientProxy extends CommonProxy
-{
+public class ClientProxy extends CommonProxy {
     private ClientHandler clientHandler;
 
     @Override
-    public void preInit()
-    {
+    public void preInit() {
         super.preInit();
 
-        //DevCapesUtil.addFileUrl(CAPES);
+        // DevCapesUtil.addFileUrl(CAPES);
         clientHandler = new ClientHandler();
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
 
         clientHandler.init();
     }
 
     @Override
-    public void postInit()
-    {
+    public void postInit() {
         super.postInit();
 
         clientHandler.postInit();

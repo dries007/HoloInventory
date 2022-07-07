@@ -4,8 +4,5 @@ import net.minecraft.item.ItemStack;
 
 public interface IHoloGlasses {
 
-	boolean shouldRender(ItemStack stack);
-
-
-
+    boolean shouldRender(ItemStack stack);
 }

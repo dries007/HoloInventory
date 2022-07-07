@@ -23,27 +23,20 @@ package net.dries007.holoInventory.util;
 
 import net.dries007.holoInventory.server.ServerHandler;
 
-public class CommonProxy
-{
+public class CommonProxy {
     private ServerHandler serverHandler;
 
-    public void preInit()
-    {
+    public void preInit() {
         serverHandler = new ServerHandler();
     }
 
-    public void init()
-    {
+    public void init() {
         serverHandler.init();
     }
 
-    public void postInit()
-    {
+    public void postInit() {}
 
-    }
-
-    public void serverStarting()
-    {
+    public void serverStarting() {
         serverHandler.init();
     }
 }

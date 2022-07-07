@@ -21,6 +21,8 @@
 
 package net.dries007.holoInventory.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.ResetMessage;
@@ -36,164 +38,137 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CommandHoloInventory extends CommandBase
-{
+public class CommandHoloInventory extends CommandBase {
     @Override
-    public String getCommandName()
-    {
+    public String getCommandName() {
         return "holoinventory";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 0;
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender)
-    {
+    public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender) {
         return true;
     }
 
     @Override
-    public String getCommandUsage(ICommandSender icommandsender)
-    {
+    public String getCommandUsage(ICommandSender icommandsender) {
         return "Use to <reset> local cache, <reload> the config, <(un)ban> tiles and override names.";
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args)
-    {
-        switch (args.length)
-        {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        switch (args.length) {
             default:
                 return null;
             case 1:
-                if (isOp(sender)) return getListOfStringsMatchingLastWord(args, "reset", "reload", "overrideName", "ban", "unban");
+                if (isOp(sender))
+                    return getListOfStringsMatchingLastWord(args, "reset", "reload", "overrideName", "ban", "unban");
                 else return getListOfStringsMatchingLastWord(args, "reset", "overrideName");
             case 2:
-                if (isOp(sender) && args[0].equalsIgnoreCase("unban")) return getListOfStringsFromIterableMatchingLastWord(args, getAllList());
+                if (isOp(sender) && args[0].equalsIgnoreCase("unban"))
+                    return getListOfStringsFromIterableMatchingLastWord(args, getAllList());
                 else return null;
         }
     }
 
-    private boolean isOp(ICommandSender sender)
-    {
-        return MinecraftServer.getServer().isSinglePlayer() || !(sender instanceof EntityPlayerMP) || MinecraftServer.getServer().getConfigurationManager().func_152596_g(((EntityPlayerMP) sender).getGameProfile());
+    private boolean isOp(ICommandSender sender) {
+        return MinecraftServer.getServer().isSinglePlayer()
+                || !(sender instanceof EntityPlayerMP)
+                || MinecraftServer.getServer()
+                        .getConfigurationManager()
+                        .func_152596_g(((EntityPlayerMP) sender).getGameProfile());
     }
 
-    private List<String> getAllList()
-    {
+    private List<String> getAllList() {
         ArrayList<String> temp = new ArrayList<String>();
-		temp.addAll(Config.bannedEntities);
-		temp.addAll(Config.bannedTiles);
+        temp.addAll(Config.bannedEntities);
+        temp.addAll(Config.bannedTiles);
         return temp;
     }
 
-    private void sendHelp(ICommandSender sender)
-    {
+    private void sendHelp(ICommandSender sender) {
         sender.addChatMessage(new ChatComponentText("-= HoloInventory By Dries007 =-"));
         sender.addChatMessage(new ChatComponentText("Use one of the following arguments with this command:"));
         sender.addChatMessage(new ChatComponentText("  * <reset>             -> Reset the clients cache"));
         sender.addChatMessage(new ChatComponentText("  * <reload>            -> Reload (server) config."));
         sender.addChatMessage(new ChatComponentText("  * <overrideName> [new name] -> Override a name"));
-        sender.addChatMessage(new ChatComponentText("  * <ban>                -> Ban the next inventory you RIGHTclick"));
+        sender.addChatMessage(
+                new ChatComponentText("  * <ban>                -> Ban the next inventory you RIGHTclick"));
         sender.addChatMessage(new ChatComponentText("  * <unban> [a name] -> Unban a an inventory"));
         sender.addChatMessage(new ChatComponentText("Pro tip: Use tab completion!"));
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args)
-    {
-        if (args.length == 0)
-        {
+    public void processCommand(ICommandSender sender, String[] args) {
+        if (args.length == 0) {
             sendHelp(sender);
-        }
-        else if (args[0].equalsIgnoreCase("reset"))
-        {
+        } else if (args[0].equalsIgnoreCase("reset")) {
             if (!(sender instanceof EntityPlayer)) throw new WrongUsageException("You can't use this as the server...");
             HoloInventory.getSnw().sendTo(new ResetMessage(), (EntityPlayerMP) sender);
-            for (InventoryData data : ServerHandler.serverEventHandler.blockMap.values())
-            {
+            for (InventoryData data : ServerHandler.serverEventHandler.blockMap.values()) {
                 //noinspection SuspiciousMethodCalls
                 data.playerSet.remove(sender);
             }
-        }
-        else if (args[0].equalsIgnoreCase("reload"))
-        {
+        } else if (args[0].equalsIgnoreCase("reload")) {
             if (sender instanceof EntityPlayer)
                 HoloInventory.getSnw().sendTo(new ResetMessage(), (EntityPlayerMP) sender);
-            if (isOp(sender))
-                HoloInventory.getConfig().reload();
+            if (isOp(sender)) HoloInventory.getConfig().reload();
 
             sender.addChatMessage(new ChatComponentText("Reload command send."));
-        }
-        else if (args[0].equalsIgnoreCase("overrideName"))
-        {
+        } else if (args[0].equalsIgnoreCase("overrideName")) {
             if (!(sender instanceof EntityPlayer)) throw new WrongUsageException("You can't use this as the server...");
-            if (args.length == 1)
-            {
+            if (args.length == 1) {
                 throw new WrongUsageException("Give a name, can contain spaces.");
-            }
-            else
-            {
+            } else {
                 StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 1; i < args.length; i++) stringBuilder.append(args[i]).append(' ');
+                for (int i = 1; i < args.length; i++)
+                    stringBuilder.append(args[i]).append(' ');
                 String name = stringBuilder.toString().trim();
 
-                sender.addChatMessage(new ChatComponentText("RIGHTclick a block or entity to override the hologram name on that type to " + name));
+                sender.addChatMessage(new ChatComponentText(
+                        "RIGHTclick a block or entity to override the hologram name on that type to " + name));
                 ServerHandler.serverEventHandler.overrideUsers.put(sender.getCommandSenderName(), name);
             }
-        }
-        else if (args[0].equalsIgnoreCase("ban"))
-        {
-            if (isOp(sender))
-            {
+        } else if (args[0].equalsIgnoreCase("ban")) {
+            if (isOp(sender)) {
                 ServerHandler.serverEventHandler.banUsers.add(sender.getCommandSenderName());
-                sender.addChatMessage(new ChatComponentText("RIGHTclick a block or entity to ban the hologram on that type."));
+                sender.addChatMessage(
+                        new ChatComponentText("RIGHTclick a block or entity to ban the hologram on that type."));
+            } else {
+                sender.addChatMessage(
+                        new ChatComponentText("You are not opped. Ban stuff in SSP to block it client side."));
             }
-            else
-            {
-                sender.addChatMessage(new ChatComponentText("You are not opped. Ban stuff in SSP to block it client side."));
-            }
-        }
-        else if (args[0].equalsIgnoreCase("unban"))
-        {
-            if (isOp(sender))
-            {
-                if (args.length == 1)
-                {
-                    if (getAllList().size() == 0) sender.addChatMessage(new ChatComponentText("You didn't ban any inventories yet..."));
-                    else sender.addChatMessage(new ChatComponentText("A list of all banned inventories:\n" + joinNiceString(getAllList().toArray())));
-                }
-                else if (getAllList().contains(args[1]))
-                {
-					Config.bannedEntities.remove(args[1]);
-					Config.bannedTiles.remove(args[1]);
+        } else if (args[0].equalsIgnoreCase("unban")) {
+            if (isOp(sender)) {
+                if (args.length == 1) {
+                    if (getAllList().size() == 0)
+                        sender.addChatMessage(new ChatComponentText("You didn't ban any inventories yet..."));
+                    else
+                        sender.addChatMessage(new ChatComponentText("A list of all banned inventories:\n"
+                                + joinNiceString(getAllList().toArray())));
+                } else if (getAllList().contains(args[1])) {
+                    Config.bannedEntities.remove(args[1]);
+                    Config.bannedTiles.remove(args[1]);
                     HoloInventory.getConfig().overrideBannedThings();
+                } else {
+                    sender.addChatMessage(new ChatComponentText("That thing is not on any banlist I know of...")
+                            .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
                 }
-                else
-                {
-                    sender.addChatMessage(new ChatComponentText("That thing is not on any banlist I know of...").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
-                }
+            } else {
+                sender.addChatMessage(
+                        new ChatComponentText("You are not opped. Unban stuff in SSP to unblock it client side."));
+                sender.addChatMessage(
+                        new ChatComponentText("If you think this ban is stupid, ask a server admin to remove it."));
             }
-            else
-            {
-                sender.addChatMessage(new ChatComponentText("You are not opped. Unban stuff in SSP to unblock it client side."));
-                sender.addChatMessage(new ChatComponentText("If you think this ban is stupid, ask a server admin to remove it."));
-            }
-        }
-        else
-        {
+        } else {
             sendHelp(sender);
         }
     }
 
     @Override
-    public int compareTo(Object par1Obj)
-    {
+    public int compareTo(Object par1Obj) {
         return super.compareTo((ICommand) par1Obj);
     }
 }

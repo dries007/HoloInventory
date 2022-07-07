@@ -41,22 +41,30 @@ import net.dries007.holoInventory.util.CommonProxy;
 import net.minecraft.item.Item;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = HoloInventory.MODID, name = HoloInventory.MODID, acceptableRemoteVersions = "*", dependencies="after:Baubles;after:TConstruct")
+@Mod(
+        modid = HoloInventory.MODID,
+        name = HoloInventory.MODID,
+        acceptableRemoteVersions = "*",
+        dependencies = "after:Baubles;after:TConstruct")
 public class HoloInventory {
 
     public static final String MODID = "GRADLETOKEN_MODID";
     public static final String VERSION = "GRADLETOKEN_VERSION";
 
-	@Mod.Instance(value = MODID)
+    @Mod.Instance(value = MODID)
     private static HoloInventory instance;
+
     public static Item holoGlasses;
     private Config config;
 
     @Mod.Metadata
     private ModMetadata metadata;
 
-    @SidedProxy(serverSide = "net.dries007.holoInventory.util.CommonProxy", clientSide = "net.dries007.holoInventory.util.ClientProxy")
+    @SidedProxy(
+            serverSide = "net.dries007.holoInventory.util.CommonProxy",
+            clientSide = "net.dries007.holoInventory.util.ClientProxy")
     public static CommonProxy proxy;
+
     private SimpleNetworkWrapper snw;
     private Logger logger;
 
@@ -65,8 +73,8 @@ public class HoloInventory {
     @Mod.EventHandler()
     public void preInit(FMLPreInitializationEvent event) {
 
-    	isBaublesLoaded = Loader.isModLoaded("Baubles");
-    	isTinkersLoaded = Loader.isModLoaded("TConstruct");
+        isBaublesLoaded = Loader.isModLoaded("Baubles");
+        isTinkersLoaded = Loader.isModLoaded("TConstruct");
 
         logger = event.getModLog();
         config = new Config(event.getSuggestedConfigurationFile());

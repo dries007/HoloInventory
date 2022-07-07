@@ -32,7 +32,7 @@ import org.lwjgl.input.Keyboard;
 
 public class KeyManager {
 
-    public static final KeyBinding key = new KeyBinding("HoloGlasses", 0, "key.categories.holoinventory"){
+    public static final KeyBinding key = new KeyBinding("HoloGlasses", 0, "key.categories.holoinventory") {
         @Override
         public void setKeyCode(int p_151462_1_) {
             HoloInventory.getConfig().setKey(p_151462_1_);
@@ -60,7 +60,6 @@ public class KeyManager {
      * 2: Only render hologram while key pressed. (Handled in Renderer)
      * 3: Don't render hologram while key pressed. (Handled in Renderer)
      */
-
     boolean alreadyToggling = false;
 
     @SubscribeEvent
@@ -76,9 +75,7 @@ public class KeyManager {
                         Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
                         HoloInventory.getConfig().setKeyState(Renderer.INSTANCE.enabled);
                     }
-                }
-
-                else alreadyToggling = false;
+                } else alreadyToggling = false;
                 break;
             case 2:
                 Renderer.INSTANCE.enabled = Keyboard.isKeyDown(code);

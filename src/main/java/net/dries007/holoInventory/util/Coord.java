@@ -24,19 +24,16 @@ package net.dries007.holoInventory.util;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class Coord
-{
+public class Coord {
     public int dim;
     public double x;
     public double y;
     public double z;
 
-    public Coord(int dim, MovingObjectPosition mop)
-    {
+    public Coord(int dim, MovingObjectPosition mop) {
         this.dim = dim;
 
-        switch (mop.typeOfHit)
-        {
+        switch (mop.typeOfHit) {
             case BLOCK:
                 this.x = mop.blockX;
                 this.y = mop.blockY;
@@ -50,8 +47,7 @@ public class Coord
         }
     }
 
-    public Coord offset(int side)
-    {
+    public Coord offset(int side) {
         ForgeDirection dir = ForgeDirection.getOrientation(side);
         this.x = +dir.offsetX;
         this.y = +dir.offsetY;
@@ -60,15 +56,12 @@ public class Coord
         return this;
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return (int) this.x + ((int) this.z << 8) + ((int) this.y << 16) + (this.dim << 24);
     }
 
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof Coord)
-        {
+    public boolean equals(Object obj) {
+        if (obj instanceof Coord) {
             Coord coord = (Coord) obj;
             return this.x == coord.x && this.y == coord.y && this.z == coord.z && this.dim == coord.dim;
         }

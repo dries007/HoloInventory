@@ -24,23 +24,16 @@ package net.dries007.holoInventory.server;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraftforge.common.MinecraftForge;
 
-public class ServerHandler
-{
+public class ServerHandler {
     public static ServerEventHandler serverEventHandler;
 
-    public ServerHandler()
-    {
+    public ServerHandler() {}
 
-    }
-
-    public void init()
-    {
-        if (serverEventHandler == null)
-        {
+    public void init() {
+        if (serverEventHandler == null) {
             serverEventHandler = new ServerEventHandler();
             MinecraftForge.EVENT_BUS.register(serverEventHandler);
             FMLCommonHandler.instance().bus().register(serverEventHandler);
-        }
-        else serverEventHandler.clear();
+        } else serverEventHandler.clear();
     }
 }

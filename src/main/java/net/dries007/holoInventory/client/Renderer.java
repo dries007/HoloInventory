@@ -21,12 +21,17 @@
 
 package net.dries007.holoInventory.client;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import codechicken.nei.ItemList;
 import codechicken.nei.NEIClientConfig;
 import codechicken.nei.SearchField;
 import codechicken.nei.api.ItemFilter;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.api.IHoloGlasses;
@@ -35,7 +40,6 @@ import net.dries007.holoInventory.network.EntityRequestMessage;
 import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -56,20 +60,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL12;
 
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.lwjgl.opengl.GL11.*;
-
-public class Renderer
-{
+public class Renderer {
     private static final DecimalFormat DF_ONE_FRACTION_DIGIT = new DecimalFormat("##.0");
     private static final DecimalFormat DF_TWO_FRACTION_DIGIT = new DecimalFormat("#.00");
     // changed with an attached debugger..
     static int stackSizeDebugOverride = 0;
     private static final String[] suffixNormal = {"", "K", "M", "B"};
-    private static final String[] suffixDarkened = {"", EnumChatFormatting.GRAY + "K", EnumChatFormatting.GRAY + "M", EnumChatFormatting.GRAY + "B"};
+    private static final String[] suffixDarkened = {
+        "", EnumChatFormatting.GRAY + "K", EnumChatFormatting.GRAY + "M", EnumChatFormatting.GRAY + "B"
+    };
     private static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
     public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<>();
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<>();
@@ -88,87 +87,76 @@ public class Renderer
     ItemFilter cachedFilter = null;
     String cachedSearch = "";
 
-    private Renderer()
-    {
+    private Renderer() {
         customitem.hoverStart = 0f;
     }
 
     @SubscribeEvent
-    public void renderEvent(RenderWorldLastEvent event){
-       EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-       World world = Minecraft.getMinecraft().theWorld;
+    public void renderEvent(RenderWorldLastEvent event) {
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        World world = Minecraft.getMinecraft().theWorld;
 
-       ItemStack glasses = HoloGlasses.getHoloGlasses(world,player);
+        ItemStack glasses = HoloGlasses.getHoloGlasses(world, player);
 
-            try{
-				if(Config.requireGlasses && glasses!=null && ((IHoloGlasses)glasses.getItem()).shouldRender(glasses))
-                	doEvent();
-				else {
-					if(!Config.requireGlasses)
-						doEvent();
-				}
+        try {
+            if (Config.requireGlasses && glasses != null && ((IHoloGlasses) glasses.getItem()).shouldRender(glasses))
+                doEvent();
+            else {
+                if (!Config.requireGlasses) doEvent();
             }
+        } catch (Exception e) {
+            HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
+            HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
 
-            catch (Exception e){
-                HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
-                HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
-
-                e.printStackTrace();
-            }
+            e.printStackTrace();
+        }
     }
 
-    private void doEvent()
-    {
+    private void doEvent() {
         if (!enabled) return;
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.renderEngine == null || RenderManager.instance == null || RenderManager.instance.getFontRenderer() == null || mc.gameSettings.thirdPersonView != 0 || mc.objectMouseOver == null) return;
+        if (mc.renderEngine == null
+                || RenderManager.instance == null
+                || RenderManager.instance.getFontRenderer() == null
+                || mc.gameSettings.thirdPersonView != 0
+                || mc.objectMouseOver == null) return;
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
-        switch (mc.objectMouseOver.typeOfHit)
-        {
+        switch (mc.objectMouseOver.typeOfHit) {
             case BLOCK:
                 // Remove if there is no longer a TE there
                 TileEntity te = mc.theWorld.getTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
-                if (Helper.weWant(te))
-                {
+                if (Helper.weWant(te)) {
                     String clazz = te.getClass().getCanonicalName();
                     // Check for local ban
                     if (Config.bannedTiles.contains(clazz)) return;
                     NamedData<ItemStack[]> data = tileMap.get(coord.hashCode());
-                    if (data != null)
-                    {
-                        if (data.clazz == null || data.clazz.equals(clazz))
-                        {
+                    if (data != null) {
+                        if (data.clazz == null || data.clazz.equals(clazz)) {
                             // Render if we know the content
                             coord.x += 0.5;
                             coord.y += 0.5;
                             coord.z += 0.5;
                             renderHologram(data);
-                        }
-                        else
-                            tileMap.remove(coord.hashCode());
+                        } else tileMap.remove(coord.hashCode());
                     }
-                }
-                else
-                    tileMap.remove(coord.hashCode());
+                } else tileMap.remove(coord.hashCode());
                 break;
             case ENTITY:
                 if (!Config.enableEntities) break;
                 Entity entity = mc.objectMouseOver.entityHit;
-                if (Helper.weWant(entity))
-                {
+                if (Helper.weWant(entity)) {
                     // Check for local ban
                     if (Config.bannedEntities.contains(entity.getClass().getCanonicalName())) return;
 
                     int id = entity.getEntityId();
                     // Make & store request
-                    if (!requestMap.containsKey(id))
-                    {
-                        HoloInventory.getSnw().sendToServer(new EntityRequestMessage(mc.theWorld.provider.dimensionId, id));
+                    if (!requestMap.containsKey(id)) {
+                        HoloInventory.getSnw()
+                                .sendToServer(new EntityRequestMessage(mc.theWorld.provider.dimensionId, id));
                         requestMap.put(id, mc.theWorld.getTotalWorldTime());
                     }
                     // Remove old request so that we get updated info next render tick
-                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(id) + 20L * Config.syncFreq)
-                    {
+                    else if (mc.theWorld.getTotalWorldTime() > requestMap.get(id) + 20L * Config.syncFreq) {
                         requestMap.remove(id);
                     }
 
@@ -185,9 +173,8 @@ public class Renderer
      *
      * @param namedData The things to render
      */
-    private void renderMerchant(NamedData<MerchantRecipeList> namedData)
-    {
-        coord.y += 2; //Adjust for villager height
+    private void renderMerchant(NamedData<MerchantRecipeList> namedData) {
+        coord.y += 2; // Adjust for villager height
         if (namedData.data.size() == 0) return;
         final double distance = distance();
         if (distance < 1) return;
@@ -216,8 +203,7 @@ public class Renderer
 
         // merchant cannot sell more than 127 items. no need to increase spacing whatsoever
         float stackSpacing = 0.6f;
-        for (int row = 0; row < namedData.data.size(); row++)
-        {
+        for (int row = 0; row < namedData.data.size(); row++) {
             MerchantRecipe recipe = (MerchantRecipe) namedData.data.get(row);
 
             renderItem(recipe.getItemToBuy(), 0, row, recipe.getItemToBuy().stackSize, stackSpacing);
@@ -234,15 +220,13 @@ public class Renderer
      *
      * @param s_filter new search string
      */
-    private ItemFilter getFilter(String s_filter)
-    {
+    private ItemFilter getFilter(String s_filter) {
         cachedSearch = s_filter;
         List<ItemFilter> primary = new LinkedList<>();
         List<ItemFilter> secondary = new LinkedList<>();
         for (SearchField.ISearchProvider p : SearchField.searchProviders) {
             ItemFilter filter = p.getFilter(s_filter);
-            if (filter != null)
-                (p.isPrimary() ? primary : secondary).add(filter);
+            if (filter != null) (p.isPrimary() ? primary : secondary).add(filter);
         }
         if (!primary.isEmpty()) return new ItemList.AnyMultiItemFilter(primary);
         if (!secondary.isEmpty()) return new ItemList.AnyMultiItemFilter(secondary);
@@ -254,12 +238,10 @@ public class Renderer
      *
      * @param items Array of items in the inventory
      */
-    private List<ItemStack> filterByNEI(ItemStack[] items)
-    {
+    private List<ItemStack> filterByNEI(ItemStack[] items) {
         if (Config.hideItemsNotSelected && Loader.isModLoaded("NotEnoughItems") && SearchField.searchInventories()) {
             final String searchString = NEIClientConfig.getSearchExpression().toLowerCase();
-            if (!cachedSearch.equals(searchString) || cachedFilter == null)
-                cachedFilter = getFilter(searchString);
+            if (!cachedSearch.equals(searchString) || cachedFilter == null) cachedFilter = getFilter(searchString);
             return Arrays.stream(items).filter(s -> cachedFilter.matches(s)).collect(Collectors.toList());
         }
         return Arrays.asList(items);
@@ -271,8 +253,7 @@ public class Renderer
      *
      * @param namedData Array of items in the inventory
      */
-    private void renderHologram(NamedData<ItemStack[]> namedData)
-    {
+    private void renderHologram(NamedData<ItemStack[]> namedData) {
         if (namedData.data == null || namedData.name == null || namedData.data.length == 0) return;
         final double distance = distance();
         if (distance < 1.5) return;
@@ -281,38 +262,35 @@ public class Renderer
 
         int wantedSize = list.size();
 
-        switch (Config.mode)
-        {
-            // Most abundant, 1 item
+        switch (Config.mode) {
+                // Most abundant, 1 item
             case 2:
                 wantedSize = 1;
                 break;
-            // Most abundant, 3 items
+                // Most abundant, 3 items
             case 3:
                 wantedSize = 3;
                 break;
-            // Most abundant, 5 items
+                // Most abundant, 5 items
             case 4:
                 wantedSize = 5;
                 break;
-            // Most abundant, 7 items
+                // Most abundant, 7 items
             case 5:
                 wantedSize = 7;
                 break;
-            // Most abundant, 9 items
+                // Most abundant, 9 items
             case 6:
                 wantedSize = 9;
                 break;
         }
 
-        if (Config.mode != 0)
-        {
+        if (Config.mode != 0) {
             list.sort(Comparator.<ItemStack>comparingInt(s -> s.stackSize).reversed());
             if (list.size() > wantedSize) list = list.subList(0, wantedSize);
         }
 
-        if (Config.cycle != 0)
-        {
+        if (Config.cycle != 0) {
             int i = (int) ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() / Config.cycle) % list.size());
             list = Collections.singletonList(list.get(i));
         }
@@ -326,8 +304,7 @@ public class Renderer
      * @param itemStacks The itemStacks that will be rendered
      * @param distance   The distance the player is from the hologram, passed to avoid 2th calculation.
      */
-    private void doRenderHologram(String name, List<ItemStack> itemStacks, double distance)
-    {
+    private void doRenderHologram(String name, List<ItemStack> itemStacks, double distance) {
         // Move to right position and rotate to face the player
         glPushMatrix();
 
@@ -339,12 +316,9 @@ public class Renderer
 
         // See if we need to increase spacing
         float stackSpacing = 0.6f;
-        if (Config.renderText)
-        {
-            for (ItemStack stack : itemStacks)
-            {
-                if (stack.stackSize >= 1000 || stackSizeDebugOverride >= 1000)
-                {
+        if (Config.renderText) {
+            for (ItemStack stack : itemStacks) {
+                if (stack.stackSize >= 1000 || stackSizeDebugOverride >= 1000) {
                     stackSpacing = 0.8f;
                     break;
                 }
@@ -354,7 +328,9 @@ public class Renderer
         // Values for later
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
         maxColumns = getMaxColumns(itemStacks.size());
-        maxRows = (itemStacks.size() % maxColumns == 0) ? (itemStacks.size() / maxColumns) - 1 : itemStacks.size() / maxColumns;
+        maxRows = (itemStacks.size() % maxColumns == 0)
+                ? (itemStacks.size() / maxColumns) - 1
+                : itemStacks.size() / maxColumns;
         blockScale = getBlockScaleModifier(maxColumns) + (float) (0.05f * distance);
         maxWith = maxColumns * blockScale * (stackSpacing + 0.1f) * 0.4f;
         maxHeight = maxRows * blockScale * (stackSpacing + 0.1f) * 0.4f;
@@ -368,18 +344,15 @@ public class Renderer
 
         // Render items
         int column = 0, row = 0;
-        for (ItemStack item : itemStacks)
-        {
+        for (ItemStack item : itemStacks) {
             int stackSize = item.stackSize;
-            if (!Config.renderMultiple)
-            {
+            if (!Config.renderMultiple) {
                 item = item.copy();
                 item.stackSize = 1;
             }
             renderItem(item, column, row, stackSize, stackSpacing);
             column++;
-            if (column >= maxColumns)
-            {
+            if (column >= maxColumns) {
                 column = 0;
                 row++;
             }
@@ -392,9 +365,11 @@ public class Renderer
      *
      * @param depth Shift towards the player if negative
      */
-    private void moveAndRotate(double depth)
-    {
-        glTranslated(coord.x - RenderManager.renderPosX, coord.y - RenderManager.renderPosY, coord.z - RenderManager.renderPosZ);
+    private void moveAndRotate(double depth) {
+        glTranslated(
+                coord.x - RenderManager.renderPosX,
+                coord.y - RenderManager.renderPosY,
+                coord.z - RenderManager.renderPosZ);
         glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
         glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
         glTranslated(0, 0, depth);
@@ -404,8 +379,7 @@ public class Renderer
      * @param columns amount of columns in the hologram
      * @return the blockScaleModifier
      */
-    private float getBlockScaleModifier(int columns)
-    {
+    private float getBlockScaleModifier(int columns) {
         if (columns > 9) return 0.2f - columns * 0.005f;
         else return 0.2f + (9 - columns) * 0.05f;
     }
@@ -414,8 +388,7 @@ public class Renderer
      * @param size of the inventory
      * @return columns of the hologram
      */
-    private int getMaxColumns(int size)
-    {
+    private int getMaxColumns(int size) {
         if (size < 9) return size;
         else if (size <= 27) return 9;
         else if (size <= 54) return 11;
@@ -430,33 +403,26 @@ public class Renderer
      * @param stackSize the stackSize.
      * @return the string to be rendered
      */
-    private String doStackSizeCrap(int stackSize)
-    {
-        if (stackSizeDebugOverride != 0)
-            stackSize = stackSizeDebugOverride;
+    private String doStackSizeCrap(int stackSize) {
+        if (stackSizeDebugOverride != 0) stackSize = stackSizeDebugOverride;
         String string = formatStackSize(stackSize);
 
         glTranslatef(-RenderManager.instance.getFontRenderer().getStringWidth(string) / 2.f, 0f, 0f);
         return string;
     }
 
-    private static String formatStackSize(long i)
-    {
+    private static String formatStackSize(long i) {
         String[] suffixSelected = Config.renderSuffixDarkened ? suffixDarkened : suffixNormal;
         int level = 0;
-        while (i > 1000 && level < suffixSelected.length - 1)
-        {
+        while (i > 1000 && level < suffixSelected.length - 1) {
             level++;
-            if (i >= 100_000)
-            {
+            if (i >= 100_000) {
                 // still more level to go, or 0 fraction digit
                 i /= 1000;
-            } else if (i >= 10_000)
-            {
+            } else if (i >= 10_000) {
                 // 1 fraction digit
                 return DF_ONE_FRACTION_DIGIT.format(i / 1000.0d) + suffixSelected[level];
-            } else
-            {
+            } else {
                 // 2 fraction digit
                 return DF_TWO_FRACTION_DIGIT.format(i / 1000.0d) + suffixSelected[level];
             }
@@ -473,11 +439,13 @@ public class Renderer
      * @param stackSize    the stackSize to use for text
      * @param stackSpacing spacing multiplier
      */
-    private void renderItem(ItemStack itemStack, int column, int row, int stackSize, float stackSpacing)
-    {
+    private void renderItem(ItemStack itemStack, int column, int row, int stackSize, float stackSpacing) {
         RenderHelper.enableStandardItemLighting();
         glPushMatrix();
-        glTranslatef(maxWith - ((column + 0.2f) * blockScale * stackSpacing), maxHeight - ((row + 0.05f) * blockScale * stackSpacing), 0f);
+        glTranslatef(
+                maxWith - ((column + 0.2f) * blockScale * stackSpacing),
+                maxHeight - ((row + 0.05f) * blockScale * stackSpacing),
+                0f);
         glScalef(blockScale, blockScale, blockScale);
         if (Minecraft.getMinecraft().gameSettings.fancyGraphics)
             glRotatef(Config.rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
@@ -487,11 +455,13 @@ public class Renderer
         if (itemStack.hasEffect(0)) glDisable(GL_LIGHTING);
         glPopMatrix();
         RenderHelper.disableStandardItemLighting();
-        if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1))
-        {
+        if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1)) {
             glPushMatrix();
             glDisable(GL_DEPTH_TEST);
-            glTranslatef(maxWith - ((column + 0.2f) * blockScale * stackSpacing), maxHeight - ((row + 0.05f) * blockScale * stackSpacing), 0f);
+            glTranslatef(
+                    maxWith - ((column + 0.2f) * blockScale * stackSpacing),
+                    maxHeight - ((row + 0.05f) * blockScale * stackSpacing),
+                    0f);
             glScalef(blockScale, blockScale, blockScale);
             glScalef(0.03f, 0.03f, 0.03f);
             glRotatef(180, 0.0F, 0.0F, 1.0F);
@@ -503,8 +473,7 @@ public class Renderer
         }
     }
 
-    private void renderBG()
-    {
+    private void renderBG() {
         glPushMatrix();
         glEnable(GL12.GL_RESCALE_NORMAL);
         glDisable(GL_DEPTH_TEST);
@@ -513,7 +482,7 @@ public class Renderer
         Tessellator tess = Tessellator.instance;
         Tessellator.renderingWorldRenderer = false;
         tess.startDrawing(GL_QUADS);
-		tess.setColorRGBA(Config.colorR, Config.colorG, Config.colorB, Config.colorAlpha);
+        tess.setColorRGBA(Config.colorR, Config.colorG, Config.colorB, Config.colorAlpha);
         double d = blockScale / 3;
         tess.addVertex(maxWith + d, -d - maxHeight, 0);
         tess.addVertex(-maxWith - d, -d - maxHeight, 0);
@@ -527,8 +496,7 @@ public class Renderer
         glPopMatrix();
     }
 
-    private void renderName(String name)
-    {
+    private void renderName(String name) {
         FontRenderer fontRenderer = RenderManager.instance.getFontRenderer();
         if (Config.nameOverrides.containsKey(name)) name = Config.nameOverrides.get(name);
         else name = StatCollector.translateToLocal(name);
@@ -551,10 +519,9 @@ public class Renderer
         glPopMatrix();
     }
 
-    private double distance()
-    {
-        return Math.sqrt((coord.x - RenderManager.renderPosX) * (coord.x - RenderManager.renderPosX) +
-                (coord.y - RenderManager.renderPosY) * (coord.y - RenderManager.renderPosY) +
-                (coord.z - RenderManager.renderPosZ) * (coord.z - RenderManager.renderPosZ));
+    private double distance() {
+        return Math.sqrt((coord.x - RenderManager.renderPosX) * (coord.x - RenderManager.renderPosX)
+                + (coord.y - RenderManager.renderPosY) * (coord.y - RenderManager.renderPosY)
+                + (coord.z - RenderManager.renderPosZ) * (coord.z - RenderManager.renderPosZ));
     }
 }

@@ -21,6 +21,8 @@
 
 package net.dries007.holoInventory.util;
 
+import appeng.api.parts.IPartHost;
+import appeng.tile.misc.TileInterface;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,25 +33,33 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
-import appeng.api.parts.IPartHost;
-import appeng.tile.misc.TileInterface;
-
-public class Helper
-{
-    public static boolean weWant(Object o)
-    {
-        return o != null && (o instanceof IInventory || o instanceof IMerchant
-            || o instanceof TileEntityEnderChest || o instanceof BlockJukebox.TileEntityJukebox
-            || o instanceof TileInterface || o instanceof IPartHost);
+public class Helper {
+    public static boolean weWant(Object o) {
+        return o != null
+                && (o instanceof IInventory
+                        || o instanceof IMerchant
+                        || o instanceof TileEntityEnderChest
+                        || o instanceof BlockJukebox.TileEntityJukebox
+                        || o instanceof TileInterface
+                        || o instanceof IPartHost);
     }
 
-    public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer)
-    {
+    public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer) {
         float f = 1.0F;
-        float f1 = par2EntityPlayer.prevRotationPitch + (par2EntityPlayer.rotationPitch - par2EntityPlayer.prevRotationPitch) * f;
-        float f2 = par2EntityPlayer.prevRotationYaw + (par2EntityPlayer.rotationYaw - par2EntityPlayer.prevRotationYaw) * f;
+        float f1 = par2EntityPlayer.prevRotationPitch
+                + (par2EntityPlayer.rotationPitch - par2EntityPlayer.prevRotationPitch) * f;
+        float f2 = par2EntityPlayer.prevRotationYaw
+                + (par2EntityPlayer.rotationYaw - par2EntityPlayer.prevRotationYaw) * f;
         double d0 = par2EntityPlayer.prevPosX + (par2EntityPlayer.posX - par2EntityPlayer.prevPosX) * (double) f;
-        double d1 = par2EntityPlayer.prevPosY + (par2EntityPlayer.posY - par2EntityPlayer.prevPosY) * (double) f + (double) (par2EntityPlayer.worldObj.isRemote ? par2EntityPlayer.getEyeHeight() - par2EntityPlayer.getDefaultEyeHeight() : par2EntityPlayer.getEyeHeight()); // isRemote check to revert changes to ray trace position due to adding the eye height clientside and player yOffset differences
+        double d1 = par2EntityPlayer.prevPosY
+                + (par2EntityPlayer.posY - par2EntityPlayer.prevPosY) * (double) f
+                + (double)
+                        (par2EntityPlayer.worldObj.isRemote
+                                ? par2EntityPlayer.getEyeHeight() - par2EntityPlayer.getDefaultEyeHeight()
+                                : par2EntityPlayer
+                                        .getEyeHeight()); // isRemote check to revert changes to ray trace position due
+        // to adding the eye height clientside and player yOffset
+        // differences
         double d2 = par2EntityPlayer.prevPosZ + (par2EntityPlayer.posZ - par2EntityPlayer.prevPosZ) * (double) f;
         Vec3 vec3 = Vec3.createVectorHelper(d0, d1, d2);
         float f3 = MathHelper.cos(-f2 * 0.017453292F - (float) Math.PI);
@@ -59,8 +69,7 @@ public class Helper
         float f7 = f4 * f5;
         float f8 = f3 * f5;
         double d3 = 5.0D;
-        if (par2EntityPlayer instanceof EntityPlayerMP)
-        {
+        if (par2EntityPlayer instanceof EntityPlayerMP) {
             d3 = ((EntityPlayerMP) par2EntityPlayer).theItemInWorldManager.getBlockReachDistance();
         }
         Vec3 vec31 = vec3.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);

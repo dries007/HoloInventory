@@ -10,44 +10,41 @@ import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.village.MerchantRecipeList;
 
-public class MerchantInventoryMessage implements IMessage
-{
+public class MerchantInventoryMessage implements IMessage {
     NBTTagCompound data;
 
-    public MerchantInventoryMessage(NBTTagCompound tag)
-    {
+    public MerchantInventoryMessage(NBTTagCompound tag) {
         data = tag;
     }
 
-    public MerchantInventoryMessage()
-    {
-
-    }
+    public MerchantInventoryMessage() {}
 
     @Override
-    public void fromBytes(ByteBuf buf)
-    {
+    public void fromBytes(ByteBuf buf) {
         data = ByteBufUtils.readTag(buf);
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
-    {
+    public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeTag(buf, data);
     }
 
-    public static class Handler implements IMessageHandler<MerchantInventoryMessage, IMessage>
-    {
+    public static class Handler implements IMessageHandler<MerchantInventoryMessage, IMessage> {
         @Override
-        public IMessage onMessage(MerchantInventoryMessage message, MessageContext ctx)
-        {
-            if (ctx.side.isClient())
-            {
+        public IMessage onMessage(MerchantInventoryMessage message, MessageContext ctx) {
+            if (ctx.side.isClient()) {
                 MerchantRecipeList list = new MerchantRecipeList();
                 list.readRecipiesFromTags(message.data);
 
-                if (message.data.hasKey("class")) Renderer.merchantMap.put(message.data.getInteger("id"), new NamedData<MerchantRecipeList>(message.data.getString("name"), message.data.getString("class"), list));
-                else Renderer.merchantMap.put(message.data.getInteger("id"), new NamedData<MerchantRecipeList>(message.data.getString("name"), list));
+                if (message.data.hasKey("class"))
+                    Renderer.merchantMap.put(
+                            message.data.getInteger("id"),
+                            new NamedData<MerchantRecipeList>(
+                                    message.data.getString("name"), message.data.getString("class"), list));
+                else
+                    Renderer.merchantMap.put(
+                            message.data.getInteger("id"),
+                            new NamedData<MerchantRecipeList>(message.data.getString("name"), list));
             }
 
             return null;
