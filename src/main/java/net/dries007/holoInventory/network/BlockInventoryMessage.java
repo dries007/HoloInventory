@@ -52,17 +52,25 @@ public class BlockInventoryMessage implements IMessage {
                 if (Config.enableStacking) {
                     List<ItemStack> stacks = new ArrayList<>();
                     for (ItemStack stackToAdd : data.data) {
-                        boolean f = false;
+                        int remainingAmount = stackToAdd.stackSize;
                         for (ItemStack stackInList : stacks) {
                             if (stackInList == null) continue;
+
                             if (stackToAdd.isItemEqual(stackInList)
                                     && ItemStack.areItemStackTagsEqual(stackToAdd, stackInList)) {
-                                stackInList.stackSize += stackToAdd.stackSize;
-                                f = true;
-                                break;
+                                int toMerge = Math.min(remainingAmount, Integer.MAX_VALUE - stackInList.stackSize);
+                                if (toMerge > 0) {
+                                    stackInList.stackSize += toMerge;
+                                    remainingAmount -= toMerge;
+                                }
+                                if (remainingAmount <= 0) break;
                             }
                         }
-                        if (!f) stacks.add(stackToAdd.copy());
+                        if (remainingAmount != 0) {
+                            ItemStack remainingStack = stackToAdd.copy();
+                            remainingStack.stackSize = remainingAmount;
+                            stacks.add(remainingStack);
+                        }
                     }
                     data.data = stacks.toArray(new ItemStack[0]);
                 }
