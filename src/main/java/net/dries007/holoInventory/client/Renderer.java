@@ -266,6 +266,7 @@ public class Renderer {
         if (distance < 1.5) return;
 
         List<ItemStack> list = filterByNEI(namedData.data);
+        if (list.isEmpty()) return;
 
         int wantedSize = list.size();
 
