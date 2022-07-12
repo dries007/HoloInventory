@@ -239,10 +239,17 @@ public class Renderer {
      * @param items Array of items in the inventory
      */
     private List<ItemStack> filterByNEI(ItemStack[] items) {
-        if (Config.hideItemsNotSelected && Loader.isModLoaded("NotEnoughItems") && SearchField.searchInventories()) {
-            final String searchString = NEIClientConfig.getSearchExpression().toLowerCase();
-            if (!cachedSearch.equals(searchString) || cachedFilter == null) cachedFilter = getFilter(searchString);
-            return Arrays.stream(items).filter(s -> cachedFilter.matches(s)).collect(Collectors.toList());
+        try {
+            if (Config.hideItemsNotSelected
+                    && Loader.isModLoaded("NotEnoughItems")
+                    && SearchField.searchInventories()) {
+                final String searchString =
+                        NEIClientConfig.getSearchExpression().toLowerCase();
+                if (!cachedSearch.equals(searchString) || cachedFilter == null) cachedFilter = getFilter(searchString);
+                return Arrays.stream(items).filter(s -> cachedFilter.matches(s)).collect(Collectors.toList());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return Arrays.asList(items);
     }
