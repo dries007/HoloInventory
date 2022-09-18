@@ -15,8 +15,8 @@ import net.minecraft.nbt.NBTTagList;
  * @author Dries007
  */
 public class DecoderRegistry {
-    private static final Map<Class, InventoryDecoder> CACHE_MAP = new HashMap<Class, InventoryDecoder>();
-    private static final List<InventoryDecoder> REGISTERED_INVENTORY_DECODERS = new ArrayList<InventoryDecoder>();
+    private static final Map<Class<? extends IInventory>, InventoryDecoder> CACHE_MAP = new HashMap<>();
+    private static final List<InventoryDecoder> REGISTERED_INVENTORY_DECODERS = new ArrayList<>();
     private static final InventoryDecoder VANILLA = new InventoryDecoder(IInventory.class) {
         @Override
         public NBTTagList toNBT(IInventory te) {

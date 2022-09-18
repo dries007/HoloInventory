@@ -11,13 +11,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.village.MerchantRecipeList;
 
 public class MerchantInventoryMessage implements IMessage {
+
     NBTTagCompound data;
 
     public MerchantInventoryMessage(NBTTagCompound tag) {
         data = tag;
     }
-
-    public MerchantInventoryMessage() {}
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -36,15 +35,14 @@ public class MerchantInventoryMessage implements IMessage {
                 MerchantRecipeList list = new MerchantRecipeList();
                 list.readRecipiesFromTags(message.data);
 
-                if (message.data.hasKey("class"))
+                if (message.data.hasKey("class")) {
                     Renderer.merchantMap.put(
                             message.data.getInteger("id"),
-                            new NamedData<MerchantRecipeList>(
-                                    message.data.getString("name"), message.data.getString("class"), list));
-                else
+                            new NamedData<>(message.data.getString("name"), message.data.getString("class"), list));
+                } else {
                     Renderer.merchantMap.put(
-                            message.data.getInteger("id"),
-                            new NamedData<MerchantRecipeList>(message.data.getString("name"), list));
+                            message.data.getInteger("id"), new NamedData<>(message.data.getString("name"), list));
+                }
             }
 
             return null;

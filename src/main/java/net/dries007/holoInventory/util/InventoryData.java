@@ -33,10 +33,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class InventoryData {
-    public int id;
+    public final int id;
     public WeakReference<IInventory> te;
-    public WeakHashMap<EntityPlayer, NBTTagCompound> playerSet = new WeakHashMap<>();
-    public String name;
+    public final WeakHashMap<EntityPlayer, NBTTagCompound> playerSet = new WeakHashMap<>();
+    public final String name;
     public String type;
 
     public InventoryData(IInventory te, int id) {

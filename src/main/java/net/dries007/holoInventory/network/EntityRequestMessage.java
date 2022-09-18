@@ -39,7 +39,7 @@ public class EntityRequestMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<EntityRequestMessage, IMessage> {
-        public static HashMultimap<Integer, String> map = HashMultimap.create();
+        public static final HashMultimap<Integer, String> map = HashMultimap.create();
 
         @Override
         public IMessage onMessage(EntityRequestMessage message, MessageContext ctx) {

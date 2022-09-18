@@ -24,7 +24,7 @@ package net.dries007.holoInventory.util;
 public class NamedData<T> {
     public T data;
     public String clazz;
-    public String name;
+    public final String name;
 
     public NamedData(String name, T data) {
         this.name = name;

@@ -22,7 +22,6 @@
 package net.dries007.holoInventory.util;
 
 import appeng.api.parts.IPartHost;
-import appeng.tile.misc.TileInterface;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,14 +33,13 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
 public class Helper {
+
     public static boolean weWant(Object o) {
-        return o != null
-                && (o instanceof IInventory
-                        || o instanceof IMerchant
-                        || o instanceof TileEntityEnderChest
-                        || o instanceof BlockJukebox.TileEntityJukebox
-                        || o instanceof TileInterface
-                        || o instanceof IPartHost);
+        return o instanceof IInventory
+                || o instanceof IMerchant
+                || o instanceof TileEntityEnderChest
+                || o instanceof BlockJukebox.TileEntityJukebox
+                || o instanceof IPartHost;
     }
 
     public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer) {

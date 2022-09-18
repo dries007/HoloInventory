@@ -25,7 +25,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class Coord {
-    public int dim;
+    public final int dim;
     public double x;
     public double y;
     public double z;
@@ -49,10 +49,9 @@ public class Coord {
 
     public Coord offset(int side) {
         ForgeDirection dir = ForgeDirection.getOrientation(side);
-        this.x = +dir.offsetX;
-        this.y = +dir.offsetY;
-        this.z = +dir.offsetZ;
-
+        this.x += dir.offsetX;
+        this.y += dir.offsetY;
+        this.z += dir.offsetZ;
         return this;
     }
 

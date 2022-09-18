@@ -22,7 +22,6 @@ public class ResetMessage implements IMessage {
                 Renderer.tileMap.clear();
                 Renderer.merchantMap.clear();
             }
-
             return null;
         }
     }

@@ -57,9 +57,9 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 public class ServerEventHandler {
-    public List<String> banUsers = new ArrayList<>();
-    public HashMap<String, String> overrideUsers = new HashMap<>();
-    public HashMap<Integer, InventoryData> blockMap = new HashMap<>();
+    public final List<String> banUsers = new ArrayList<>();
+    public final HashMap<String, String> overrideUsers = new HashMap<>();
+    public final HashMap<Integer, InventoryData> blockMap = new HashMap<>();
 
     private static class CachedPatternInventory {
         public static int computeHash(IInventory key) {
@@ -79,17 +79,19 @@ public class ServerEventHandler {
             hash = computeHash(key);
         }
 
-        public WeakReference<IInventory> inventory;
-        public int hash;
+        public final WeakReference<IInventory> inventory;
+        public final int hash;
     }
 
-    Map<IInventory, CachedPatternInventory> wrappedInventoryCache = new WeakHashMap<>();
+    final Map<IInventory, CachedPatternInventory> wrappedInventoryCache = new WeakHashMap<>();
     private static final String JUKEBOX_NAME = "Jukebox";
 
     @SubscribeEvent()
     public void event(PlayerInteractEvent event) {
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
-        if (banUsers.contains(event.entityPlayer.getDisplayName())) {
+        if (banUsers.contains(
+                event.entityPlayer
+                        .getDisplayName())) { // TODO do we really need to check a list on each players right click ?
             banUsers.remove(event.entityPlayer.getDisplayName());
             event.setCanceled(true);
 
@@ -98,13 +100,16 @@ public class ServerEventHandler {
                 Config.bannedTiles.add(te.getClass().getCanonicalName());
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(
                         te.getClass().getCanonicalName() + " will no longer display a hologram."));
-            } else
+            } else {
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
+            }
 
             HoloInventory.getConfig().overrideBannedThings();
         }
 
-        if (overrideUsers.containsKey(event.entityPlayer.getDisplayName())) {
+        if (overrideUsers.containsKey(
+                event.entityPlayer
+                        .getDisplayName())) { // TODO do we really need to check a list on each players right click ?
             if (FMLCommonHandler.instance().getEffectiveSide().isClient()) return;
 
             String nameOverride = overrideUsers.get(event.entityPlayer.getDisplayName());
@@ -124,17 +129,19 @@ public class ServerEventHandler {
                                 event.entityPlayer);
                 event.entityPlayer.addChatComponentMessage(
                         new ChatComponentText(te.getClass().getCanonicalName() + " will now be named " + nameOverride));
-            } else
+            } else {
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText("That is no inventory. Try again."));
+            }
         }
     }
 
     @SubscribeEvent()
     public void event(EntityInteractEvent event) {
-        if (banUsers.contains(event.entityPlayer.getDisplayName())) {
+        if (banUsers.contains(
+                event.entityPlayer
+                        .getDisplayName())) { // TODO do we really need to check a list on each players right click ?
             banUsers.remove(event.entityPlayer.getDisplayName());
             event.setCanceled(true);
-
             if (Helper.weWant(event.target)) {
                 Config.bannedEntities.add(event.target.getClass().getCanonicalName());
                 event.entityPlayer.addChatComponentMessage(new ChatComponentText(
@@ -150,27 +157,26 @@ public class ServerEventHandler {
     public void event(TickEvent.PlayerTickEvent event) {
         try {
             if (event.phase != TickEvent.Phase.END || event.side != Side.SERVER) return;
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
-            WorldServer world = player.getServerForPlayer();
+            final EntityPlayerMP player = (EntityPlayerMP) event.player;
+            final WorldServer world = player.getServerForPlayer();
             if (world == null) return;
 
-            MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
+            final MovingObjectPosition mo = Helper.getPlayerLookingSpot(player);
 
             if (mo != null) {
                 switch (mo.typeOfHit) {
                     case BLOCK:
-                        Coord coord = new Coord(world.provider.dimensionId, mo);
-                        int x = (int) coord.x, y = (int) coord.y, z = (int) coord.z;
-                        TileEntity te = world.getTileEntity(x, y, z);
+                        final Coord coord = new Coord(world.provider.dimensionId, mo);
+                        final int x = (int) coord.x, y = (int) coord.y, z = (int) coord.z;
+                        final TileEntity te = world.getTileEntity(x, y, z);
                         if (Helper.weWant(te)) {
                             checkForChangedType(coord.hashCode(), te);
-                            HoloInventory.getConfig();
                             if (Config.bannedTiles.contains(te.getClass().getCanonicalName())) {
                                 // BANNED THING
                                 cleanup(coord, player);
                             } else if (te instanceof TileEntityChest) {
-                                Block block = world.getBlock(x, y, z);
-                                TileEntityChest teChest = (TileEntityChest) te;
+                                final Block block = world.getBlock(x, y, z);
+                                final TileEntityChest teChest = (TileEntityChest) te;
                                 IInventory inventory = teChest;
 
                                 if (world.getBlock(x, y, z + 1) == block)
@@ -194,8 +200,8 @@ public class ServerEventHandler {
 
                                 doStuff(coord.hashCode(), player, inventory);
                             } else if (te instanceof TileInterface) {
-                                IInventory patterns = ((TileInterface) te).getInventoryByName("patterns");
-                                IInventory wrapped =
+                                final IInventory patterns = ((TileInterface) te).getInventoryByName("patterns");
+                                final IInventory wrapped =
                                         getCachedPatternsWrapper(world, ((TileInterface) te).getCustomName(), patterns);
                                 doStuff(coord.hashCode(), player, wrapped);
                             } else if (te instanceof IPartHost) {
@@ -203,8 +209,9 @@ public class ServerEventHandler {
                                 final IPartHost host = (IPartHost) te;
                                 final SelectedPart sp = host.selectPart(position);
                                 if (sp != null && sp.part instanceof PartInterface) {
-                                    IInventory patterns = ((PartInterface) sp.part).getInventoryByName("patterns");
-                                    IInventory wrapped = getCachedPatternsWrapper(
+                                    final IInventory patterns =
+                                            ((PartInterface) sp.part).getInventoryByName("patterns");
+                                    final IInventory wrapped = getCachedPatternsWrapper(
                                             world, ((PartInterface) sp.part).getCustomName(), patterns);
                                     doStuff(coord.hashCode(), player, wrapped);
                                 }
@@ -230,7 +237,6 @@ public class ServerEventHandler {
         } catch (Exception e) {
             HoloInventory.getLogger().warn("Some error while sending over inventory, no hologram for you :(");
             HoloInventory.getLogger().warn("Please make an issue on github if this happens.");
-
             e.printStackTrace();
         }
     }
@@ -248,17 +254,17 @@ public class ServerEventHandler {
 
     private void checkForChangedType(int id, TileEntity te) {
         if (blockMap.containsKey(id)) {
-            InventoryData data = blockMap.get(id);
+            final InventoryData data = blockMap.get(id);
             if (!te.getClass().getCanonicalName().equals(data.getType())) blockMap.remove(id);
         }
     }
 
     private void cleanup(Coord coord, EntityPlayerMP player) {
         if (blockMap.containsKey(coord.hashCode())) {
-            InventoryData inventoryData = blockMap.get(coord.hashCode());
+            final InventoryData inventoryData = blockMap.get(coord.hashCode());
             inventoryData.playerSet.remove(player);
             if (inventoryData.playerSet.isEmpty()) blockMap.remove(coord.hashCode());
-            NBTTagCompound root = new NBTTagCompound();
+            final NBTTagCompound root = new NBTTagCompound();
             root.setByte("type", (byte) 0);
             root.setInteger("id", coord.hashCode());
             HoloInventory.getSnw().sendTo(new RemoveInventoryMessage(root), player);
@@ -267,9 +273,9 @@ public class ServerEventHandler {
 
     private IInventory convertToOutputItems(String name, IInventory patterns, World w) {
         int N = patterns.getSizeInventory();
-        ItemStack[] outputs = new ItemStack[N];
+        final ItemStack[] outputs = new ItemStack[N];
         for (int i = 0; i < N; ++i) {
-            ItemStack stack = patterns.getStackInSlot(i);
+            final ItemStack stack = patterns.getStackInSlot(i);
             outputs[i] = null;
             if (stack != null && stack.getItem() instanceof ICraftingPatternItem) {
                 IAEItemStack[] outs = ((ICraftingPatternItem) stack.getItem())

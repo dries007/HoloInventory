@@ -26,15 +26,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import net.dries007.holoInventory.util.DevPerks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
 public class Config {
     private static Configuration configuration;
     private final File file;
 
-    public static boolean requireGlasses = true;
+    public static final boolean requireGlasses = true;
     public static boolean colorEnable = false;
     public static int colorAlpha = 200;
     public static int colorR = 14;
@@ -56,9 +54,9 @@ public class Config {
     public static boolean debug = false;
     public static double renderScaling = 1.0;
 
-    public static ArrayList<String> bannedTiles = new ArrayList<String>();
-    public static ArrayList<String> bannedEntities = new ArrayList<String>();
-    public static HashMap<String, String> nameOverrides = new HashMap<String, String>();
+    public static final ArrayList<String> bannedTiles = new ArrayList<>();
+    public static final ArrayList<String> bannedEntities = new ArrayList<>();
+    public static final HashMap<String, String> nameOverrides = new HashMap<>();
 
     public Config(File file) {
         this.file = file;
@@ -70,16 +68,16 @@ public class Config {
                 .get(
                         HoloInventory.MODID,
                         "bannedTiles",
-                        bannedTiles.toArray(new String[bannedTiles.size()]),
+                        bannedTiles.toArray(new String[0]),
                         "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.")
-                .set(bannedTiles.toArray(new String[bannedTiles.size()]));
+                .set(bannedTiles.toArray(new String[0]));
         configuration
                 .get(
                         HoloInventory.MODID,
                         "bannedEntities",
-                        bannedEntities.toArray(new String[bannedEntities.size()]),
+                        bannedEntities.toArray(new String[0]),
                         "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.")
-                .set(bannedEntities.toArray(new String[bannedEntities.size()]));
+                .set(bannedEntities.toArray(new String[0]));
         save();
     }
 
@@ -224,7 +222,7 @@ public class Config {
                 .get(
                         HoloInventory.MODID,
                         "bannedTiles",
-                        bannedTiles.toArray(new String[bannedTiles.size()]),
+                        bannedTiles.toArray(new String[0]),
                         "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.")
                 .getStringList()));
         bannedEntities.clear();
@@ -232,7 +230,7 @@ public class Config {
                 .get(
                         HoloInventory.MODID,
                         "bannedEntities",
-                        bannedEntities.toArray(new String[bannedEntities.size()]),
+                        bannedEntities.toArray(new String[0]),
                         "Banned inventories.\n" + "Use the ingame command '/holoinventory' to change this list easily.")
                 .getStringList()));
 
@@ -254,24 +252,8 @@ public class Config {
 
         debug = configuration.getBoolean(
                 "debug", HoloInventory.MODID, debug, "Enable debug, use when errors or weird behaviour happens.");
-        if (configuration.getBoolean(
-                "sillyness", HoloInventory.MODID, true, "Disable sillyness only if you want to piss of the devs XD"))
-            MinecraftForge.EVENT_BUS.register(new DevPerks(debug));
 
         save();
-    }
-
-    public void setKey(int p_151462_1_) {
-        configuration
-                .get(HoloInventory.MODID, "keyCode", p_151462_1_, "You can set this ingame.")
-                .set(p_151462_1_);
-        save();
-    }
-
-    public int getKey() {
-        return configuration
-                .get(HoloInventory.MODID, "keyCode", 0, "You can set this ingame.")
-                .getInt();
     }
 
     public void save() {

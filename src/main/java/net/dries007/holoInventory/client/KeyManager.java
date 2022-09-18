@@ -24,7 +24,7 @@ package net.dries007.holoInventory.client;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.minecraft.client.settings.KeyBinding;
@@ -32,17 +32,11 @@ import org.lwjgl.input.Keyboard;
 
 public class KeyManager {
 
-    public static final KeyBinding key = new KeyBinding("HoloGlasses", 0, "key.categories.holoinventory") {
-        @Override
-        public void setKeyCode(int p_151462_1_) {
-            HoloInventory.getConfig().setKey(p_151462_1_);
-            super.setKeyCode(p_151462_1_);
-        }
-    };
+    public static final KeyBinding key =
+            new KeyBinding("HoloGlasses", Keyboard.KEY_NUMPAD5, "key.categories.holoinventory");
 
     public KeyManager() {
         ClientRegistry.registerKeyBinding(key);
-        key.setKeyCode(HoloInventory.getConfig().getKey());
         switch (Config.keyMode) {
             case 1:
                 Renderer.INSTANCE.enabled = Config.keyState;
@@ -63,25 +57,25 @@ public class KeyManager {
     boolean alreadyToggling = false;
 
     @SubscribeEvent
-    public void input(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) return;
-        int code = key.getKeyCode();
-        if (code < 0 || code > Keyboard.KEYBOARD_SIZE) return;
+    public void input(InputEvent.KeyInputEvent event) {
+        final boolean isKeyPressed = key.getIsKeyPressed();
         switch (Config.keyMode) {
             case 1:
-                if (Keyboard.isKeyDown(code) && FMLClientHandler.instance().getClient().inGameHasFocus) {
+                if (isKeyPressed && FMLClientHandler.instance().getClient().inGameHasFocus) {
                     if (!alreadyToggling) {
                         alreadyToggling = true;
                         Renderer.INSTANCE.enabled = !Renderer.INSTANCE.enabled;
                         HoloInventory.getConfig().setKeyState(Renderer.INSTANCE.enabled);
                     }
-                } else alreadyToggling = false;
+                } else {
+                    alreadyToggling = false;
+                }
                 break;
             case 2:
-                Renderer.INSTANCE.enabled = Keyboard.isKeyDown(code);
+                Renderer.INSTANCE.enabled = isKeyPressed;
                 break;
             case 3:
-                Renderer.INSTANCE.enabled = !Keyboard.isKeyDown(code);
+                Renderer.INSTANCE.enabled = !isKeyPressed;
                 break;
         }
     }

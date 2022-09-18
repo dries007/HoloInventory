@@ -12,9 +12,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 public class EntityInventoryMessage implements IMessage {
-    NBTTagCompound data;
 
-    public EntityInventoryMessage() {}
+    NBTTagCompound data;
 
     public EntityInventoryMessage(NBTTagCompound inventoryData) {
         data = inventoryData;
@@ -41,15 +40,15 @@ public class EntityInventoryMessage implements IMessage {
                     itemStacks[i] = ItemStack.loadItemStackFromNBT(tag);
                     if (itemStacks[i] != null) itemStacks[i].stackSize = tag.getInteger("Count");
                 }
-                if (message.data.hasKey("class"))
+                if (message.data.hasKey("class")) {
                     Renderer.entityMap.put(
                             message.data.getInteger("id"),
-                            new NamedData<ItemStack[]>(
+                            new NamedData<>(
                                     message.data.getString("name"), message.data.getString("class"), itemStacks));
-                else
+                } else {
                     Renderer.entityMap.put(
-                            message.data.getInteger("id"),
-                            new NamedData<ItemStack[]>(message.data.getString("name"), itemStacks));
+                            message.data.getInteger("id"), new NamedData<>(message.data.getString("name"), itemStacks));
+                }
             }
 
             return null;
