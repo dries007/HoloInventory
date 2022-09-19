@@ -18,6 +18,9 @@ public class MerchantInventoryMessage implements IMessage {
         data = tag;
     }
 
+    @SuppressWarnings("unused") // used by FML reflection
+    public MerchantInventoryMessage() {}
+
     @Override
     public void fromBytes(ByteBuf buf) {
         data = ByteBufUtils.readTag(buf);

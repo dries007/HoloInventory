@@ -19,6 +19,9 @@ public class EntityInventoryMessage implements IMessage {
         data = inventoryData;
     }
 
+    @SuppressWarnings("unused") // used by FML reflection
+    public EntityInventoryMessage() {}
+
     @Override
     public void fromBytes(ByteBuf buf) {
         data = ByteBufUtils.readTag(buf);
