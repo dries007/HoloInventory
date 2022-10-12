@@ -78,6 +78,10 @@ public class Renderer {
     private Coord coord;
     public boolean enabled = true;
 
+    // copy of RenderManager#renderPosX and its cousins. we need to calculate these ourselves as they can be broken
+    // by optifine
+    private static double renderPosX, renderPosY, renderPosZ;
+
     public static final Renderer INSTANCE = new Renderer();
     private float timeD, blockScale, maxWith, maxHeight;
     private int maxColumns, maxRows;
@@ -100,7 +104,7 @@ public class Renderer {
         final ItemStack glasses = HoloGlasses.getHoloGlasses(world, player);
         try {
             if (!Config.requireGlasses || glasses != null && ((IHoloGlasses) glasses.getItem()).shouldRender(glasses)) {
-                doEvent();
+                doEvent(event.partialTicks);
             }
         } catch (Exception e) {
             HoloInventory.getLogger().warn("Some error while rendering the hologram :(");
@@ -109,7 +113,7 @@ public class Renderer {
         }
     }
 
-    private void doEvent() {
+    private void doEvent(float partialTicks) {
         final Minecraft mc = Minecraft.getMinecraft();
         if (mc.renderEngine == null
                 || RenderManager.instance == null
@@ -134,6 +138,7 @@ public class Renderer {
                             coord.x += 0.5;
                             coord.y += 0.5;
                             coord.z += 0.5;
+                            setRenderPos(partialTicks);
                             renderHologram(data);
                         } else {
                             tileMap.remove(coord.hashCode());
@@ -163,6 +168,7 @@ public class Renderer {
                     }
 
                     // Render appropriate hologram
+                    setRenderPos(partialTicks);
                     if (entity instanceof IInventory && entityMap.containsKey(id)) renderHologram(entityMap.get(id));
                     if (entity instanceof IMerchant && merchantMap.containsKey(id)) renderMerchant(merchantMap.get(id));
                 }
@@ -173,7 +179,7 @@ public class Renderer {
     /**
      * Render a villagers hologram
      *
-     * @param namedData The things to render
+     * @param namedData    The things to render
      */
     private void renderMerchant(NamedData<MerchantRecipeList> namedData) {
         coord.y += 2; // Adjust for villager height
@@ -260,7 +266,7 @@ public class Renderer {
      * Render a regular hologram
      * Does stacking first if user wants it
      *
-     * @param namedData Array of items in the inventory
+     * @param namedData    Array of items in the inventory
      */
     private void renderHologram(NamedData<ItemStack[]> namedData) {
         if (namedData.data == null || namedData.name == null || namedData.data.length == 0) return;
@@ -376,10 +382,7 @@ public class Renderer {
      * @param depth Shift towards the player if negative
      */
     private void moveAndRotate(double depth) {
-        GL11.glTranslated(
-                coord.x - RenderManager.renderPosX,
-                coord.y - RenderManager.renderPosY,
-                coord.z - RenderManager.renderPosZ);
+        GL11.glTranslated(coord.x - renderPosX, coord.y - renderPosY, coord.z - renderPosZ);
         GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
         GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
         GL11.glTranslated(0, 0, depth);
@@ -529,9 +532,21 @@ public class Renderer {
         GL11.glPopMatrix();
     }
 
+    private static void setRenderPos(float partialTicks) {
+        Entity thePlayer = Minecraft.getMinecraft().thePlayer;
+        double lastTickPosX = thePlayer.lastTickPosX;
+        double posX = thePlayer.posX;
+        renderPosX = lastTickPosX + (posX - lastTickPosX) * partialTicks;
+        renderPosY = thePlayer.lastTickPosY + (thePlayer.posY - thePlayer.lastTickPosY) * partialTicks;
+        renderPosZ = thePlayer.lastTickPosZ + (thePlayer.posZ - thePlayer.lastTickPosZ) * partialTicks;
+    }
+
     private double distance() {
-        return Math.sqrt((coord.x - RenderManager.renderPosX) * (coord.x - RenderManager.renderPosX)
-                + (coord.y - RenderManager.renderPosY) * (coord.y - RenderManager.renderPosY)
-                + (coord.z - RenderManager.renderPosZ) * (coord.z - RenderManager.renderPosZ));
+        // it appears optifine might mess up the renderViewEntity's posX and lasttickposx, so we have to do it
+        // ourselves
+        double dx = coord.x - renderPosX;
+        double dy = coord.y - renderPosY;
+        double dz = coord.z - renderPosZ;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 }
