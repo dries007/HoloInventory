@@ -22,6 +22,7 @@
 package net.dries007.holoInventory.server;
 
 import appeng.api.implementations.ICraftingPatternItem;
+import appeng.api.networking.crafting.ICraftingPatternDetails;
 import appeng.api.parts.IPartHost;
 import appeng.api.parts.SelectedPart;
 import appeng.api.storage.data.IAEItemStack;
@@ -278,10 +279,10 @@ public class ServerEventHandler {
             final ItemStack stack = patterns.getStackInSlot(i);
             outputs[i] = null;
             if (stack != null && stack.getItem() instanceof ICraftingPatternItem) {
-                IAEItemStack[] outs = ((ICraftingPatternItem) stack.getItem())
-                        .getPatternForItem(stack, w)
-                        .getCondensedOutputs();
-                if (outs.length > 0) outputs[i] = outs[0].getItemStack();
+                ICraftingPatternDetails pd = ((ICraftingPatternItem) stack.getItem()).getPatternForItem(stack, w);
+                if (pd == null) continue;
+                IAEItemStack[] outs = pd.getCondensedOutputs();
+                if (outs != null && outs.length > 0) outputs[i] = outs[0].getItemStack();
             }
         }
         return new FakeInventory(name, outputs);
