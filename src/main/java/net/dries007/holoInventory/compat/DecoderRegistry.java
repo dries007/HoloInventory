@@ -1,23 +1,27 @@
 package net.dries007.holoInventory.compat;
 
-import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
-import cpw.mods.fml.common.Loader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
+import cpw.mods.fml.common.Loader;
+
 /**
  * @author Dries007
  */
 public class DecoderRegistry {
+
     private static final Map<Class<? extends IInventory>, InventoryDecoder> CACHE_MAP = new HashMap<>();
     private static final List<InventoryDecoder> REGISTERED_INVENTORY_DECODERS = new ArrayList<>();
     private static final InventoryDecoder VANILLA = new InventoryDecoder(IInventory.class) {
+
         @Override
         public NBTTagList toNBT(IInventory te) {
             NBTTagList list = new NBTTagList();
@@ -38,6 +42,7 @@ public class DecoderRegistry {
     public static void init() {
         if (Loader.isModLoaded("StorageDrawers")) {
             REGISTERED_INVENTORY_DECODERS.add(new InventoryDecoder(IDrawerGroup.class) {
+
                 @Override
                 public NBTTagList toNBT(IInventory te) {
                     IDrawerGroup drawerGroup = ((IDrawerGroup) te);

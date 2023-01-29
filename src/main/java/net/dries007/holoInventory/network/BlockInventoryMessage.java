@@ -1,12 +1,8 @@
 package net.dries007.holoInventory.network;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.client.Renderer;
 import net.dries007.holoInventory.util.NamedData;
@@ -14,7 +10,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import io.netty.buffer.ByteBuf;
+
 public class BlockInventoryMessage implements IMessage {
+
     NBTTagCompound data;
 
     public BlockInventoryMessage(NBTTagCompound inventoryData) {
@@ -34,6 +37,7 @@ public class BlockInventoryMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<BlockInventoryMessage, IMessage> {
+
         @Override
         public IMessage onMessage(BlockInventoryMessage message, MessageContext ctx) {
             if (message == null || message.data == null) return null; // hun?

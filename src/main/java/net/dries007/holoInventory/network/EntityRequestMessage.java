@@ -1,11 +1,5 @@
 package net.dries007.holoInventory.network;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.HashMultimap;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import io.netty.buffer.ByteBuf;
 import net.dries007.holoInventory.Config;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
@@ -15,7 +9,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.DimensionManager;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.HashMultimap;
+
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import io.netty.buffer.ByteBuf;
+
 public class EntityRequestMessage implements IMessage {
+
     private int dim;
     private int entityId;
 
@@ -39,6 +42,7 @@ public class EntityRequestMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<EntityRequestMessage, IMessage> {
+
         public static final HashMultimap<Integer, String> map = HashMultimap.create();
 
         @Override
@@ -78,8 +82,7 @@ public class EntityRequestMessage implements IMessage {
                         root.setTag("list", list);
                         return new EntityInventoryMessage(root);
                     } else {
-                        NBTTagCompound tag =
-                                ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
+                        NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
                         tag.setInteger("id", message.entityId);
                         tag.setString("name", entity.getCommandSenderName());
                         tag.setString("class", entity.getClass().getCanonicalName());

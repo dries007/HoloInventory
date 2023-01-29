@@ -1,14 +1,16 @@
 package net.dries007.holoInventory.network;
 
+import net.dries007.holoInventory.client.Renderer;
+import net.minecraft.nbt.NBTTagCompound;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import net.dries007.holoInventory.client.Renderer;
-import net.minecraft.nbt.NBTTagCompound;
 
 public class RemoveInventoryMessage implements IMessage {
+
     NBTTagCompound data;
 
     public RemoveInventoryMessage() {}
@@ -28,6 +30,7 @@ public class RemoveInventoryMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<RemoveInventoryMessage, IMessage> {
+
         @Override
         public IMessage onMessage(RemoveInventoryMessage message, MessageContext ctx) {
             if (ctx.side.isClient()) {

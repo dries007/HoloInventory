@@ -1,35 +1,22 @@
 /*
- * Copyright (c) 2014. Dries K. Aka Dries007
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Copyright (c) 2014. Dries K. Aka Dries007 Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+ * following conditions: The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 package net.dries007.holoInventory.client;
 
-import codechicken.nei.ItemList;
-import codechicken.nei.NEIClientConfig;
-import codechicken.nei.SearchField;
-import codechicken.nei.api.ItemFilter;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.api.IHoloGlasses;
@@ -56,18 +43,26 @@ import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import codechicken.nei.ItemList;
+import codechicken.nei.NEIClientConfig;
+import codechicken.nei.SearchField;
+import codechicken.nei.api.ItemFilter;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 public class Renderer {
+
     private static final DecimalFormat DF_ONE_FRACTION_DIGIT = new DecimalFormat("##.0");
     private static final DecimalFormat DF_TWO_FRACTION_DIGIT = new DecimalFormat("#.00");
     // changed with an attached debugger..
     static int stackSizeDebugOverride = 0;
-    private static final String[] suffixNormal = {"", "K", "M", "B"};
-    private static final String[] suffixDarkened = {
-        "", EnumChatFormatting.GRAY + "K", EnumChatFormatting.GRAY + "M", EnumChatFormatting.GRAY + "B"
-    };
+    private static final String[] suffixNormal = { "", "K", "M", "B" };
+    private static final String[] suffixDarkened = { "", EnumChatFormatting.GRAY + "K", EnumChatFormatting.GRAY + "M",
+            EnumChatFormatting.GRAY + "B" };
     private static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
     public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<>();
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<>();
@@ -115,8 +110,7 @@ public class Renderer {
 
     private void doEvent(float partialTicks) {
         final Minecraft mc = Minecraft.getMinecraft();
-        if (mc.renderEngine == null
-                || RenderManager.instance == null
+        if (mc.renderEngine == null || RenderManager.instance == null
                 || RenderManager.instance.getFontRenderer() == null
                 || mc.gameSettings.thirdPersonView != 0
                 || mc.objectMouseOver == null) {
@@ -179,7 +173,7 @@ public class Renderer {
     /**
      * Render a villagers hologram
      *
-     * @param namedData    The things to render
+     * @param namedData The things to render
      */
     private void renderMerchant(NamedData<MerchantRecipeList> namedData) {
         coord.y += 2; // Adjust for villager height
@@ -248,11 +242,9 @@ public class Renderer {
      */
     private List<ItemStack> filterByNEI(ItemStack[] items) {
         try {
-            if (Config.hideItemsNotSelected
-                    && Loader.isModLoaded("NotEnoughItems")
+            if (Config.hideItemsNotSelected && Loader.isModLoaded("NotEnoughItems")
                     && SearchField.searchInventories()) {
-                final String searchString =
-                        NEIClientConfig.getSearchExpression().toLowerCase();
+                final String searchString = NEIClientConfig.getSearchExpression().toLowerCase();
                 if (!cachedSearch.equals(searchString) || cachedFilter == null) cachedFilter = getFilter(searchString);
                 return Arrays.stream(items).filter(s -> cachedFilter.matches(s)).collect(Collectors.toList());
             }
@@ -263,10 +255,9 @@ public class Renderer {
     }
 
     /**
-     * Render a regular hologram
-     * Does stacking first if user wants it
+     * Render a regular hologram Does stacking first if user wants it
      *
-     * @param namedData    Array of items in the inventory
+     * @param namedData Array of items in the inventory
      */
     private void renderHologram(NamedData<ItemStack[]> namedData) {
         if (namedData.data == null || namedData.name == null || namedData.data.length == 0) return;
@@ -279,23 +270,23 @@ public class Renderer {
         int wantedSize = list.size();
 
         switch (Config.mode) {
-                // Most abundant, 1 item
+            // Most abundant, 1 item
             case 2:
                 wantedSize = 1;
                 break;
-                // Most abundant, 3 items
+            // Most abundant, 3 items
             case 3:
                 wantedSize = 3;
                 break;
-                // Most abundant, 5 items
+            // Most abundant, 5 items
             case 4:
                 wantedSize = 5;
                 break;
-                // Most abundant, 7 items
+            // Most abundant, 7 items
             case 5:
                 wantedSize = 7;
                 break;
-                // Most abundant, 9 items
+            // Most abundant, 9 items
             case 6:
                 wantedSize = 9;
                 break;
@@ -344,8 +335,7 @@ public class Renderer {
         // Values for later
         timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
         maxColumns = getMaxColumns(itemStacks.size());
-        maxRows = (itemStacks.size() % maxColumns == 0)
-                ? (itemStacks.size() / maxColumns) - 1
+        maxRows = (itemStacks.size() % maxColumns == 0) ? (itemStacks.size() / maxColumns) - 1
                 : itemStacks.size() / maxColumns;
         blockScale = getBlockScaleModifier(maxColumns) + (float) (0.05f * distance);
         maxWith = maxColumns * blockScale * (stackSpacing + 0.1f) * 0.4f;

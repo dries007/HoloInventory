@@ -1,14 +1,15 @@
 package net.dries007.holoInventory.network;
 
+import net.dries007.holoInventory.client.Renderer;
+import net.dries007.holoInventory.util.NamedData;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.village.MerchantRecipeList;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import net.dries007.holoInventory.client.Renderer;
-import net.dries007.holoInventory.util.NamedData;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.village.MerchantRecipeList;
 
 public class MerchantInventoryMessage implements IMessage {
 
@@ -32,6 +33,7 @@ public class MerchantInventoryMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<MerchantInventoryMessage, IMessage> {
+
         @Override
         public IMessage onMessage(MerchantInventoryMessage message, MessageContext ctx) {
             if (ctx.side.isClient()) {
@@ -43,8 +45,8 @@ public class MerchantInventoryMessage implements IMessage {
                             message.data.getInteger("id"),
                             new NamedData<>(message.data.getString("name"), message.data.getString("class"), list));
                 } else {
-                    Renderer.merchantMap.put(
-                            message.data.getInteger("id"), new NamedData<>(message.data.getString("name"), list));
+                    Renderer.merchantMap
+                            .put(message.data.getInteger("id"), new NamedData<>(message.data.getString("name"), list));
                 }
             }
 

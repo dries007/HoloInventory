@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagList;
  * @author Dries007
  */
 public abstract class InventoryDecoder {
+
     public final Class<?> targetClass;
 
     public InventoryDecoder(Class<?> targetClass) {

@@ -1,12 +1,7 @@
 package net.dries007.holoInventory.items;
 
-import baubles.api.BaubleType;
-import baubles.api.BaublesApi;
-import baubles.api.IBauble;
-import cpw.mods.fml.common.Optional.Interface;
-import cpw.mods.fml.common.Optional.InterfaceList;
-import cpw.mods.fml.common.Optional.Method;
 import java.util.List;
+
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.api.IHoloGlasses;
 import net.minecraft.creativetab.CreativeTabs;
@@ -19,19 +14,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
+
 import org.lwjgl.input.Keyboard;
+
 import tconstruct.armor.ArmorProxyClient;
 import tconstruct.armor.player.TPlayerStats;
 import tconstruct.library.accessory.IAccessory;
+import baubles.api.BaubleType;
+import baubles.api.BaublesApi;
+import baubles.api.IBauble;
+import cpw.mods.fml.common.Optional.Interface;
+import cpw.mods.fml.common.Optional.InterfaceList;
+import cpw.mods.fml.common.Optional.Method;
 
-@InterfaceList({
-    @Interface(iface = "baubles.api.IBauble", modid = "Baubles"),
-    @Interface(iface = "tconstruct.library.accessory.IAccessory", modid = "TConstruct")
-})
+@InterfaceList({ @Interface(iface = "baubles.api.IBauble", modid = "Baubles"),
+        @Interface(iface = "tconstruct.library.accessory.IAccessory", modid = "TConstruct") })
 public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAccessory {
 
-    public static final ArmorMaterial MATERIAL =
-            EnumHelper.addArmorMaterial("holoGlasses", 0, new int[] {0, 0, 0, 0}, 0);
+    public static final ArmorMaterial MATERIAL = EnumHelper
+            .addArmorMaterial("holoGlasses", 0, new int[] { 0, 0, 0, 0 }, 0);
 
     public HoloGlasses(String name) {
         super(MATERIAL, 0, 0);
@@ -63,26 +64,22 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
 
         if (HoloInventory.isBaublesLoaded) {
             IInventory inventory = BaublesApi.getBaubles(player);
-            for (int i = 0; i != inventory.getSizeInventory(); i++)
-                if (inventory.getStackInSlot(i) != null
-                        && inventory.getStackInSlot(i).getItem() instanceof IHoloGlasses)
-                    return inventory.getStackInSlot(i);
+            for (int i = 0; i != inventory.getSizeInventory(); i++) if (inventory.getStackInSlot(i) != null
+                    && inventory.getStackInSlot(i).getItem() instanceof IHoloGlasses)
+                return inventory.getStackInSlot(i);
         }
 
         if (HoloInventory.isTinkersLoaded) {
             IInventory inventory = TPlayerStats.get(player).armor;
 
-            if (world.isRemote)
-                for (int i = 0; i != inventory.getSizeInventory(); i++) {
-                    if (ArmorProxyClient.armorExtended.getStackInSlot(i) != null
-                            && ArmorProxyClient.armorExtended.getStackInSlot(i).getItem() instanceof IHoloGlasses)
-                        return ArmorProxyClient.armorExtended.getStackInSlot(i);
-                }
-            else
-                for (int i = 0; i != inventory.getSizeInventory(); i++)
-                    if (inventory.getStackInSlot(i) != null
-                            && inventory.getStackInSlot(i).getItem() instanceof IHoloGlasses)
-                        return inventory.getStackInSlot(i);
+            if (world.isRemote) for (int i = 0; i != inventory.getSizeInventory(); i++) {
+                if (ArmorProxyClient.armorExtended.getStackInSlot(i) != null
+                        && ArmorProxyClient.armorExtended.getStackInSlot(i).getItem() instanceof IHoloGlasses)
+                    return ArmorProxyClient.armorExtended.getStackInSlot(i);
+            }
+            else for (int i = 0; i != inventory.getSizeInventory(); i++) if (inventory.getStackInSlot(i) != null
+                    && inventory.getStackInSlot(i).getItem() instanceof IHoloGlasses)
+                return inventory.getStackInSlot(i);
         }
         return null;
     }
