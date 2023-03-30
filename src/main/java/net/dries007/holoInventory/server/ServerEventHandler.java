@@ -241,12 +241,13 @@ public class ServerEventHandler {
 
     private IInventory getCachedPatternsWrapper(WorldServer world, String name, IInventory patterns) {
         CachedPatternInventory cache = wrappedInventoryCache.get(patterns);
-        if (cache == null || cache.inventory.get() == null
+        IInventory ret;
+        if (cache == null || (ret = cache.inventory.get()) == null
                 || cache.hash != CachedPatternInventory.computeHash(patterns)) {
-            cache = new CachedPatternInventory(convertToOutputItems(name, patterns, world), patterns);
+            cache = new CachedPatternInventory(ret = convertToOutputItems(name, patterns, world), patterns);
             wrappedInventoryCache.put(patterns, cache);
         }
-        return cache.inventory.get();
+        return ret;
     }
 
     private void checkForChangedType(int id, TileEntity te) {
