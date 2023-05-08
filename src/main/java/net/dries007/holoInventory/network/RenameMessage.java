@@ -9,10 +9,14 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * Server -> Client
+ */
 public class RenameMessage implements IMessage {
 
     String name, override;
 
+    @SuppressWarnings("unused")
     public RenameMessage() {}
 
     public RenameMessage(String name, String override) {

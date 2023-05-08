@@ -13,9 +13,11 @@
 
 package net.dries007.holoInventory.client;
 
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
@@ -26,26 +28,21 @@ import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import codechicken.nei.ItemList;
 import codechicken.nei.NEIClientConfig;
@@ -56,20 +53,12 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class Renderer {
 
-    private static final DecimalFormat DF_ONE_FRACTION_DIGIT = new DecimalFormat("##.0");
-    private static final DecimalFormat DF_TWO_FRACTION_DIGIT = new DecimalFormat("#.00");
-    // changed with an attached debugger..
-    static int stackSizeDebugOverride = 0;
-    private static final String[] suffixNormal = { "", "K", "M", "B" };
-    private static final String[] suffixDarkened = { "", EnumChatFormatting.GRAY + "K", EnumChatFormatting.GRAY + "M",
-            EnumChatFormatting.GRAY + "B" };
-    private static final int TEXTCOLOR = 255 + (255 << 8) + (255 << 16) + (170 << 24);
-    public static final HashMap<Integer, NamedData<ItemStack[]>> tileMap = new HashMap<>();
+    public static final HashMap<Integer, NamedData<ItemStack[]>> tileInventoryMap = new HashMap<>();
+    public static final HashMap<Integer, List<FluidTankInfo>> tileFluidHandlerMap = new HashMap<>();
     public static final HashMap<Integer, NamedData<ItemStack[]>> entityMap = new HashMap<>();
     public static final HashMap<Integer, NamedData<MerchantRecipeList>> merchantMap = new HashMap<>();
     public static final HashMap<Integer, Long> requestMap = new HashMap<>();
 
-    private final EntityItem customitem = new EntityItem(Minecraft.getMinecraft().theWorld);
     private Coord coord;
     public boolean enabled = true;
 
@@ -78,16 +67,14 @@ public class Renderer {
     private static double renderPosX, renderPosY, renderPosZ;
 
     public static final Renderer INSTANCE = new Renderer();
-    private float timeD, blockScale, maxWith, maxHeight;
-    private int maxColumns, maxRows;
-    private boolean renderText;
+
+    private final GroupRenderer itemGroupRenderer = new GroupRenderer();
+    private final GroupRenderer fluidGroupRenderer = new GroupRenderer();
 
     ItemFilter cachedFilter = null;
     String cachedSearch = "";
 
-    private Renderer() {
-        customitem.hoverStart = 0f;
-    }
+    private Renderer() {}
 
     @SubscribeEvent
     public void renderEvent(RenderWorldLastEvent event) {
@@ -117,29 +104,41 @@ public class Renderer {
             return;
         }
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
+        itemGroupRenderer.reset();
+        fluidGroupRenderer.reset();
+        GroupRenderer.updateTime();
         switch (mc.objectMouseOver.typeOfHit) {
             case BLOCK:
                 // Remove if there is no longer a TE there
                 TileEntity te = mc.theWorld.getTileEntity((int) coord.x, (int) coord.y, (int) coord.z);
-                if (Helper.weWant(te)) {
+                if (Helper.weWant(te) || te instanceof IFluidHandler) {
                     String clazz = te.getClass().getCanonicalName();
                     // Check for local ban
                     if (Config.bannedTiles.contains(clazz)) return;
-                    NamedData<ItemStack[]> data = tileMap.get(coord.hashCode());
-                    if (data != null) {
-                        if (data.clazz == null || data.clazz.equals(clazz)) {
-                            // Render if we know the content
-                            coord.x += 0.5;
-                            coord.y += 0.5;
-                            coord.z += 0.5;
-                            setRenderPos(partialTicks);
-                            renderHologram(data);
-                        } else {
-                            tileMap.remove(coord.hashCode());
+
+                    NamedData<ItemStack[]> invData = tileInventoryMap.get(coord.hashCode());
+                    if (invData != null) {
+                        if (invData.clazz != null && !invData.clazz.equals(clazz)) {
+                            // Render only if we know the content
+                            invData = null;
+                            tileInventoryMap.remove(coord.hashCode());
                         }
                     }
+
+                    List<FluidTankInfo> fluidTankInfos = tileFluidHandlerMap.get(coord.hashCode());
+                    if (fluidTankInfos != null && !(te instanceof IFluidHandler)) {
+                        // Render only if we know the content
+                        fluidTankInfos = null;
+                        tileFluidHandlerMap.remove(coord.hashCode());
+                    }
+
+                    coord.x += 0.5;
+                    coord.y += 0.5;
+                    coord.z += 0.5;
+                    setRenderPos(partialTicks);
+                    renderHologram(invData, fluidTankInfos);
                 } else {
-                    tileMap.remove(coord.hashCode());
+                    tileInventoryMap.remove(coord.hashCode());
                 }
                 break;
             case ENTITY:
@@ -188,31 +187,35 @@ public class Renderer {
         if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
         GL11.glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
 
-        // Values for later
-        timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
-        maxColumns = 3;
-        maxRows = namedData.data.size();
-        blockScale = getBlockScaleModifier(maxColumns) + (float) (0.1f * distance);
-        maxWith = maxColumns * blockScale * 0.7f * 0.4f;
-        maxHeight = maxRows * blockScale * 0.7f * 0.4f;
-        renderText = true;
+        itemGroupRenderer.calculateColumns(3);
+        itemGroupRenderer.setRows(namedData.data.size() - 1);
+        itemGroupRenderer.setScale((float) (0.1f * distance));
+        // merchant cannot sell more than 127 items. no need to increase spacing whatsoever
+        itemGroupRenderer.setSpacing(0.6f);
+        itemGroupRenderer.setRenderText(true);
 
         // Render the BG
-        if (Config.colorEnable) renderBG();
+        if (Config.colorEnable) {
+            GroupRenderer.renderBG(itemGroupRenderer);
+        }
 
         // Render the inv name
-        if (Config.renderName) renderName(namedData.name);
+        if (Config.renderName) {
+            GroupRenderer.renderName(namedData.name, itemGroupRenderer);
+        }
 
-        // merchant cannot sell more than 127 items. no need to increase spacing whatsoever
-        float stackSpacing = 0.6f;
+        List<ItemStack> stacks = new ArrayList<>();
         for (int row = 0; row < namedData.data.size(); row++) {
             MerchantRecipe recipe = (MerchantRecipe) namedData.data.get(row);
-
-            renderItem(recipe.getItemToBuy(), 0, row, recipe.getItemToBuy().stackSize, stackSpacing);
-            if (recipe.hasSecondItemToBuy())
-                renderItem(recipe.getSecondItemToBuy(), 1, row, recipe.getSecondItemToBuy().stackSize, stackSpacing);
-            renderItem(recipe.getItemToSell(), 2, row, recipe.getItemToSell().stackSize, stackSpacing);
+            stacks.add(recipe.getItemToBuy());
+            if (recipe.hasSecondItemToBuy()) {
+                stacks.add(recipe.getSecondItemToBuy());
+            } else {
+                stacks.add(null);
+            }
+            stacks.add(recipe.getItemToSell());
         }
+        itemGroupRenderer.renderItems(stacks);
 
         GL11.glPopMatrix();
     }
@@ -238,9 +241,11 @@ public class Renderer {
     /**
      * Filter items by NEI search string
      *
-     * @param items Array of items in the inventory
+     * @param namedData Data containing array of items in the inventory
      */
-    private List<ItemStack> filterByNEI(ItemStack[] items) {
+    private List<ItemStack> filterByNEI(NamedData<ItemStack[]> namedData) {
+        if (namedData == null || namedData.isInvalid()) return Collections.emptyList();
+        ItemStack[] items = namedData.data;
         try {
             if (Config.hideItemsNotSelected && Loader.isModLoaded("NotEnoughItems")
                     && SearchField.searchInventories()) {
@@ -254,18 +259,22 @@ public class Renderer {
         return Arrays.asList(items);
     }
 
+    private void renderHologram(NamedData<ItemStack[]> namedData) {
+        renderHologram(namedData, null);
+    }
+
     /**
      * Render a regular hologram Does stacking first if user wants it
      *
-     * @param namedData Array of items in the inventory
+     * @param namedData      Array of items in the inventory
+     * @param fluidTankInfos List of fluids in the tile
      */
-    private void renderHologram(NamedData<ItemStack[]> namedData) {
-        if (namedData.data == null || namedData.name == null || namedData.data.length == 0) return;
+    private void renderHologram(@Nullable NamedData<ItemStack[]> namedData,
+            @Nullable List<FluidTankInfo> fluidTankInfos) {
         final double distance = distance();
         if (distance < 1.5) return;
 
-        List<ItemStack> list = filterByNEI(namedData.data);
-        if (list.isEmpty()) return;
+        List<ItemStack> list = filterByNEI(namedData);
 
         int wantedSize = list.size();
 
@@ -302,7 +311,11 @@ public class Renderer {
             list = Collections.singletonList(list.get(i));
         }
 
-        doRenderHologram(namedData.name, list, distance);
+        doRenderHologram(
+                namedData != null ? namedData.name : null,
+                list,
+                fluidTankInfos != null ? fluidTankInfos : Collections.emptyList(),
+                distance);
     }
 
     /**
@@ -311,7 +324,9 @@ public class Renderer {
      * @param itemStacks The itemStacks that will be rendered
      * @param distance   The distance the player is from the hologram, passed to avoid 2th calculation.
      */
-    private void doRenderHologram(String name, List<ItemStack> itemStacks, double distance) {
+    private void doRenderHologram(@Nullable String name, @Nonnull List<ItemStack> itemStacks,
+            @Nonnull List<FluidTankInfo> fluidTankInfos, double distance) {
+        if (itemStacks.isEmpty() && fluidTankInfos.isEmpty()) return;
         // Move to right position and rotate to face the player
         GL11.glPushMatrix();
 
@@ -321,49 +336,93 @@ public class Renderer {
         if (uiScaleFactor < 0.1) uiScaleFactor = 0.1;
         GL11.glScaled(uiScaleFactor, uiScaleFactor, uiScaleFactor);
 
+        preRenderHologramItems(itemStacks, distance);
+        preRenderHologramFluids(fluidTankInfos, distance);
+
+        itemGroupRenderer.setOffset(fluidGroupRenderer.calculateOffset());
+
+        // Render the BG
+        if (Config.colorEnable) {
+            List<GroupRenderer> list = new ArrayList<>();
+            if (!itemStacks.isEmpty()) {
+                list.add(itemGroupRenderer);
+            }
+            if (!fluidTankInfos.isEmpty()) {
+                list.add(fluidGroupRenderer);
+            }
+            GroupRenderer.renderBG(list.toArray(new GroupRenderer[0]));
+        }
+
+        // Render the inv name
+        if (Config.renderName && name != null) {
+            GroupRenderer.renderName(name, itemGroupRenderer, fluidGroupRenderer);
+        }
+
+        renderHologramItems(itemStacks);
+        renderHologramFluids(fluidTankInfos);
+
+        GL11.glPopMatrix();
+    }
+
+    private void preRenderHologramItems(List<ItemStack> itemStacks, double distance) {
+        if (itemStacks.isEmpty()) return;
+
         // See if we need to increase spacing
         float stackSpacing = 0.6f;
         if (Config.renderText) {
             for (ItemStack stack : itemStacks) {
-                if (stack.stackSize >= 1000 || stackSizeDebugOverride >= 1000) {
+                if (stack.stackSize >= 1000 || GroupRenderer.stackSizeDebugOverride >= 1000) {
                     stackSpacing = 0.8f;
                     break;
                 }
             }
         }
 
-        // Values for later
-        timeD = (float) (360.0 * (double) (System.currentTimeMillis() & 0x3FFFL) / (double) 0x3FFFL);
-        maxColumns = getMaxColumns(itemStacks.size());
-        maxRows = (itemStacks.size() % maxColumns == 0) ? (itemStacks.size() / maxColumns) - 1
-                : itemStacks.size() / maxColumns;
-        blockScale = getBlockScaleModifier(maxColumns) + (float) (0.05f * distance);
-        maxWith = maxColumns * blockScale * (stackSpacing + 0.1f) * 0.4f;
-        maxHeight = maxRows * blockScale * (stackSpacing + 0.1f) * 0.4f;
-        renderText = Config.renderText;
+        itemGroupRenderer.calculateColumns(itemStacks.size());
+        itemGroupRenderer.calculateRows(itemStacks.size());
+        itemGroupRenderer.setScale((float) (0.05f * distance));
+        itemGroupRenderer.setSpacing(stackSpacing);
+        itemGroupRenderer.setRenderText(Config.renderText);
+    }
 
-        // Render the BG
-        if (Config.colorEnable) renderBG();
+    private void renderHologramItems(List<ItemStack> itemStacks) {
+        if (itemStacks.isEmpty()) return;
 
-        // Render the inv name
-        if (Config.renderName) renderName(name);
-
-        // Render items
-        int column = 0, row = 0;
+        List<ItemStack> renderStacks = new ArrayList<>();
         for (ItemStack item : itemStacks) {
-            int stackSize = item.stackSize;
             if (!Config.renderMultiple) {
                 item = item.copy();
                 item.stackSize = 1;
             }
-            renderItem(item, column, row, stackSize, stackSpacing);
-            column++;
-            if (column >= maxColumns) {
-                column = 0;
-                row++;
+            renderStacks.add(item);
+        }
+        itemGroupRenderer.renderItems(renderStacks);
+    }
+
+    private void preRenderHologramFluids(List<FluidTankInfo> fluidTankInfos, double distance) {
+        if (fluidTankInfos.isEmpty()) return;
+
+        // See if we need to increase spacing
+        float spacing = 0.6f;
+        if (Config.renderText) {
+            for (FluidTankInfo fluidTankInfo : fluidTankInfos) {
+                if (fluidTankInfo.fluid.amount >= 1000) {
+                    spacing = 0.8f;
+                    break;
+                }
             }
         }
-        GL11.glPopMatrix();
+
+        fluidGroupRenderer.calculateColumns(fluidTankInfos.size());
+        fluidGroupRenderer.calculateRows(fluidTankInfos.size());
+        fluidGroupRenderer.setScale((float) (0.05f * distance));
+        fluidGroupRenderer.setSpacing(spacing);
+        fluidGroupRenderer.setRenderText(Config.renderText);
+    }
+
+    private void renderHologramFluids(List<FluidTankInfo> fluidTankInfos) {
+        if (fluidTankInfos.isEmpty()) return;
+        fluidGroupRenderer.renderFluids(fluidTankInfos);
     }
 
     /**
@@ -376,150 +435,6 @@ public class Renderer {
         GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 0.5F, 0.0F);
         GL11.glRotatef(RenderManager.instance.playerViewX, 0.5F, 0.0F, 0.0F);
         GL11.glTranslated(0, 0, depth);
-    }
-
-    /**
-     * @param columns amount of columns in the hologram
-     * @return the blockScaleModifier
-     */
-    private float getBlockScaleModifier(int columns) {
-        if (columns > 9) return 0.2f - columns * 0.005f;
-        else return 0.2f + (9 - columns) * 0.05f;
-    }
-
-    /**
-     * @param size of the inventory
-     * @return columns of the hologram
-     */
-    private int getMaxColumns(int size) {
-        if (size < 9) return size;
-        else if (size <= 27) return 9;
-        else if (size <= 54) return 11;
-        else if (size <= 90) return 14;
-        else if (size <= 109) return 18;
-        else return 21;
-    }
-
-    /**
-     * Shifts GL & returns the string
-     *
-     * @param stackSize the stackSize.
-     * @return the string to be rendered
-     */
-    private String doStackSizeCrap(int stackSize) {
-        if (stackSizeDebugOverride != 0) stackSize = stackSizeDebugOverride;
-        String string = formatStackSize(stackSize);
-
-        GL11.glTranslatef(-RenderManager.instance.getFontRenderer().getStringWidth(string) / 2.f, 0f, 0f);
-        return string;
-    }
-
-    private static String formatStackSize(long i) {
-        String[] suffixSelected = Config.renderSuffixDarkened ? suffixDarkened : suffixNormal;
-        int level = 0;
-        while (i > 1000 && level < suffixSelected.length - 1) {
-            level++;
-            if (i >= 100_000) {
-                // still more level to go, or 0 fraction digit
-                i /= 1000;
-            } else if (i >= 10_000) {
-                // 1 fraction digit
-                return DF_ONE_FRACTION_DIGIT.format(i / 1000.0d) + suffixSelected[level];
-            } else {
-                // 2 fraction digit
-                return DF_TWO_FRACTION_DIGIT.format(i / 1000.0d) + suffixSelected[level];
-            }
-        }
-        return i + suffixSelected[level];
-    }
-
-    /**
-     * Renders 1 item
-     *
-     * @param itemStack    itemStack to render
-     * @param column       the column the item needs to be rendered at
-     * @param row          the row the item needs to be rendered at
-     * @param stackSize    the stackSize to use for text
-     * @param stackSpacing spacing multiplier
-     */
-    private void renderItem(ItemStack itemStack, int column, int row, int stackSize, float stackSpacing) {
-        RenderHelper.enableStandardItemLighting();
-        GL11.glPushMatrix();
-        GL11.glTranslatef(
-                maxWith - ((column + 0.2f) * blockScale * stackSpacing),
-                maxHeight - ((row + 0.05f) * blockScale * stackSpacing),
-                0f);
-        GL11.glScalef(blockScale, blockScale, blockScale);
-        if (Minecraft.getMinecraft().gameSettings.fancyGraphics)
-            GL11.glRotatef(Config.rotateItems ? timeD : 0f, 0.0F, 1.0F, 0.0F);
-        else GL11.glRotatef(RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-        customitem.setEntityItemStack(itemStack);
-        ClientHandler.RENDER_ITEM.doRender(customitem, 0, 0, 0, 0, 0);
-        if (itemStack.hasEffect(0)) GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glPopMatrix();
-        RenderHelper.disableStandardItemLighting();
-        if (renderText && !(itemStack.getMaxStackSize() == 1 && itemStack.stackSize == 1)) {
-            GL11.glPushMatrix();
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glTranslatef(
-                    maxWith - ((column + 0.2f) * blockScale * stackSpacing),
-                    maxHeight - ((row + 0.05f) * blockScale * stackSpacing),
-                    0f);
-            GL11.glScalef(blockScale, blockScale, blockScale);
-            GL11.glScalef(0.03f, 0.03f, 0.03f);
-            GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
-            GL11.glTranslatef(-1f, 1f, 0f);
-            RenderManager.instance.getFontRenderer().drawString(doStackSizeCrap(stackSize), 0, 0, TEXTCOLOR, true);
-            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glPopMatrix();
-        }
-    }
-
-    private void renderBG() {
-        GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        Tessellator tess = Tessellator.instance;
-        Tessellator.renderingWorldRenderer = false;
-        tess.startDrawing(GL11.GL_QUADS);
-        tess.setColorRGBA(Config.colorR, Config.colorG, Config.colorB, Config.colorAlpha);
-        double d = blockScale / 3;
-        tess.addVertex(maxWith + d, -d - maxHeight, 0);
-        tess.addVertex(-maxWith - d, -d - maxHeight, 0);
-        tess.addVertex(-maxWith - d, d + maxHeight, 0);
-        tess.addVertex(maxWith + d, d + maxHeight, 0);
-        tess.draw();
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glPopMatrix();
-    }
-
-    private void renderName(String name) {
-        FontRenderer fontRenderer = RenderManager.instance.getFontRenderer();
-        if (Config.nameOverrides.containsKey(name)) name = Config.nameOverrides.get(name);
-        else name = StatCollector.translateToLocal(name);
-        GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-
-        GL11.glTranslated(0f, maxHeight + blockScale / 1.25, 0f);
-
-        GL11.glScaled(blockScale, blockScale, blockScale);
-        GL11.glScalef(1.5f, 1.5f, 1.5f);
-        GL11.glScalef(0.03f, 0.03f, 0.03f);
-        GL11.glTranslated(fontRenderer.getStringWidth(name) / 2f, 0f, 0f);
-        GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
-        fontRenderer.drawString(name, 0, 0, TEXTCOLOR, true);
-
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glPopMatrix();
     }
 
     private static void setRenderPos(float partialTicks) {

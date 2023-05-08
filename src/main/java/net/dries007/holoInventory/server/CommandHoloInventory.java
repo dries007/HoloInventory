@@ -146,7 +146,7 @@ public class CommandHoloInventory extends CommandBase {
                 throw new WrongUsageException("You can't use this as the server...");
             }
             HoloInventory.getSnw().sendTo(new ResetMessage(), (EntityPlayerMP) sender);
-            for (InventoryData data : ServerHandler.serverEventHandler.blockMap.values()) {
+            for (InventoryData data : ServerHandler.serverEventHandler.mapBlockToInv.values()) {
                 data.playerSet.remove(sender);
             }
             sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Cleared client cache"));

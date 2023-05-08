@@ -29,4 +29,8 @@ public class NamedData<T> {
         this.clazz = clazz;
         this.data = data;
     }
+
+    public boolean isInvalid() {
+        return data == null || name == null;
+    }
 }

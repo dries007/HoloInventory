@@ -13,6 +13,8 @@
 
 package net.dries007.holoInventory.util;
 
+import java.util.function.Function;
+
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,5 +64,37 @@ public class Helper {
         }
         Vec3 vec31 = vec3.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
         return par2EntityPlayer.worldObj.rayTraceBlocks(vec3, vec31);
+    }
+
+    public static <T> float min(Function<T, Float> function, T[] array) {
+        if (array.length == 0) throw new IllegalArgumentException();
+        float ret = Float.MAX_VALUE;
+        for (T value : array) {
+            float test = function.apply(value);
+            if (test < ret) {
+                ret = test;
+            }
+        }
+        return ret;
+    }
+
+    public static <T> float max(Function<T, Float> function, T[] array) {
+        if (array.length == 0) throw new IllegalArgumentException();
+        float ret = -Float.MAX_VALUE;
+        for (T value : array) {
+            float test = function.apply(value);
+            if (test > ret) {
+                ret = test;
+            }
+        }
+        return ret;
+    }
+
+    public static <T> float sum(Function<T, Float> function, T[] array) {
+        float ret = 0;
+        for (T value : array) {
+            ret += function.apply(value);
+        }
+        return ret;
     }
 }

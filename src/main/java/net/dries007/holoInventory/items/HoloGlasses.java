@@ -17,15 +17,15 @@ import net.minecraftforge.common.util.EnumHelper;
 
 import org.lwjgl.input.Keyboard;
 
-import tconstruct.armor.ArmorProxyClient;
-import tconstruct.armor.player.TPlayerStats;
-import tconstruct.library.accessory.IAccessory;
 import baubles.api.BaubleType;
 import baubles.api.BaublesApi;
 import baubles.api.IBauble;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
 import cpw.mods.fml.common.Optional.Method;
+import tconstruct.armor.ArmorProxyClient;
+import tconstruct.armor.player.TPlayerStats;
+import tconstruct.library.accessory.IAccessory;
 
 @InterfaceList({ @Interface(iface = "baubles.api.IBauble", modid = "Baubles"),
         @Interface(iface = "tconstruct.library.accessory.IAccessory", modid = "TConstruct") })

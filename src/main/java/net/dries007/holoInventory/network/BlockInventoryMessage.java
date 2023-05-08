@@ -1,5 +1,7 @@
 package net.dries007.holoInventory.network;
 
+import static net.dries007.holoInventory.util.NBTKeys.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -16,6 +19,9 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * Server -> Client
+ */
 public class BlockInventoryMessage implements IMessage {
 
     NBTTagCompound data;
@@ -24,6 +30,7 @@ public class BlockInventoryMessage implements IMessage {
         data = inventoryData;
     }
 
+    @SuppressWarnings("unused")
     public BlockInventoryMessage() {}
 
     @Override
@@ -42,17 +49,19 @@ public class BlockInventoryMessage implements IMessage {
         public IMessage onMessage(BlockInventoryMessage message, MessageContext ctx) {
             if (message == null || message.data == null) return null; // hun?
             if (ctx.side.isClient()) {
-                NBTTagList list = message.data.getTagList("list", 10);
+                NBTTagList list = message.data.getTagList(NBT_KEY_LIST, Constants.NBT.TAG_COMPOUND);
                 ItemStack[] itemStacks = new ItemStack[list.tagCount()];
                 for (int i = 0; i < list.tagCount(); i++) {
                     NBTTagCompound tag = list.getCompoundTagAt(i);
                     itemStacks[i] = ItemStack.loadItemStackFromNBT(tag);
-                    if (itemStacks[i] != null) itemStacks[i].stackSize = tag.getInteger("Count");
+                    if (itemStacks[i] != null) itemStacks[i].stackSize = tag.getInteger(NBT_KEY_COUNT);
                 }
                 NamedData<ItemStack[]> data;
-                if (message.data.hasKey("class"))
-                    data = new NamedData<>(message.data.getString("name"), message.data.getString("class"), itemStacks);
-                else data = new NamedData<>(message.data.getString("name"), itemStacks);
+                if (message.data.hasKey(NBT_KEY_CLASS)) data = new NamedData<>(
+                        message.data.getString(NBT_KEY_NAME),
+                        message.data.getString(NBT_KEY_CLASS),
+                        itemStacks);
+                else data = new NamedData<>(message.data.getString(NBT_KEY_NAME), itemStacks);
                 if (Config.enableStacking) {
                     List<ItemStack> stacks = new ArrayList<>();
                     for (ItemStack stackToAdd : data.data) {
@@ -78,7 +87,7 @@ public class BlockInventoryMessage implements IMessage {
                     }
                     data.data = stacks.toArray(new ItemStack[0]);
                 }
-                Renderer.tileMap.put(message.data.getInteger("id"), data);
+                Renderer.tileInventoryMap.put(message.data.getInteger(NBT_KEY_ID), data);
             }
 
             return null;

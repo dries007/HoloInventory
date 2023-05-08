@@ -13,7 +13,8 @@
 
 package net.dries007.holoInventory;
 
-import net.dries007.holoInventory.compat.DecoderRegistry;
+import net.dries007.holoInventory.compat.InventoryDecoderRegistry;
+import net.dries007.holoInventory.items.FluidRenderFakeItem;
 import net.dries007.holoInventory.items.HoloGlasses;
 import net.dries007.holoInventory.network.*;
 import net.dries007.holoInventory.server.CommandHoloInventory;
@@ -49,6 +50,7 @@ public class HoloInventory {
     private static HoloInventory instance;
 
     public static Item holoGlasses;
+    public static FluidRenderFakeItem fluidRenderFakeItem;
     private Config config;
 
     @Mod.Metadata
@@ -75,6 +77,8 @@ public class HoloInventory {
 
         holoGlasses = new HoloGlasses("Hologlasses");
         GameRegistry.registerItem(holoGlasses, "Hologlasses", MODID);
+        fluidRenderFakeItem = new FluidRenderFakeItem("fluidRenderFakeItem");
+        GameRegistry.registerItem(fluidRenderFakeItem, "fluidRenderFakeItem", MODID);
 
         int id = 0;
         snw = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
@@ -86,10 +90,11 @@ public class HoloInventory {
         snw.registerMessage(RemoveInventoryMessage.Handler.class, RemoveInventoryMessage.class, id++, Side.CLIENT);
         snw.registerMessage(RenameMessage.Handler.class, RenameMessage.class, id++, Side.CLIENT);
         snw.registerMessage(ResetMessage.Handler.class, ResetMessage.class, id++, Side.CLIENT);
+        snw.registerMessage(BlockFluidHandlerMessage.Handler.class, BlockFluidHandlerMessage.class, id++, Side.CLIENT);
 
         proxy.preInit();
 
-        DecoderRegistry.init();
+        InventoryDecoderRegistry.init();
     }
 
     @Mod.EventHandler()

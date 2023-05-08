@@ -13,11 +13,13 @@
 
 package net.dries007.holoInventory.util;
 
+import static net.dries007.holoInventory.util.NBTKeys.*;
+
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import net.dries007.holoInventory.HoloInventory;
-import net.dries007.holoInventory.compat.DecoderRegistry;
+import net.dries007.holoInventory.compat.InventoryDecoderRegistry;
 import net.dries007.holoInventory.network.BlockInventoryMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -48,9 +50,9 @@ public class InventoryData {
             return;
         }
         NBTTagCompound data = new NBTTagCompound();
-        data.setInteger("id", this.id);
-        data.setString("name", name);
-        data.setTag("list", DecoderRegistry.toNBT(ste));
+        data.setInteger(NBT_KEY_ID, this.id);
+        data.setString(NBT_KEY_NAME, name);
+        data.setTag(NBT_KEY_LIST, InventoryDecoderRegistry.toNBT(ste));
 
         if (!playerSet.containsKey(player) || !playerSet.get(player).equals(data)) {
             playerSet.put(player, data);

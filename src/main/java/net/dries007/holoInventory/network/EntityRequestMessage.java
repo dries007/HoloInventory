@@ -1,12 +1,14 @@
 package net.dries007.holoInventory.network;
 
+import static net.dries007.holoInventory.util.NBTKeys.*;
+
 import net.dries007.holoInventory.Config;
+import net.dries007.holoInventory.compat.InventoryDecoderRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.DimensionManager;
 
 import com.google.common.base.Strings;
@@ -17,11 +19,15 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * Client -> Server
+ */
 public class EntityRequestMessage implements IMessage {
 
     private int dim;
     private int entityId;
 
+    @SuppressWarnings("unused")
     public EntityRequestMessage() {}
 
     public EntityRequestMessage(int dim, int entityId) {
@@ -57,8 +63,8 @@ public class EntityRequestMessage implements IMessage {
                         if (map.containsEntry(message.entityId, player.getDisplayName())) {
                             map.remove(message.entityId, player.getDisplayName());
                             NBTTagCompound root = new NBTTagCompound();
-                            root.setByte("type", (byte) 1);
-                            root.setInteger("id", message.entityId);
+                            root.setByte(NBT_KEY_TYPE, (byte) 1);
+                            root.setInteger(NBT_KEY_ID, message.entityId);
 
                             return new RemoveInventoryMessage(root);
                         }
@@ -70,22 +76,16 @@ public class EntityRequestMessage implements IMessage {
                     if (entity instanceof IInventory) {
                         IInventory inventory = (IInventory) entity;
                         NBTTagCompound root = new NBTTagCompound();
-                        root.setInteger("id", message.entityId);
-                        root.setString("name", Strings.nullToEmpty(inventory.getInventoryName()));
-                        root.setString("class", entity.getClass().getCanonicalName());
-                        NBTTagList list = new NBTTagList();
-                        for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                            if (inventory.getStackInSlot(i) != null) {
-                                list.appendTag(inventory.getStackInSlot(i).writeToNBT(new NBTTagCompound()));
-                            }
-                        }
-                        root.setTag("list", list);
+                        root.setInteger(NBT_KEY_ID, message.entityId);
+                        root.setString(NBT_KEY_NAME, Strings.nullToEmpty(inventory.getInventoryName()));
+                        root.setString(NBT_KEY_CLASS, entity.getClass().getCanonicalName());
+                        root.setTag(NBT_KEY_LIST, InventoryDecoderRegistry.toNBT(inventory));
                         return new EntityInventoryMessage(root);
                     } else {
                         NBTTagCompound tag = ((IMerchant) entity).getRecipes(player).getRecipiesAsTags();
-                        tag.setInteger("id", message.entityId);
-                        tag.setString("name", entity.getCommandSenderName());
-                        tag.setString("class", entity.getClass().getCanonicalName());
+                        tag.setInteger(NBT_KEY_ID, message.entityId);
+                        tag.setString(NBT_KEY_NAME, entity.getCommandSenderName());
+                        tag.setString(NBT_KEY_CLASS, entity.getClass().getCanonicalName());
                         return new MerchantInventoryMessage(tag);
                     }
                 }

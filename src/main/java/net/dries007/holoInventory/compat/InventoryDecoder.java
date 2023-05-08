@@ -8,11 +8,15 @@ import net.minecraft.nbt.NBTTagList;
  */
 public abstract class InventoryDecoder {
 
-    public final Class<?> targetClass;
+    private final Class<?> targetClass;
 
     public InventoryDecoder(Class<?> targetClass) {
         this.targetClass = targetClass;
     }
 
-    public abstract NBTTagList toNBT(IInventory te);
+    public boolean matches(IInventory inv) {
+        return targetClass.isAssignableFrom(inv.getClass());
+    }
+
+    public abstract NBTTagList toNBT(IInventory inv);
 }
