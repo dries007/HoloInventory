@@ -44,6 +44,8 @@ public class FluidHandlerData {
     private NBTTagList encodeFluidTankInfo(IFluidHandler fluidHandler) {
         NBTTagList tagList = new NBTTagList();
         FluidTankInfo[] tankInfos = fluidHandler.getTankInfo(ForgeDirection.UNKNOWN);
+        if (tankInfos == null) return tagList;
+
         for (FluidTankInfo tankInfo : tankInfos) {
             NBTTagCompound fluidTag = new NBTTagCompound();
             if (tankInfo.fluid != null) {
