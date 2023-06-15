@@ -65,6 +65,10 @@ public class BlockInventoryMessage implements IMessage {
                 if (Config.enableStacking) {
                     List<ItemStack> stacks = new ArrayList<>();
                     for (ItemStack stackToAdd : data.data) {
+                        if (stackToAdd.stackSize == 0) {
+                            stacks.add(stackToAdd);
+                            continue;
+                        }
                         int remainingAmount = stackToAdd.stackSize;
                         for (ItemStack stackInList : stacks) {
                             if (stackInList == null) continue;
