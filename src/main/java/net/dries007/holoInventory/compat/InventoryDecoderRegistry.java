@@ -15,6 +15,7 @@ import net.minecraft.nbt.NBTTagList;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
 import cpw.mods.fml.common.Loader;
+import mcp.mobius.betterbarrels.common.blocks.TileEntityBarrel;
 
 /**
  * @author Dries007
@@ -57,6 +58,23 @@ public class InventoryDecoderRegistry {
                             tag.setInteger(NBT_KEY_COUNT, stack.stackSize);
                             list.appendTag(tag);
                         }
+                    }
+                    return list;
+                }
+            });
+        }
+        if (Loader.isModLoaded("JABBA")) {
+            REGISTERED_INVENTORY_DECODERS.add(new InventoryDecoder(TileEntityBarrel.class) {
+
+                @Override
+                public NBTTagList toNBT(IInventory inv) {
+                    NBTTagList list = new NBTTagList();
+                    ItemStack stack = inv.getStackInSlot(1);
+                    if (stack != null) {
+                        NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
+                        int item_amount = ((TileEntityBarrel) inv).getStorage().getAmount();
+                        tag.setInteger(NBT_KEY_COUNT, item_amount);
+                        list.appendTag(tag);
                     }
                     return list;
                 }
