@@ -15,6 +15,9 @@ import net.minecraft.nbt.NBTTagList;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
 import cpw.mods.fml.common.Loader;
+import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
+import gregtech.api.metatileentity.BaseMetaTileEntity;
+import gregtech.common.tileentities.storage.GT_MetaTileEntity_QuantumChest;
 import mcp.mobius.betterbarrels.common.blocks.TileEntityBarrel;
 
 /**
@@ -75,6 +78,35 @@ public class InventoryDecoderRegistry {
                         int item_amount = ((TileEntityBarrel) inv).getStorage().getAmount();
                         tag.setInteger(NBT_KEY_COUNT, item_amount);
                         list.appendTag(tag);
+                    }
+                    return list;
+                }
+            });
+        }
+        if (Loader.isModLoaded("gregtech")) {
+
+            REGISTERED_INVENTORY_DECODERS.add(new InventoryDecoder(BaseMetaTileEntity.class) {
+
+                @Override
+                public NBTTagList toNBT(IInventory inv) {
+                    IMetaTileEntity metaTileEntity = ((BaseMetaTileEntity) inv).getMetaTileEntity();
+                    if (!(metaTileEntity instanceof GT_MetaTileEntity_QuantumChest)) {
+                        return DEFAULT.toNBT(inv);
+                    }
+                    NBTTagList list = new NBTTagList();
+                    for (int i = 0; i < 3; i++) {
+                        ItemStack stack = inv.getStackInSlot(i);
+                        if (stack != null) {
+                            NBTTagCompound tag = stack.writeToNBT(new NBTTagCompound());
+                            tag.setInteger(NBT_KEY_COUNT, stack.stackSize);
+                            if (i == 2) {
+                                int item_amount = ((GT_MetaTileEntity_QuantumChest) metaTileEntity).mItemCount;
+                                if (item_amount > 0) {
+                                    tag.setInteger(NBT_KEY_COUNT, item_amount);
+                                }
+                            }
+                            list.appendTag(tag);
+                        }
                     }
                     return list;
                 }
