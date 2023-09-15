@@ -215,11 +215,11 @@ public class ServerEventHandler {
                     (TileEntityChest) world.getTileEntity(x + 1, y, z));
 
             processInventoryData(coord.hashCode(), player, inventory);
-        } else if (te instanceof TileInterface) {
+        } else if (HoloInventory.isAE2Loaded && te instanceof TileInterface) {
             final IInventory patterns = ((TileInterface) te).getInventoryByName("patterns");
             final IInventory wrapped = getCachedPatternsWrapper(world, ((TileInterface) te).getCustomName(), patterns);
             processInventoryData(coord.hashCode(), player, wrapped);
-        } else if (te instanceof IPartHost) {
+        } else if (HoloInventory.isAE2Loaded && te instanceof IPartHost) {
             final Vec3 position = mo.hitVec.addVector(-mo.blockX, -mo.blockY, -mo.blockZ);
             final IPartHost host = (IPartHost) te;
             final SelectedPart sp = host.selectPart(position);

@@ -64,13 +64,14 @@ public class HoloInventory {
     private SimpleNetworkWrapper snw;
     private Logger logger;
 
-    public static boolean isBaublesLoaded, isTinkersLoaded = false;
+    public static boolean isBaublesLoaded, isTinkersLoaded, isAE2Loaded = false;
 
     @Mod.EventHandler()
     public void preInit(FMLPreInitializationEvent event) {
 
         isBaublesLoaded = Loader.isModLoaded("Baubles");
         isTinkersLoaded = Loader.isModLoaded("TConstruct");
+        isAE2Loaded = Loader.isModLoaded("appliedenergistics2");
 
         logger = event.getModLog();
         config = new Config(event.getSuggestedConfigurationFile());

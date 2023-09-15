@@ -15,6 +15,7 @@ package net.dries007.holoInventory.util;
 
 import java.util.function.Function;
 
+import net.dries007.holoInventory.HoloInventory;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,7 +34,7 @@ public class Helper {
         return o instanceof IInventory || o instanceof IMerchant
                 || o instanceof TileEntityEnderChest
                 || o instanceof BlockJukebox.TileEntityJukebox
-                || o instanceof IPartHost;
+                || (HoloInventory.isAE2Loaded && o instanceof IPartHost);
     }
 
     public static MovingObjectPosition getPlayerLookingSpot(EntityPlayer par2EntityPlayer) {
