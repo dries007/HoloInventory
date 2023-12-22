@@ -13,6 +13,8 @@
 
 package net.dries007.holoInventory.client;
 
+import java.lang.reflect.Field;
+import java.nio.FloatBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
@@ -38,12 +41,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.lwjgl.opengl.GL11;
 
+import codechicken.lib.asm.ObfMapping;
 import codechicken.nei.ItemList;
 import codechicken.nei.NEIClientConfig;
 import codechicken.nei.SearchField;
@@ -73,12 +78,36 @@ public class Renderer {
 
     ItemFilter cachedFilter = null;
     String cachedSearch = "";
+    private Field projectionField;
+    private Field modelviewField;
 
-    private Renderer() {}
+    private Renderer() {
+        // Because we're using RenderGameOverlayEvent instead of RenderWorldLastEvent, we need to apply the world's
+        // projection and modelview matrices ourselves. Getting access to them is easier said than done. They are stored
+        // in ActiveRenderInfo, and they're private with no methods to access them. We must use reflection.
+        try {
+            if (ObfMapping.obfuscated) {
+                // noinspection JavaReflectionMemberAccess
+                projectionField = ActiveRenderInfo.class.getDeclaredField("field_74595_k");
+                // noinspection JavaReflectionMemberAccess
+                modelviewField = ActiveRenderInfo.class.getDeclaredField("field_74594_j");
+            } else {
+                projectionField = ActiveRenderInfo.class.getDeclaredField("projection");
+                modelviewField = ActiveRenderInfo.class.getDeclaredField("modelview");
+            }
 
+            projectionField.setAccessible(true);
+            modelviewField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            HoloInventory.getLogger().error("Could not find matrices.");
+        }
+
+    }
+
+    // change to RenderGameOverlayEvent so shaders don't effect the render.
     @SubscribeEvent
-    public void renderEvent(RenderWorldLastEvent event) {
-        if (!enabled) {
+    public void renderEvent(RenderGameOverlayEvent event) {
+        if (!enabled || event.type != ElementType.HELMET) {
             return;
         }
         final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
@@ -327,9 +356,29 @@ public class Renderer {
     private void doRenderHologram(@Nullable String name, @Nonnull List<ItemStack> itemStacks,
             @Nonnull List<FluidTankInfo> fluidTankInfos, double distance) {
         if (itemStacks.isEmpty() && fluidTankInfos.isEmpty()) return;
-        // Move to right position and rotate to face the player
+
+        // not sure why blending is happening, but there it is.
+        GL11.glDisable(GL11.GL_BLEND);
+
+        GL11.glPushMatrix();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPushMatrix();
 
+        try {
+            GL11.glMatrixMode(GL11.GL_PROJECTION);
+            GL11.glLoadMatrix((FloatBuffer) projectionField.get(null));
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+            GL11.glLoadMatrix((FloatBuffer) modelviewField.get(null));
+        } catch (IllegalAccessException | NullPointerException e) {
+            GL11.glMatrixMode(GL11.GL_PROJECTION);
+            GL11.glPopMatrix();
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+            GL11.glPopMatrix();
+            GL11.glEnable(GL11.GL_BLEND);
+            return;
+        }
+
+        // Move to right position and rotate to face the player
         moveAndRotate(-1);
 
         double uiScaleFactor = Config.renderScaling;
@@ -361,7 +410,13 @@ public class Renderer {
         renderHologramItems(itemStacks);
         renderHologramFluids(fluidTankInfos);
 
+        // Undo our changes to the matrices, though the warped UI was hilarious.
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+
+        GL11.glEnable(GL11.GL_BLEND);
     }
 
     private void preRenderHologramItems(List<ItemStack> itemStacks, double distance) {
