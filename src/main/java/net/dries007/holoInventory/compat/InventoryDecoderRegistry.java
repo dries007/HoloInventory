@@ -1,6 +1,6 @@
 package net.dries007.holoInventory.compat;
 
-import static net.dries007.holoInventory.util.NBTKeys.*;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_COUNT;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -13,16 +13,25 @@
 
 package net.dries007.holoInventory.server;
 
-import static net.dries007.holoInventory.util.NBTKeys.*;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_ID;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_TYPE;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import net.dries007.holoInventory.Config;
 import net.dries007.holoInventory.HoloInventory;
 import net.dries007.holoInventory.network.RemoveInventoryMessage;
 import net.dries007.holoInventory.network.RenameMessage;
-import net.dries007.holoInventory.util.*;
+import net.dries007.holoInventory.util.Coord;
+import net.dries007.holoInventory.util.FakeInventory;
+import net.dries007.holoInventory.util.FluidHandlerData;
+import net.dries007.holoInventory.util.Helper;
+import net.dries007.holoInventory.util.InventoryData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.entity.player.EntityPlayerMP;

@@ -1,6 +1,10 @@
 package net.dries007.holoInventory.network;
 
-import static net.dries007.holoInventory.util.NBTKeys.*;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_CLASS;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_COUNT;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_ID;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_LIST;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_NAME;
 
 import java.util.ArrayList;
 import java.util.List;

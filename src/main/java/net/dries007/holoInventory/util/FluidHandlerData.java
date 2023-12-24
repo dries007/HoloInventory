@@ -1,6 +1,8 @@
 package net.dries007.holoInventory.util;
 
-import static net.dries007.holoInventory.util.NBTKeys.*;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_CAPACITY;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_ID;
+import static net.dries007.holoInventory.util.NBTKeys.NBT_KEY_TANK;
 
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
