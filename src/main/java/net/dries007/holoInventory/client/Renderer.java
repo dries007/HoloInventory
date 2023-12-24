@@ -393,16 +393,7 @@ public class Renderer {
 
     private void renderHologramItems(List<ItemStack> itemStacks) {
         if (itemStacks.isEmpty()) return;
-
-        List<ItemStack> renderStacks = new ArrayList<>();
-        for (ItemStack item : itemStacks) {
-            if (!Config.renderMultiple) {
-                item = item.copy();
-                item.stackSize = 1;
-            }
-            renderStacks.add(item);
-        }
-        itemGroupRenderer.renderItems(renderStacks);
+        itemGroupRenderer.renderItems(itemStacks);
     }
 
     private void preRenderHologramFluids(List<FluidTankInfo> fluidTankInfos, double distance) {

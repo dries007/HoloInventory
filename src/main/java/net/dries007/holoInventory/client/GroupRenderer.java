@@ -125,7 +125,11 @@ public class GroupRenderer {
      */
     private void renderItem(ItemStack itemStack, int column, int row) {
         if (itemStack == null) return;
-        fakeEntityItem.setEntityItemStack(itemStack);
+        ItemStack renderStack = itemStack.copy();
+        if (!Config.renderMultiple) {
+            renderStack.stackSize = 1;
+        }
+        fakeEntityItem.setEntityItemStack(renderStack);
         if (itemStack.hasEffect(0)) {
             GL11.glDisable(GL11.GL_LIGHTING);
         }
