@@ -34,6 +34,7 @@ import net.dries007.holoInventory.util.Coord;
 import net.dries007.holoInventory.util.Helper;
 import net.dries007.holoInventory.util.NamedData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
@@ -44,6 +45,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -54,6 +57,7 @@ import codechicken.nei.ItemList;
 import codechicken.nei.NEIClientConfig;
 import codechicken.nei.SearchField;
 import codechicken.nei.api.ItemFilter;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -79,12 +83,17 @@ public class Renderer {
 
     ItemFilter cachedFilter = null;
     String cachedSearch = "";
-
-    private Renderer() {}
+    private boolean fancyGraphics;
 
     @SubscribeEvent
-    public void renderEvent(RenderWorldLastEvent event) {
-        if (!enabled) {
+    public void optifineIsAnnoying(RenderWorldLastEvent event) {
+        fancyGraphics = Minecraft.getMinecraft().gameSettings.fancyGraphics;
+    }
+
+    // change to RenderGameOverlayEvent so shaders don't effect the render.
+    @SubscribeEvent
+    public void renderEvent(RenderGameOverlayEvent event) {
+        if (!enabled || event.type != ElementType.HELMET) {
             return;
         }
         final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
@@ -109,6 +118,11 @@ public class Renderer {
                 || mc.objectMouseOver == null) {
             return;
         }
+
+        if (FMLClientHandler.instance().hasOptifine()) {
+            Minecraft.getMinecraft().gameSettings.fancyGraphics = fancyGraphics;
+        }
+
         coord = new Coord(mc.theWorld.provider.dimensionId, mc.objectMouseOver);
         itemGroupRenderer.reset();
         fluidGroupRenderer.reset();
@@ -172,6 +186,10 @@ public class Renderer {
                     if (entity instanceof IMerchant && merchantMap.containsKey(id)) renderMerchant(merchantMap.get(id));
                 }
                 break;
+        }
+
+        if (FMLClientHandler.instance().hasOptifine()) {
+            Minecraft.getMinecraft().gameSettings.fancyGraphics = false;
         }
     }
 
@@ -333,9 +351,20 @@ public class Renderer {
     private void doRenderHologram(@Nullable String name, @Nonnull List<ItemStack> itemStacks,
             @Nonnull List<FluidTankInfo> fluidTankInfos, double distance) {
         if (itemStacks.isEmpty() && fluidTankInfos.isEmpty()) return;
-        // Move to right position and rotate to face the player
+
+        // not sure why blending is happening, but there it is.
+        GL11.glDisable(GL11.GL_BLEND);
+
+        GL11.glPushMatrix();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPushMatrix();
 
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadMatrix(ActiveRenderInfo.projection);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadMatrix(ActiveRenderInfo.modelview);
+
+        // Move to right position and rotate to face the player
         moveAndRotate(-1);
 
         double uiScaleFactor = Config.renderScaling;
@@ -367,7 +396,13 @@ public class Renderer {
         renderHologramItems(itemStacks);
         renderHologramFluids(fluidTankInfos);
 
+        // Undo our changes to the matrices, though the warped UI was hilarious.
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glPopMatrix();
+
+        GL11.glEnable(GL11.GL_BLEND);
     }
 
     private void preRenderHologramItems(List<ItemStack> itemStacks, double distance) {
