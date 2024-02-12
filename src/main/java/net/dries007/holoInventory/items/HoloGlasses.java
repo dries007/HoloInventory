@@ -47,9 +47,8 @@ public class HoloGlasses extends ItemArmor implements IHoloGlasses, IBauble, IAc
         return "holoinventory:textures/models/armor/glasses.png";
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean par4) {
         list.add("You can put it in the Tinkers mask slot");
         list.add("<Hold Shift>");
         if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {

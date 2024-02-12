@@ -38,5 +38,5 @@ public class FluidRenderFakeItem extends Item {
     }
 
     @Override
-    public void getSubItems(Item p_150895_1_, CreativeTabs p_150895_2_, List p_150895_3_) {}
+    public void getSubItems(Item p_150895_1_, CreativeTabs p_150895_2_, List<ItemStack> p_150895_3_) {}
 }

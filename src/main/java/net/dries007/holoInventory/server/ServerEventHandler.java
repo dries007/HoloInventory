@@ -183,6 +183,8 @@ public class ServerEventHandler {
                         processInventoryData(mo.entityHit.getEntityId(), player, (IInventory) mo.entityHit);
                     }
                     break;
+                default:
+                    break;
             }
         } catch (Exception e) {
             HoloInventory.getLogger().warn("Some error while sending over inventory, no hologram for you :(");

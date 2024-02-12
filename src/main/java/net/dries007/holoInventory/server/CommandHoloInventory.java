@@ -53,7 +53,7 @@ public class CommandHoloInventory extends CommandBase {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         switch (args.length) {
             default:
                 return null;

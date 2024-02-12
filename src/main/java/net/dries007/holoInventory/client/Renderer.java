@@ -186,6 +186,8 @@ public class Renderer {
                     if (entity instanceof IMerchant && merchantMap.containsKey(id)) renderMerchant(merchantMap.get(id));
                 }
                 break;
+            default:
+                break;
         }
 
         if (FMLClientHandler.instance().hasOptifine()) {

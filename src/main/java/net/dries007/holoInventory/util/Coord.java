@@ -37,6 +37,8 @@ public class Coord {
                 this.y = mop.entityHit.posY;
                 this.z = mop.entityHit.posZ;
                 break;
+            default:
+                break;
         }
     }
 
